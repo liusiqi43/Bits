@@ -4,6 +4,14 @@ android {
     compileSdkVersion 19
     buildToolsVersion '19.0.3'
 
+    sourceSets {
+        main {
+            java {
+                srcDir 'src-gen'
+            }
+        }
+    }
+
     defaultConfig {
         minSdkVersion 8
         targetSdkVersion 19
@@ -16,6 +24,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
+
 }
 
 dependencies {
