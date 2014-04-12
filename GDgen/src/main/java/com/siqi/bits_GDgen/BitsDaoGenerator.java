@@ -9,7 +9,7 @@ import de.greenrobot.daogenerator.ToMany;
 public class BitsDaoGenerator {
 
     public static void main(String args[]) throws Exception {
-        Schema schema = new Schema(1, "com.siqi.bits");
+        Schema schema = new Schema(3, "com.siqi.bits");
 
         /**
          * Task
@@ -19,6 +19,7 @@ public class BitsDaoGenerator {
         task.addStringProperty("description").notNull().unique();
         task.addDateProperty("createdOn").notNull();
         task.addDateProperty("modifiedOn").notNull();
+        task.addDateProperty("deletedOn");
         // if 6 times a day, that's once every 2 hours, interval stores 2 hours in ms
         task.addLongProperty("interval").notNull().getProperty();
         // currentTime when just created
@@ -35,7 +36,10 @@ public class BitsDaoGenerator {
         Entity category = schema.addEntity("Category");
         category.addIdProperty();
         category.addStringProperty("name");
-        category.addStringProperty("iconUrl");
+        category.addStringProperty("iconDrawableName");
+        category.addDateProperty("createdOn").notNull();
+        category.addDateProperty("modifiedOn").notNull();
+        category.addDateProperty("deletedOn");
 
 
         /**

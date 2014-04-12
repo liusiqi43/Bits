@@ -1,0 +1,23 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.siqi.bits.app.MainActivity$PlaceholderFragment">
+
+    <com.fortysevendeg.swipelistview.SwipeListView
+        xmlns:swipe="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/bitslist"
+        android:listSelector="#ffffffff"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        swipe:swipeFrontView="@+id/front"
+        swipe:swipeBackView="@+id/back"
+        swipe:swipeActionLeft="choice"
+        swipe:swipeActionRight="choice"
+        swipe:swipeMode="both"
+        swipe:swipeOpenOnLongPress="false"
+        swipe:swipeOffsetLeft="30dp"
+        swipe:swipeOffsetRight="30dp"
+        />
+
+</RelativeLayout>

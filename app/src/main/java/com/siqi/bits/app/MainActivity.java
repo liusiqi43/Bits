@@ -1,21 +1,21 @@
 package com.siqi.bits.app;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Toast;
+
+import com.siqi.bits.app.ui.BitsListFragment;
+import com.siqi.bits.app.ui.NewBitFragment;
 
 public class MainActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks,
+        NewBitFragment.OnNewBitInteractionListener, BitsListFragment.OnBitListInteractionListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -46,21 +46,47 @@ public class MainActivity extends ActionBarActivity
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                .commit();
+
+        // TODO: remove this when other sections implemented
+        if (position != 0){
+            return;
+        }
+
+        switch (position) {
+            case 0:
+                fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, BitsListFragment.newInstance())
+                        .commit();
+        }
     }
 
+    // set main activity title correctly
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
-                mTitle = getString(R.string.title_section1);
+                mTitle = getString(R.string.bits);
                 break;
             case 2:
-                mTitle = getString(R.string.title_section2);
+                mTitle = getString(R.string.statistics);
                 break;
             case 3:
-                mTitle = getString(R.string.title_section3);
+                mTitle = getString(R.string.settings);
+                break;
+            case 4:
+                mTitle = getString(R.string.rewards);
+                break;
+            case 5:
+                mTitle = getString(R.string.feedback);
+                break;
+            case 6:
+                mTitle = getString(R.string.help);
+                break;
+            case 7:
+                mTitle = getString(R.string.share_fb);
+                break;
+            case 8:
+                mTitle = getString(R.string.share_email);
                 break;
         }
     }
@@ -93,51 +119,30 @@ public class MainActivity extends ActionBarActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            Toast.makeText(this, "Start setting intent.", Toast.LENGTH_SHORT).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((MainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
+    @Override
+    public void onNewDisposeInteraction() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.popBackStack();
     }
 
+    @Override
+    public void startEditBitFragment(Long id) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        NewBitFragment editFragment = NewBitFragment.newInstance(id);
+
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        transaction.setCustomAnimations(R.anim.abc_slide_in_top, 0, 0, R.anim.abc_slide_out_top);
+        transaction.replace(R.id.container, editFragment);
+        transaction.addToBackStack(null);
+
+        transaction.commit();
+    }
 }
