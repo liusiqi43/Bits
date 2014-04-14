@@ -4,9 +4,13 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 
 import com.siqi.bits.Category;
 import com.siqi.bits.Task;
@@ -29,14 +33,17 @@ public class NewBitFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String BIT_ID = "bit_id";
+    public static final int FRAGMENT_ID = 9;
 
     // TODO: Rename and change types of parameters
     private long mBitID;
     private Task mTask;
 
-    private Button mCancelBtn;
-    private Button mSaveBtn;
-
+    private EditText mBitTitle;
+    // n times
+    private RadioGroup mFrequency;
+    // per week
+    private RadioGroup mInterval;
 
     private OnNewBitInteractionListener mListener;
 
@@ -75,30 +82,49 @@ public class NewBitFragment extends Fragment {
         } else {
             Category c = cm.getDefaultCategory();
             mTask = tm.newTask(c);
-            mTask.setDescription("What's on your mind");
             mTask.setInterval(24 * 3600 * 1000);
             mTask.setLastDone(System.currentTimeMillis());
             mTask.setNextScheduledTime(mTask.getLastDone() + mTask.getInterval());
         }
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_new_bit, container, false);
+        setHasOptionsMenu(true);
 
-
-        mCancelBtn = (Button) v.findViewById(R.id.cancel_button);
-
-        mCancelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mListener.onNewDisposeInteraction();
-            }
-        });
+        mBitTitle = (EditText) v.findViewById(R.id.bit_title_edittext);
+        mFrequency = (RadioGroup) v.findViewById(R.id.frequency_radio_group);
+        mInterval = (RadioGroup) v.findViewById(R.id.interval_radio_group);
 
         // Inflate the layout for this fragment
         return v;
+    }
+
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        this.getActivity().getMenuInflater().inflate(R.menu.newbits, menu);
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.action_cancel) {
+            this.mListener.onNewDisposeInteraction();
+            return true;
+        } else if (item.getItemId() == R.id.action_save) {
+            /**
+             * Save the model here
+             */
+            this.mListener.onNewDisposeInteraction();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

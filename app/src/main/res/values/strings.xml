@@ -15,5 +15,17 @@
     <string name="action_new">New</string>
     <string name="action_settings">Settings</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="actionbar_cancel">Cancel</string>
+    <string name="actionbar_save">Save</string>
 
+
+    <string name="radio_day">day</string>
+    <string name="radio_week">week</string>
+    <string name="radio_month">month</string>
+    <string name="radio_year">year</string>
+    <string name="I_want_to_do_this">I want to do this</string>
+    <string name="times_a">times a</string>
+    <string name="put_in_category">put the bit in appropriate category</string>
+    <string name="create_new_bit">Create New Bit</string>
+    <string name="whats_on_your_mind">What\'s on your mind? </string>
 </resources>

@@ -27,6 +27,8 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
 
+    private int mCurrentSectionID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,13 +60,17 @@ public class MainActivity extends ActionBarActivity
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, BitsListFragment.newInstance())
                         .commit();
+                onSectionAttached(BitsListFragment.FRAGMENT_ID);
         }
     }
 
     // set main activity title correctly
     public void onSectionAttached(int number) {
+
+        mCurrentSectionID = number;
+
         switch (number) {
-            case 1:
+            case BitsListFragment.FRAGMENT_ID:
                 mTitle = getString(R.string.bits);
                 break;
             case 2:
@@ -88,6 +94,9 @@ public class MainActivity extends ActionBarActivity
             case 8:
                 mTitle = getString(R.string.share_email);
                 break;
+            case NewBitFragment.FRAGMENT_ID:
+                mTitle = getString(R.string.create_new_bit);
+                break;
         }
     }
 
@@ -101,7 +110,8 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+        if (!mNavigationDrawerFragment.isDrawerOpen()
+                && mCurrentSectionID != NewBitFragment.FRAGMENT_ID) {
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
@@ -130,6 +140,7 @@ public class MainActivity extends ActionBarActivity
     public void onNewDisposeInteraction() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.popBackStack();
+        onSectionAttached(BitsListFragment.FRAGMENT_ID);
     }
 
     @Override
@@ -141,7 +152,10 @@ public class MainActivity extends ActionBarActivity
 
         transaction.setCustomAnimations(R.anim.abc_slide_in_top, 0, 0, R.anim.abc_slide_out_top);
         transaction.replace(R.id.container, editFragment);
-        transaction.addToBackStack(null);
+        transaction.addToBackStack("BitsListFragment");
+
+        onSectionAttached(NewBitFragment.FRAGMENT_ID);
+
 
         transaction.commit();
     }
