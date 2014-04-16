@@ -10,11 +10,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.siqi.bits.Category;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.R;
+
+import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 
 import model.CategoryManager;
 import model.TaskManager;
@@ -30,20 +34,18 @@ import model.TaskManager;
  *
  */
 public class NewBitFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String BIT_ID = "bit_id";
     public static final int FRAGMENT_ID = 9;
+    private static final String BIT_ID = "bit_id";
+    private final ConcurrentHashMap<String, Integer> IntervalToDays = new ConcurrentHashMap<String, Integer>();
 
-    // TODO: Rename and change types of parameters
     private long mBitID;
     private Task mTask;
 
-    private EditText mBitTitle;
+    private EditText mBitTitleEditText;
     // n times
-    private RadioGroup mFrequency;
+    private RadioGroup mFrequencyRBtnGroup;
     // per week
-    private RadioGroup mInterval;
+    private RadioGroup mIntervalRBtnGroup;
 
     private OnNewBitInteractionListener mListener;
 
@@ -76,15 +78,21 @@ public class NewBitFragment extends Fragment {
         TaskManager tm = TaskManager.getInstance(this.getActivity().getApplicationContext());
         CategoryManager cm = CategoryManager.getInstance(this.getActivity().getApplicationContext());
 
+        /**
+         * TODO Optimize this so that there is only one copy of hashmap...
+         * Well this is in a Frag so there should be only one copy...how bad it can be??
+         */
+        IntervalToDays.put(getString(R.string.radio_day), 1);
+        IntervalToDays.put(getString(R.string.radio_week), 7);
+        IntervalToDays.put(getString(R.string.radio_month), 30);
+        IntervalToDays.put(getString(R.string.radio_year), 365);
+
         if (getArguments() != null) {
             mBitID = getArguments().getLong(BIT_ID);
             mTask = tm.getTask(mBitID);
         } else {
             Category c = cm.getDefaultCategory();
             mTask = tm.newTask(c);
-            mTask.setInterval(24 * 3600 * 1000);
-            mTask.setLastDone(System.currentTimeMillis());
-            mTask.setNextScheduledTime(mTask.getLastDone() + mTask.getInterval());
         }
     }
 
@@ -95,9 +103,9 @@ public class NewBitFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_new_bit, container, false);
         setHasOptionsMenu(true);
 
-        mBitTitle = (EditText) v.findViewById(R.id.bit_title_edittext);
-        mFrequency = (RadioGroup) v.findViewById(R.id.frequency_radio_group);
-        mInterval = (RadioGroup) v.findViewById(R.id.interval_radio_group);
+        mBitTitleEditText = (EditText) v.findViewById(R.id.bit_title_edittext);
+        mFrequencyRBtnGroup = (RadioGroup) v.findViewById(R.id.frequency_radio_group);
+        mIntervalRBtnGroup = (RadioGroup) v.findViewById(R.id.interval_radio_group);
 
         // Inflate the layout for this fragment
         return v;
@@ -117,10 +125,38 @@ public class NewBitFragment extends Fragment {
             this.mListener.onNewDisposeInteraction();
             return true;
         } else if (item.getItemId() == R.id.action_save) {
+            if (mBitTitleEditText.getText().toString().trim().length() == 0) {
+                mBitTitleEditText.setError(getString(R.string.empty_title_error));
+                return true;
+            }
+
             /**
              * Save the model here
              */
-            this.mListener.onNewDisposeInteraction();
+            mTask.setLastDone(System.currentTimeMillis());
+            mTask.setDescription(mBitTitleEditText.getText().toString());
+            mTask.setCreatedOn(new Date());
+            mTask.setModifiedOn(new Date());
+            mTask.setDoneCount(0);
+            mTask.setSkipCount(0);
+            mTask.setLateCount(0);
+
+            RadioButton rbFreq = (RadioButton) this.getView().findViewById(this.mFrequencyRBtnGroup.getCheckedRadioButtonId());
+            RadioButton rbInterval = (RadioButton) this.getView().findViewById(this.mIntervalRBtnGroup.getCheckedRadioButtonId());
+
+            int daysCount = IntervalToDays.get(rbInterval.getText().toString());
+
+            mTask.setInterval((long) daysCount * 24 * 3600 * 1000/(Integer.parseInt(rbFreq.getText().toString())));
+            mTask.setLastDone(System.currentTimeMillis());
+            mTask.setNextScheduledTime(mTask.getLastDone() + mTask.getInterval());
+
+            try {
+                TaskManager.getInstance(getActivity().getApplicationContext()).insertTask(mTask);
+                mListener.onNewDisposeInteraction();
+            } catch (TaskManager.DuplicatedTaskException e) {
+                mBitTitleEditText.setError(getString(R.string.duplicated_title_error));
+            }
+
             return true;
         }
 

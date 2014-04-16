@@ -1,1 +1,1 @@
-include ':app', ':GDgen'
+include ':app', ':GDgen', ':swipelistview'

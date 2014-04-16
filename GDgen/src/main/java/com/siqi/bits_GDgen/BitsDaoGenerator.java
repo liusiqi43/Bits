@@ -16,7 +16,7 @@ public class BitsDaoGenerator {
          */
         Entity task = schema.addEntity("Task");
         task.addIdProperty();
-        task.addStringProperty("description").notNull().unique();
+        task.addStringProperty("description").notNull();
         task.addDateProperty("createdOn").notNull();
         task.addDateProperty("modifiedOn").notNull();
         task.addDateProperty("deletedOn");
@@ -25,9 +25,9 @@ public class BitsDaoGenerator {
         // currentTime when just created
         task.addLongProperty("lastDone").notNull().getProperty();
         Property nextScheduledTime = task.addLongProperty("nextScheduledTime").notNull().getProperty();
-        task.addIntProperty("doneCount");
-        task.addIntProperty("skipCount");
-        task.addIntProperty("lateCount");
+        task.addIntProperty("doneCount").notNull();
+        task.addIntProperty("skipCount").notNull();
+        task.addIntProperty("lateCount").notNull();
 
 
         /**

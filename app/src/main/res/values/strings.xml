@@ -28,4 +28,6 @@
     <string name="put_in_category">put the bit in appropriate category</string>
     <string name="create_new_bit">Create New Bit</string>
     <string name="whats_on_your_mind">What\'s on your mind? </string>
+    <string name="duplicated_title_error">A bit with same title already exists, make that a habit first!</string>
+    <string name="empty_title_error">Bit needs a title to get started!</string>
 </resources>

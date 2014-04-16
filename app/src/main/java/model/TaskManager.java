@@ -2,7 +2,6 @@ package model;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.siqi.bits.Category;
 import com.siqi.bits.DaoMaster;
@@ -10,6 +9,8 @@ import com.siqi.bits.DaoSession;
 import com.siqi.bits.Task;
 import com.siqi.bits.TaskDao;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -44,9 +45,13 @@ public class TaskManager {
         return INSTANCE;
     }
 
-    public void insertTask(Task t) {
-        mTaskDao.insert(t);
-        Log.d(getClass().getName(), "Task "+t.getDescription()+" inserted in DAO");
+    public void insertTask(Task t) throws DuplicatedTaskException {
+        if (mTaskDao.queryBuilder()
+                .where(TaskDao.Properties.Description.eq(t.getDescription()), TaskDao.Properties.DeletedOn.isNull())
+                .list().size() > 0)
+            throw new DuplicatedTaskException();
+        else
+            mTaskDao.insert(t);
     }
 
     public Task newTask(Category c) {
@@ -61,5 +66,30 @@ public class TaskManager {
     public List<Task> getAllTasks() {
         List<Task> tasks = mTaskDao.queryBuilder().where(TaskDao.Properties.DeletedOn.isNull()).list();
         return tasks;
+    }
+
+    public List<Task> getAllSortedTasks() {
+        List<Task> tasks = getAllTasks();
+        Collections.sort(tasks, new Comparator<Task>() {
+            @Override
+            public int compare(Task task, Task task2) {
+                if (task.getNextScheduledTime() < task2.getNextScheduledTime()) {
+                    return -1;
+                } else if (task2.getNextScheduledTime() < task.getNextScheduledTime()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        });
+
+        return tasks;
+    }
+
+    public void updateTask(Task t) {
+        mTaskDao.update(t);
+    }
+
+    public class DuplicatedTaskException extends Throwable {
     }
 }
