@@ -867,7 +867,7 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
                         }
                     }
                 }
-                if (deltaMode > slop && swipeCurrentAction == SwipeListView.SWIPE_ACTION_NONE && velocityY < velocityX) {
+                if (deltaMode > slop && swipeCurrentAction == SwipeListView.SWIPE_ACTION_NONE && 3 * velocityY < velocityX) {
                     Log.d("ACTION_MOVE", "deltaMode > slop && swipeCurrentAction == SwipeListView.SWIPE_ACTION_NONE && velocityY < velocityX");
                     swiping = true;
                     swipingRight = (deltaX > 0);
