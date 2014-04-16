@@ -22,6 +22,7 @@ import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAni
 import com.siqi.bits.Task;
 import com.siqi.bits.app.MainActivity;
 import com.siqi.bits.app.R;
+import com.siqi.bits.swipelistview.BaseSwipeListViewListener;
 import com.siqi.bits.swipelistview.SwipeListView;
 
 import org.ocpsoft.prettytime.PrettyTime;
@@ -77,6 +78,30 @@ public class BitsListFragment extends Fragment {
         this.mBitsListView.setAdapter(mAdapter);
 
 
+        this.mBitsListView.setSwipeListViewListener(new BaseSwipeListViewListener(){
+            @Override
+            public void onLeftChoiceAction(int position) {
+                Task item = mAdapter.getItem(position);
+                item.setLastDoneAndUpdateNextScheduleTime(System.currentTimeMillis());
+                item.incrementSkipCount();
+                tm.updateTask(item);
+                // Implicitly calls datasetChanged() method
+                mAdapter.remove(item);
+                mAdapter.add(item);
+            }
+
+            @Override
+            public void onRightChoiceAction(int position) {
+                Task item = mAdapter.getItem(position);
+                item.setLastDoneAndUpdateNextScheduleTime(System.currentTimeMillis());
+                item.incrementDoneCount();
+                tm.updateTask(item);
+                // Implicitly calls datasetChanged() method
+                mAdapter.remove(item);
+                mAdapter.add(item);
+            }
+        });
+
         mBitsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -87,20 +112,6 @@ public class BitsListFragment extends Fragment {
                 // Implicitly calls datasetChanged() method
                 mAdapter.remove(item);
                 return true;
-            }
-        });
-
-
-        mBitsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Log.d("Click", "Called");
-                Task item = mAdapter.getItem(position);
-                item.setLastDoneAndUpdateNextScheduleTime(System.currentTimeMillis());
-                tm.updateTask(item);
-                // Implicitly calls datasetChanged() method
-                mAdapter.remove(item);
-                mAdapter.add(item);
             }
         });
 
