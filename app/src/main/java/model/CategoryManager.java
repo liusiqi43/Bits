@@ -16,6 +16,7 @@ import java.util.List;
  * Created by me on 4/9/14.
  */
 public class CategoryManager {
+    private static final String CATEGORIES_ICON_EXTENSION = ".png";
     private SQLiteDatabase mDB;
     private DaoMaster mDaoMaster;
     private DaoSession mDaoSession;
@@ -40,26 +41,23 @@ public class CategoryManager {
     }
 
     private void initWithCategories() {
-        if (mCategoryDao.count() < 3) {
+        if (mCategoryDao.count() < 100) {
             mCategoryDao.deleteAll();
 
-            Category c;
-
-            c = newCategory();
-            c.setName("Entertainment");
-            c.setIconDrawableName("icon_6599.svg");
-            insertCategory(c);
-
-            c = newCategory();
-            c.setName("Sports");
-            c.setIconDrawableName("icon_10684.svg");
-            insertCategory(c);
-
-            c = newCategory();
-            c.setName("Study");
-            c.setIconDrawableName("icon_32663.svg");
-            insertCategory(c);
+            addCategoryWithNameAndIcon("Music", "music");
+            addCategoryWithNameAndIcon("Sports", "bicycle");
+            addCategoryWithNameAndIcon("News", "news_paper");
+            addCategoryWithNameAndIcon("Reading", "notebook");
+            addCategoryWithNameAndIcon("Study", "study");
+            addCategoryWithNameAndIcon("Goal", "target");
         }
+    }
+
+    private void addCategoryWithNameAndIcon(String name, String iconName) {
+        Category c = newCategory();
+        c.setName(name);
+        c.setIconDrawableName(iconName+CATEGORIES_ICON_EXTENSION);
+        insertCategory(c);
     }
 
     public static CategoryManager getInstance(Context ctx) {

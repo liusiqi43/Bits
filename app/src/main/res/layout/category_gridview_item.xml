@@ -9,10 +9,10 @@
     android:gravity="center"
     >
 
-    <FrameLayout
+    <ImageView
         android:id="@+id/grid_item_image"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        />
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:scaleType="fitCenter" />
 
 </LinearLayout>

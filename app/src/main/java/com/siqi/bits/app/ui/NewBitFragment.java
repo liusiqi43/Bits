@@ -2,6 +2,8 @@ package com.siqi.bits.app.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,17 +15,18 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.caverock.androidsvg.SVGImageView;
 import com.siqi.bits.Category;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.R;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -253,14 +256,27 @@ public class NewBitFragment extends Fragment {
                 v = li.inflate(R.layout.category_gridview_item, parent, false);
             }
 
-            FrameLayout frameLayout = (FrameLayout) v.findViewById(R.id.grid_item_image);
+            ImageView icon = (ImageView) v.findViewById(R.id.grid_item_image);
 
             Category c = getItem(position);
-            SVGImageView svgImageView = new SVGImageView(getActivity());
-            svgImageView.setImageAsset(c.getIconDrawableName());
 
-            frameLayout.addView(svgImageView,
-                    new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+            InputStream is = null;
+            try {
+                is = getActivity().getAssets().open(c.getIconDrawableName());
+                Bitmap bitmap = BitmapFactory.decodeStream(is);
+                icon.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if(is!=null) {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 
             v.setTag(c);
             return v;

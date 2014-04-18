@@ -2,8 +2,11 @@ package com.siqi.bits.app.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,14 +16,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.caverock.androidsvg.SVGImageView;
 import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
+import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 import com.siqi.bits.Task;
@@ -31,6 +33,8 @@ import com.siqi.bits.swipelistview.SwipeListView;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -99,6 +103,8 @@ public class BitsListFragment extends Fragment {
         this.mBitsListView.setSwipeListViewListener(new BaseSwipeListViewListener(){
             @Override
             public void onLeftChoiceAction(int position) {
+                if (mAdapter.isExpanded(position))
+                    mAdapter.toggle(position);
                 Task item = mAdapter.getItem(position);
                 item.setNextScheduledTime(System.currentTimeMillis() + item.getInterval());
                 item.incrementSkipCount();
@@ -110,6 +116,8 @@ public class BitsListFragment extends Fragment {
 
             @Override
             public void onRightChoiceAction(int position) {
+                if (mAdapter.isExpanded(position))
+                    mAdapter.toggle(position);
                 Task item = mAdapter.getItem(position);
                 item.setLastDoneAndUpdateNextScheduleTime(System.currentTimeMillis());
                 item.incrementDoneCount();
@@ -118,12 +126,13 @@ public class BitsListFragment extends Fragment {
                 mAdapter.remove(item);
                 mAdapter.add(item);
             }
+
         });
+
 
         mBitsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Log.d("LongClick", "Called");
                 Task item = mAdapter.getItem(position);
                 item.setDeletedOn(new Date());
                 tm.updateTask(item);
@@ -133,6 +142,8 @@ public class BitsListFragment extends Fragment {
                 return true;
             }
         });
+
+        mAdapter.setLimit(1);
 
         return rootView;
     }
@@ -175,27 +186,42 @@ public class BitsListFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private class BitListArrayAdapter extends ArrayAdapter<Task> {
+    private class BitListArrayAdapter extends ExpandableListItemAdapter<Task> {
 
         List<Task> mItems;
+        PrettyTime prettyTime = new PrettyTime();
+        private final LruCache<String, Bitmap> mMemoryCache;
+
 
         public BitListArrayAdapter(Context ctx, List<Task> t) {
-            super(ctx, R.layout.listview_item, t);
+            super(ctx, R.layout.card_main_layout, R.id.expandable_list_item_card_title, R.id.expandable_list_item_card_content, t);
+            this.setActionViewResId(R.id.front);
+            final int cacheSize = (int) (Runtime.getRuntime().maxMemory() / 1024);
+            mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+                @Override
+                protected int sizeOf(final String key, final Bitmap bitmap) {
+                    // The cache size will be measured in kilobytes rather than
+                    // number of items.
+                    return bitmap.getRowBytes() * bitmap.getHeight() / 1024;
+                }
+            };
+
             mItems = t;
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getTitleView(int position, View convertView, ViewGroup parent) {
+            Log.d("TEST", "getTitleVlew:"+position);
             View v = convertView;
-            BitHolder holder;
+            BitTitleHolder holder;
 
             if (v == null) {
                 LayoutInflater li = getActivity().getLayoutInflater();
-                v = li.inflate(R.layout.listview_item, parent, false);
+                v = li.inflate(R.layout.card_title_layout, parent, false);
 
-                holder = new BitHolder();
+                holder = new BitTitleHolder();
 
-                holder.iconFrameLayout = (FrameLayout) v.findViewById(R.id.taskIcon);
+                holder.icon = (ImageView) v.findViewById(R.id.taskIcon);
                 holder.title = (TextView) v.findViewById(R.id.taskTitle);
                 holder.timeAgo = (TextView) v.findViewById(R.id.timeAgo);
                 holder.progressBar = (ProgressBar) v.findViewById(R.id.timeAgoProgressBar);
@@ -204,25 +230,116 @@ public class BitsListFragment extends Fragment {
 
                 v.setTag(holder);
             } else {
-                holder = (BitHolder) v.getTag();
+                holder = (BitTitleHolder) v.getTag();
             }
 
-            Task t = getItem(position);
-            PrettyTime p = new PrettyTime();
+            final Task t = getItem(position);
 
-            SVGImageView svgImageView = new SVGImageView(getActivity());
-            svgImageView.setImageAsset(t.getCategory().getIconDrawableName());
 
-            holder.iconFrameLayout.removeAllViews();
-            holder.iconFrameLayout.addView(svgImageView,
-                    new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+//            holder.iconFrameLayout.getHolder().addCallback(new SurfaceHolder.Callback() {
+//                @Override
+//                public void surfaceCreated(SurfaceHolder surfaceHolder) {
+//                    // Do some drawing when surface is ready
+//                    Canvas canvas = surfaceHolder.lockCanvas();
+//                    SVG svg = null;
+//                    try {
+//                        svg = SVG.getFromAsset(getActivity().getAssets(), t.getCategory().getIconDrawableName());
+//                    } catch (SVGParseException e){
+//                        e.printStackTrace();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    if (svg != null)
+//                        canvas.drawPicture(svg.renderToPicture(60, 60));
+//
+//                    surfaceHolder.unlockCanvasAndPost(canvas);
+//                }
+//
+//                @Override
+//                public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
+//
+//                }
+//
+//                @Override
+//                public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+//
+//                }
+//            });
 
+
+
+
+//            SVGImageView svgImageView = new SVGImageView(getActivity());
+//            svgImageView.setImageAsset(t.getCategory().getIconDrawableName());
+//
+//            holder.iconFrameLayout.removeAllViews();
+//            holder.iconFrameLayout.addView(svgImageView,
+//                    new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+            Bitmap bitmap = mMemoryCache.get(t.getCategory().getIconDrawableName());
+            if (bitmap == null) {
+                InputStream is = null;
+                try {
+                    is = getActivity().getAssets().open(t.getCategory().getIconDrawableName());
+                    bitmap = BitmapFactory.decodeStream(is);
+
+                    if (bitmap != null)
+                        mMemoryCache.put(t.getCategory().getIconDrawableName(), bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if(is!=null) {
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+            holder.icon.setImageBitmap(bitmap);
             holder.title.setText(t.getDescription());
-            holder.timeAgo.setText(p.format(new Date(t.getLastDone())));
+            holder.timeAgo.setText(prettyTime.format(new Date(t.getLastDone())));
             long duration = System.currentTimeMillis()-t.getLastDone();
             holder.progressBar.setProgress((int) (100 * (double) duration / (double) t.getInterval()));
 
+            return v;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            Log.d("TEST", "getVlew:"+position);
+            View v = super.getView(position, convertView, parent);
+
             ((SwipeListView) parent).recycle(v, position);
+
+            return v;
+        }
+
+        @Override
+        public View getContentView(int position, View convertView, ViewGroup parent) {
+            Log.d("TEST", "getContentVlew:"+position);
+            View v = convertView;
+            BitContentHolder holder;
+
+            if (v == null) {
+                LayoutInflater li = getActivity().getLayoutInflater();
+                v = li.inflate(R.layout.card_content_layout, parent, false);
+
+                holder = new BitContentHolder();
+
+                holder.bitDoneRate = (TextView) v.findViewById(R.id.bit_done_rate);
+                holder.othersDoneRate = (TextView) v.findViewById(R.id.others_done_rate);
+
+                v.setTag(holder);
+            } else {
+                holder = (BitContentHolder) v.getTag();
+            }
+
+            holder.bitDoneRate.setText("85%");
+            holder.othersDoneRate.setText("74%");
 
             return v;
         }
@@ -235,11 +352,16 @@ public class BitsListFragment extends Fragment {
     }
 
 
-    private static class BitHolder {
-        FrameLayout iconFrameLayout;
+    private static class BitTitleHolder {
+        ImageView icon;
         TextView title;
         TextView timeAgo;
         ProgressBar progressBar;
         Button skipButton, doneButton;
+    }
+
+    private static class BitContentHolder {
+        TextView bitDoneRate;
+        TextView othersDoneRate;
     }
 }

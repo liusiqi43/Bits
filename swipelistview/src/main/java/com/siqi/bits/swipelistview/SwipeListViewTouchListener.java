@@ -26,6 +26,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -51,7 +52,7 @@ import static com.nineoldandroids.view.ViewPropertyAnimator.animate;
 /**
  * Touch listener impl for the SwipeListView
  */
-public class SwipeListViewTouchListener implements View.OnTouchListener {
+public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener {
 
     private static final int DISPLACE_CHOICE = 170;
 
@@ -160,12 +161,12 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
      */
     private void setFrontView(View frontView) {
         this.frontView = frontView;
-        frontView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                swipeListView.onClickFrontView(downPosition);
-            }
-        });
+//        frontView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                swipeListView.onClickFrontView(downPosition);
+//            }
+//        });
         if (swipeOpenOnLongPress) {
             frontView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
@@ -812,10 +813,8 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
                 generateAnimate(frontView, swap, swapRight, downPosition);
                 // Left action
                 if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == DISPLACE_CHOICE) {
-                    Log.d("SwipeListView", "LeftActionCalled");
                     this.swipeListView.onLeftChoiceAction(downPosition);
                 } else if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == -DISPLACE_CHOICE) {
-                    Log.d("SwipeListView", "RightActionCalled");
                     this.swipeListView.onRightChoiceAction(downPosition);
                 }
 
