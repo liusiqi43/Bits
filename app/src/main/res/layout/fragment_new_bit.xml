@@ -1,9 +1,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent"
-    android:background="@color/white"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     >
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -11,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:background="@color/white"
         tools:context="com.siqi.bits.app.ui.NewBitFragment"
         android:padding="15dp">
 
@@ -184,7 +183,7 @@
         <GridView xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/category_gridview"
             android:layout_width="match_parent"
-            android:layout_height="309dp"
+            android:layout_height="200dp"
             android:columnWidth="80dp"
             android:numColumns="auto_fit"
             android:verticalSpacing="10dp"
@@ -192,8 +191,7 @@
             android:stretchMode="columnWidth"
             android:gravity="center"
             android:clickable="false"
-            android:focusable="true"
-            tools:listitem="@android:layout/simple_list_item_2" />
+            android:focusable="true"/>
 
 
     </LinearLayout>

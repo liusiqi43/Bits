@@ -21,6 +21,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 import com.siqi.bits.Category;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.R;
@@ -130,14 +131,18 @@ public class NewBitFragment extends Fragment {
 
         // Inflate the layout for this fragment
         mAdapter = new CategoryAdapter(this.getActivity(), cm.getAllCategories());
-        mCategoryGridView.setAdapter(mAdapter);
+        SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAdapter);
+
+        swingBottomInAnimationAdapter.setAbsListView(mCategoryGridView);
+        swingBottomInAnimationAdapter.setInitialDelayMillis(300);
+        mCategoryGridView.setAdapter(swingBottomInAnimationAdapter);
 
         mOnClickListener = new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 Toast.makeText(getActivity(), mAdapter.getItem(position).getName(), Toast.LENGTH_SHORT).show();
-                v.setBackgroundResource(R.drawable.radiobutton_active);
+                v.setBackgroundResource(R.color.MidnightBlue);
 
-                if (mLastSelected != null)
+                if (mLastSelected != null && mLastSelected != v)
                     mLastSelected.setBackgroundResource(android.R.color.transparent);
                 mLastSelected = v;
             }
@@ -176,7 +181,7 @@ public class NewBitFragment extends Fragment {
              * Save the model here
              */
             mTask.setLastDone(System.currentTimeMillis());
-            mTask.setDescription(mBitTitleEditText.getText().toString());
+            mTask.setDescription(mBitTitleEditText.getText().toString().trim());
             mTask.setCreatedOn(new Date());
             mTask.setModifiedOn(new Date());
             mTask.setDoneCount(0);
@@ -265,7 +270,7 @@ public class NewBitFragment extends Fragment {
             try {
                 is = getActivity().getAssets().open(c.getIconDrawableName());
                 Bitmap bitmap = BitmapFactory.decodeStream(is);
-                icon.setImageBitmap(bitmap);
+                icon.setImageBitmap(CategoryManager.invertImage(bitmap));
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {

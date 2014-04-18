@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -283,7 +284,8 @@ public class BitsListFragment extends Fragment {
                 try {
                     is = getActivity().getAssets().open(t.getCategory().getIconDrawableName());
                     bitmap = BitmapFactory.decodeStream(is);
-
+                    // Invert bitmap color
+                    bitmap = CategoryManager.invertImage(bitmap);
                     if (bitmap != null)
                         mMemoryCache.put(t.getCategory().getIconDrawableName(), bitmap);
                 } catch (IOException e) {
@@ -299,12 +301,42 @@ public class BitsListFragment extends Fragment {
                 }
             }
 
+            holder.icon.setMaxWidth(holder.icon.getHeight());
             holder.icon.setImageBitmap(bitmap);
             holder.title.setText(t.getDescription());
-            holder.timeAgo.setText(prettyTime.format(new Date(t.getLastDone())));
-            long duration = System.currentTimeMillis()-t.getLastDone();
-            holder.progressBar.setProgress((int) (100 * (double) duration / (double) t.getInterval()));
+            holder.timeAgo.setText("Done "+prettyTime.format(new Date(t.getLastDone())));
+            long duration = t.getNextScheduledTime() - System.currentTimeMillis();
 
+            int progress = (int) (100 * (1- ((double) duration / (double) t.getInterval())));
+
+            Log.d("Progress", ":"+progress);
+            holder.progressBar.setProgress(progress);
+
+//            if (progress > 100) {
+//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Pomegranate));
+//            } else {
+//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Emerald));
+//            }
+//            else if (progress > 90) {
+//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Alizarin));
+//            }
+//            else if (progress > 80) {
+//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Pumpkin));
+//            } else if (progress > 70) {
+//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Carrot));
+//            } else if (progress > 60) {
+//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Orange));
+//            } else if (progress > 50) {
+//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Sunflower));
+//            } else if (progress > 40) {
+//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.BelizeHole));
+//            } else if (progress > 30) {
+//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.PeterRiver));
+//            } else if (progress > 20) {
+//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Nephritis));
+//            } else {
+//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Emerald));
+//            }
             return v;
         }
 
@@ -332,14 +364,17 @@ public class BitsListFragment extends Fragment {
 
                 holder.bitDoneRate = (TextView) v.findViewById(R.id.bit_done_rate);
                 holder.othersDoneRate = (TextView) v.findViewById(R.id.others_done_rate);
+                holder.timeLine = (GridView) v.findViewById(R.id.timeline_gridview);
 
                 v.setTag(holder);
             } else {
                 holder = (BitContentHolder) v.getTag();
             }
 
-            holder.bitDoneRate.setText("85%");
-            holder.othersDoneRate.setText("74%");
+            Task t = mAdapter.getItem(position);
+
+            holder.bitDoneRate.setText(tm.getDoneRate(t) + " %");
+            holder.othersDoneRate.setText(tm.getDoneRateExcept(t) + " %");
 
             return v;
         }
@@ -363,5 +398,6 @@ public class BitsListFragment extends Fragment {
     private static class BitContentHolder {
         TextView bitDoneRate;
         TextView othersDoneRate;
+        GridView timeLine;
     }
 }

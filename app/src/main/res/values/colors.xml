@@ -22,6 +22,15 @@
     <color name="Turquoise">#1abc9c</color>
     <color name="SeaGreen">#16a085</color>
     <color name="Emerald">#2ecc71</color>
+    <color name="Pomegranate">#c0392b</color>
+
+    <color name="doneColor">@color/Emerald</color>
+    <color name="skipColor">@color/PeterRiver</color>
+    <color name="lateColor">@color/Alizarin</color>
+    <color name="noneColor">@color/concrete</color>
 
     <color name="radiobutton_inactive">@android:color/transparent</color>
+
+
+
 </resources>

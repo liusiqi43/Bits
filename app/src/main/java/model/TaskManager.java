@@ -95,6 +95,28 @@ public class TaskManager {
         mTaskDao.update(t);
     }
 
+    public int getDoneRate(Task t) {
+        double sum = t.getDoneCount() + t.getSkipCount();
+        double total = sum + t.getLateCount();
+
+        return ((int) (100 * sum/total));
+    }
+
+    public int getDoneRateExcept(Task t) {
+        List<Task> tasks = getAllTasks();
+
+        double sum = 0, total = 0;
+
+        for (Task e : tasks) {
+            if (e.getId() != t.getId()) {
+                sum += e.getDoneCount()+e.getSkipCount();
+                total += e.getDoneCount()+e.getSkipCount()+e.getLateCount();
+            }
+        }
+
+        return ((int) (100 * sum/total));
+    }
+
     public class DuplicatedTaskException extends Throwable {
     }
 }

@@ -13,6 +13,7 @@
         android:id="@+id/grid_item_image"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:scaleType="fitCenter" />
+        android:background="@color/MidnightBlue"
+        android:scaleType="centerInside" />
 
 </LinearLayout>
