@@ -11,13 +11,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.caverock.androidsvg.SVGImageView;
+import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
+import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.MainActivity;
@@ -43,7 +47,6 @@ public class BitsListFragment extends Fragment {
     private TaskManager tm;
 
     SwipeListView mBitsListView;
-//    List<Task> mBitsList = new ArrayList<Task>();
     BitListArrayAdapter mAdapter;
 
     private OnBitListInteractionListener mListener;
@@ -54,6 +57,16 @@ public class BitsListFragment extends Fragment {
     }
 
     public BitsListFragment() {
+    }
+
+    private class OnBitDismissCallback implements OnDismissCallback {
+
+        @Override
+        public void onDismiss(final AbsListView listView, final int[] reverseSortedPositions) {
+            for (int position : reverseSortedPositions) {
+                mAdapter.remove(mAdapter.getItem(position));
+            }
+        }
     }
 
     @Override
@@ -73,16 +86,21 @@ public class BitsListFragment extends Fragment {
         cm = CategoryManager.getInstance(this.getActivity().getApplicationContext());
 
         mAdapter = new BitListArrayAdapter(getActivity().getApplicationContext(), tm.getAllSortedTasks());
-        SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAdapter);
+        final AnimateDismissAdapter animateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
+
+        // Swing from bottom anim & dismiss anim
+        SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(animateDismissAdapter);
+        swingBottomInAnimationAdapter.setInitialDelayMillis(200);
+        swingBottomInAnimationAdapter.setAnimationDurationMillis(400);
         swingBottomInAnimationAdapter.setAbsListView(mBitsListView);
-        this.mBitsListView.setAdapter(mAdapter);
+        this.mBitsListView.setAdapter(swingBottomInAnimationAdapter);
 
 
         this.mBitsListView.setSwipeListViewListener(new BaseSwipeListViewListener(){
             @Override
             public void onLeftChoiceAction(int position) {
                 Task item = mAdapter.getItem(position);
-                item.setLastDoneAndUpdateNextScheduleTime(System.currentTimeMillis());
+                item.setNextScheduledTime(System.currentTimeMillis() + item.getInterval());
                 item.incrementSkipCount();
                 tm.updateTask(item);
                 // Implicitly calls datasetChanged() method
@@ -110,7 +128,8 @@ public class BitsListFragment extends Fragment {
                 item.setDeletedOn(new Date());
                 tm.updateTask(item);
                 // Implicitly calls datasetChanged() method
-                mAdapter.remove(item);
+
+                animateDismissAdapter.animateDismiss(position);
                 return true;
             }
         });
@@ -176,7 +195,7 @@ public class BitsListFragment extends Fragment {
 
                 holder = new BitHolder();
 
-                holder.icon = (ImageView) v.findViewById(R.id.taskIcon);
+                holder.iconFrameLayout = (FrameLayout) v.findViewById(R.id.taskIcon);
                 holder.title = (TextView) v.findViewById(R.id.taskTitle);
                 holder.timeAgo = (TextView) v.findViewById(R.id.timeAgo);
                 holder.progressBar = (ProgressBar) v.findViewById(R.id.timeAgoProgressBar);
@@ -191,10 +210,13 @@ public class BitsListFragment extends Fragment {
             Task t = getItem(position);
             PrettyTime p = new PrettyTime();
 
-            holder.icon.setImageResource(getResources().getIdentifier(
-                    t.getCategory().getIconDrawableName(),
-                    "drawable",
-                    getContext().getPackageName()));
+            SVGImageView svgImageView = new SVGImageView(getActivity());
+            svgImageView.setImageAsset(t.getCategory().getIconDrawableName());
+
+            holder.iconFrameLayout.removeAllViews();
+            holder.iconFrameLayout.addView(svgImageView,
+                    new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
             holder.title.setText(t.getDescription());
             holder.timeAgo.setText(p.format(new Date(t.getLastDone())));
             long duration = System.currentTimeMillis()-t.getLastDone();
@@ -204,6 +226,7 @@ public class BitsListFragment extends Fragment {
 
             return v;
         }
+
     }
 
 
@@ -213,7 +236,7 @@ public class BitsListFragment extends Fragment {
 
 
     private static class BitHolder {
-        ImageView icon;
+        FrameLayout iconFrameLayout;
         TextView title;
         TextView timeAgo;
         ProgressBar progressBar;

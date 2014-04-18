@@ -59,6 +59,11 @@ public class TaskManager {
         return t;
     }
 
+    public Task newTask() {
+        Task t = new Task(null, null, new Date(), new Date(), null, 0, 0, 0, 0, 0, 0, -1);
+        return t;
+    }
+
     public Task getTask(long id) {
         return mTaskDao.load(id);
     }

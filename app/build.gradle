@@ -39,6 +39,7 @@ dependencies {
     compile 'org.ocpsoft.prettytime:prettytime:3.0.2.Final@jar'
     compile 'com.nhaarman.listviewanimations:library:2.6.0@jar'
     compile 'com.nineoldandroids:library:2.4.0@jar'
+    compile 'com.caverock:androidsvg:1.2.1@jar'
     compile project(':swipelistview')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }

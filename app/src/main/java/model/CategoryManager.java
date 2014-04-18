@@ -35,24 +35,37 @@ public class CategoryManager {
         mDaoMaster = new DaoMaster(mDB);
         mDaoSession = mDaoMaster.newSession();
         mCategoryDao = mDaoSession.getCategoryDao();
+
+        initWithCategories();
+    }
+
+    private void initWithCategories() {
+        if (mCategoryDao.count() < 3) {
+            mCategoryDao.deleteAll();
+
+            Category c;
+
+            c = newCategory();
+            c.setName("Entertainment");
+            c.setIconDrawableName("icon_6599.svg");
+            insertCategory(c);
+
+            c = newCategory();
+            c.setName("Sports");
+            c.setIconDrawableName("icon_10684.svg");
+            insertCategory(c);
+
+            c = newCategory();
+            c.setName("Study");
+            c.setIconDrawableName("icon_32663.svg");
+            insertCategory(c);
+        }
     }
 
     public static CategoryManager getInstance(Context ctx) {
         if (INSTANCE == null)
             INSTANCE = new CategoryManager(ctx);
         return INSTANCE;
-    }
-
-    public Category getDefaultCategory() {
-        List<Category> categories = mCategoryDao.queryBuilder().where(CategoryDao.Properties.DeletedOn.isNull()).limit(1).list();
-        if (categories.isEmpty()) {
-            Category c = newCategory();
-            c.setName("Default");
-            c.setIconDrawableName("ic_action_new");
-            insertCategory(c);
-            categories.add(c);
-        }
-        return categories.get(0);
     }
 
     public Category getCategory(long id) {

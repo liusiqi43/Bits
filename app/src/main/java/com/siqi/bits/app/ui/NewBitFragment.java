@@ -1,6 +1,7 @@
 package com.siqi.bits.app.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,15 +10,22 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
+import com.caverock.androidsvg.SVGImageView;
 import com.siqi.bits.Category;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.R;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import model.CategoryManager;
@@ -47,7 +55,17 @@ public class NewBitFragment extends Fragment {
     // per week
     private RadioGroup mIntervalRBtnGroup;
 
+    private GridView mCategoryGridView;
+
+    private CategoryAdapter mAdapter;
+
     private OnNewBitInteractionListener mListener;
+
+    private CategoryManager cm;
+    private TaskManager tm;
+
+    private AdapterView.OnItemClickListener mOnClickListener;
+    private View mLastSelected;
 
     /**
      * Use this factory method to create a new instance of
@@ -75,8 +93,8 @@ public class NewBitFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        TaskManager tm = TaskManager.getInstance(this.getActivity().getApplicationContext());
-        CategoryManager cm = CategoryManager.getInstance(this.getActivity().getApplicationContext());
+        tm = TaskManager.getInstance(this.getActivity().getApplicationContext());
+        cm = CategoryManager.getInstance(this.getActivity().getApplicationContext());
 
         /**
          * TODO Optimize this so that there is only one copy of hashmap...
@@ -91,8 +109,7 @@ public class NewBitFragment extends Fragment {
             mBitID = getArguments().getLong(BIT_ID);
             mTask = tm.getTask(mBitID);
         } else {
-            Category c = cm.getDefaultCategory();
-            mTask = tm.newTask(c);
+            mTask = tm.newTask();
         }
     }
 
@@ -106,8 +123,25 @@ public class NewBitFragment extends Fragment {
         mBitTitleEditText = (EditText) v.findViewById(R.id.bit_title_edittext);
         mFrequencyRBtnGroup = (RadioGroup) v.findViewById(R.id.frequency_radio_group);
         mIntervalRBtnGroup = (RadioGroup) v.findViewById(R.id.interval_radio_group);
+        mCategoryGridView = (GridView) v.findViewById(R.id.category_gridview);
 
         // Inflate the layout for this fragment
+        mAdapter = new CategoryAdapter(this.getActivity(), cm.getAllCategories());
+        mCategoryGridView.setAdapter(mAdapter);
+
+        mOnClickListener = new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                Toast.makeText(getActivity(), mAdapter.getItem(position).getName(), Toast.LENGTH_SHORT).show();
+                v.setBackgroundResource(R.drawable.radiobutton_active);
+
+                if (mLastSelected != null)
+                    mLastSelected.setBackgroundResource(android.R.color.transparent);
+                mLastSelected = v;
+            }
+        };
+
+        mCategoryGridView.setOnItemClickListener(mOnClickListener);
+
         return v;
     }
 
@@ -130,6 +164,11 @@ public class NewBitFragment extends Fragment {
                 return true;
             }
 
+            if (mLastSelected == null) {
+                Toast.makeText(this.getActivity(), "Please select a category for the Bit", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
             /**
              * Save the model here
              */
@@ -140,6 +179,7 @@ public class NewBitFragment extends Fragment {
             mTask.setDoneCount(0);
             mTask.setSkipCount(0);
             mTask.setLateCount(0);
+            mTask.setCategory((Category) mLastSelected.getTag());
 
             RadioButton rbFreq = (RadioButton) this.getView().findViewById(this.mFrequencyRBtnGroup.getCheckedRadioButtonId());
             RadioButton rbInterval = (RadioButton) this.getView().findViewById(this.mIntervalRBtnGroup.getCheckedRadioButtonId());
@@ -196,4 +236,34 @@ public class NewBitFragment extends Fragment {
         public void onNewDisposeInteraction();
     }
 
+    private class CategoryAdapter extends ArrayAdapter<Category> {
+        List<Category> mItems;
+
+        public CategoryAdapter(Context ctx, List<Category> t) {
+            super(ctx, R.layout.category_gridview_item, t);
+            mItems = t;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View v = convertView;
+
+            if (v == null) {
+                LayoutInflater li = getActivity().getLayoutInflater();
+                v = li.inflate(R.layout.category_gridview_item, parent, false);
+            }
+
+            FrameLayout frameLayout = (FrameLayout) v.findViewById(R.id.grid_item_image);
+
+            Category c = getItem(position);
+            SVGImageView svgImageView = new SVGImageView(getActivity());
+            svgImageView.setImageAsset(c.getIconDrawableName());
+
+            frameLayout.addView(svgImageView,
+                    new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+            v.setTag(c);
+            return v;
+        }
+    }
 }
