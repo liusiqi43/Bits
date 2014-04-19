@@ -1,16 +1,14 @@
 package com.siqi.bits;
 
+import android.util.Log;
+
 import com.google.common.primitives.Chars;
-import com.siqi.bits.app.R;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import de.greenrobot.dao.DaoException;
 
@@ -254,13 +252,15 @@ public class Task {
     }
 
     public void incrementSkipCount() {
+        // Call AppendLateCount before setting new LastDoneTime, because of the dependancy of this attribute
         appendLateCount();
+        setNextScheduledTime(System.currentTimeMillis());
         this.setSkipCount(this.getSkipCount() + 1);
         setHistory(getHistory()+'s');
     }
 
     public void appendLateCount() {
-        int appendCount = (int) ((System.currentTimeMillis() - getLastDone()) / getInterval());
+        int appendCount = getLastDone() == null ? 0 : (int) ((System.currentTimeMillis() - getLastDone()) / getInterval());
         String history = getHistory();
         StringBuilder builder = new StringBuilder(history);
 
@@ -279,7 +279,9 @@ public class Task {
     }
 
     public void incrementDoneCount() {
+        // Call AppendLateCount before setting new LastDoneTime, because of the dependancy of this attribute
         appendLateCount();
+        setLastDoneAndUpdateNextScheduleTime(System.currentTimeMillis());
         this.setDoneCount(this.getDoneCount() + 1);
         setHistory(getHistory()+'d');
     }
