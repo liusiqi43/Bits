@@ -33,4 +33,5 @@
     <string name="done_on_time_rate">Done on time rate</string>
     <string name="added_recently">Added recently!</string>
     <string name="done">Done</string>
+    <string name="actionview_tag">ACTION</string>
 </resources>

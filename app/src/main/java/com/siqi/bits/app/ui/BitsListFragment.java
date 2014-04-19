@@ -140,10 +140,10 @@ public class BitsListFragment extends Fragment {
                 final ViewSwitcher viewSwitcher = (ViewSwitcher) view.findViewById(R.id.card_viewswitcher);
                 viewSwitcher.showNext();
 
-                new Handler().postDelayed(new Runnable() { public void run() {
-                    viewSwitcher.showPrevious();
-                }
-                }, 1000 * 3);
+                    new Handler().postDelayed(new Runnable() { public void run() {
+                        viewSwitcher.setDisplayedChild(0);
+                    }
+                    }, getResources().getInteger(R.integer.actionview_timeout));
 
                 return true;
             }
