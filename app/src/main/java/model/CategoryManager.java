@@ -76,7 +76,7 @@ public class CategoryManager {
     }
 
     private void initWithCategories() {
-        if (mCategoryDao.count() < 100) {
+        if (mCategoryDao.count() < 6) {
             mCategoryDao.deleteAll();
 
             addCategoryWithNameAndIcon("Music", "music");

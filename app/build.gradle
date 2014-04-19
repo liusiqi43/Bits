@@ -42,4 +42,5 @@ dependencies {
     compile 'com.caverock:androidsvg:1.2.1@jar'
     compile project(':swipelistview')
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.googlecode.guava-osgi:guava-osgi:10.0.0@jar'
 }

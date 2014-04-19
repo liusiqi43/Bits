@@ -16,7 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -304,13 +306,8 @@ public class BitsListFragment extends Fragment {
             holder.icon.setMaxWidth(holder.icon.getHeight());
             holder.icon.setImageBitmap(bitmap);
             holder.title.setText(t.getDescription());
-            holder.timeAgo.setText("Done "+prettyTime.format(new Date(t.getLastDone())));
-            long duration = t.getNextScheduledTime() - System.currentTimeMillis();
-
-            int progress = (int) (100 * (1- ((double) duration / (double) t.getInterval())));
-
-            Log.d("Progress", ":"+progress);
-            holder.progressBar.setProgress(progress);
+            holder.timeAgo.setText(t.getTimesAgoDescription(getString(R.string.done), getString(R.string.added_recently), prettyTime));
+            holder.progressBar.setProgress(t.getProgress());
 
 //            if (progress > 100) {
 //                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Pomegranate));
@@ -375,7 +372,8 @@ public class BitsListFragment extends Fragment {
 
             holder.bitDoneRate.setText(tm.getDoneRate(t) + " %");
             holder.othersDoneRate.setText(tm.getDoneRateExcept(t) + " %");
-
+            TimeLineAdapter adapter = new TimeLineAdapter(getActivity(), t.getHistoryAsCharArray(getResources().getInteger(R.integer.timeline_rect_per_row)));
+            holder.timeLine.setAdapter(adapter);
             return v;
         }
 
@@ -399,5 +397,45 @@ public class BitsListFragment extends Fragment {
         TextView bitDoneRate;
         TextView othersDoneRate;
         GridView timeLine;
+    }
+
+
+    private class TimeLineAdapter extends ArrayAdapter<Character> {
+        List<Character> mItems;
+
+        public TimeLineAdapter(Context ctx, List<Character> t) {
+            super(ctx, R.layout.timeline_girdview_item, t);
+            mItems = t;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View v = convertView;
+
+            if (v == null) {
+                LayoutInflater li = getActivity().getLayoutInflater();
+                v = li.inflate(R.layout.timeline_girdview_item, parent, false);
+            }
+
+            FrameLayout item = (FrameLayout) v.findViewById(R.id.timeline_item);
+
+            switch (mItems.get(position)) {
+                case 'l':
+                    item.setBackgroundColor(getResources().getColor(R.color.lateColor));
+                    break;
+                case 'd':
+                    item.setBackgroundColor(getResources().getColor(R.color.doneColor));
+                    break;
+                case 's':
+                    item.setBackgroundColor(getResources().getColor(R.color.skipColor));
+                    break;
+                case 'n':
+                    item.setBackgroundColor(getResources().getColor(R.color.noneColor));
+                    break;
+            }
+
+            v.setTag(mItems.get(position));
+            return v;
+        }
     }
 }

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="timeline_rect_per_row">15</integer>
+</resources>

@@ -10,6 +10,7 @@ public class BitsDaoGenerator {
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(3, "com.siqi.bits");
+        schema.enableKeepSectionsByDefault();
 
         /**
          * Task
@@ -17,13 +18,14 @@ public class BitsDaoGenerator {
         Entity task = schema.addEntity("Task");
         task.addIdProperty();
         task.addStringProperty("description").notNull();
+        task.addStringProperty("history").notNull();
         task.addDateProperty("createdOn").notNull();
         task.addDateProperty("modifiedOn").notNull();
         task.addDateProperty("deletedOn");
         // if 6 times a day, that's once every 2 hours, interval stores 2 hours in ms
         task.addLongProperty("interval").notNull().getProperty();
         // currentTime when just created
-        task.addLongProperty("lastDone").notNull().getProperty();
+        task.addLongProperty("lastDone").getProperty();
         Property nextScheduledTime = task.addLongProperty("nextScheduledTime").notNull().getProperty();
         task.addIntProperty("doneCount").notNull();
         task.addIntProperty("skipCount").notNull();

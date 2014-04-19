@@ -3,15 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/cloud"
-    android:paddingLeft="5dp"
-    android:paddingRight="5dp"
+    android:padding="5dp"
     tools:context="com.siqi.bits.app.MainActivity$PlaceholderFragment">
 
     <com.siqi.bits.swipelistview.SwipeListView
         xmlns:swipe="http://schemas.android.com/apk/res-auto"
         android:id="@+id/bitslist"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         swipe:swipeFrontView="@id/front"
         swipe:swipeBackView="@id/back"
         swipe:swipeActionLeft="choice"

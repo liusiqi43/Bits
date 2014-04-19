@@ -75,6 +75,7 @@
     <orderEntry type="library" exported="" name="appcompat-v7-19.1.0" level="project" />
     <orderEntry type="library" exported="" name="library-2.6.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
+    <orderEntry type="library" exported="" name="guava-osgi-10.0.0" level="project" />
     <orderEntry type="library" exported="" name="prettytime-3.0.2.Final" level="project" />
     <orderEntry type="library" exported="" name="androidsvg-1.2.1" level="project" />
     <orderEntry type="library" exported="" name="library-2.4.0" level="project" />

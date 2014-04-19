@@ -55,12 +55,12 @@ public class TaskManager {
     }
 
     public Task newTask(Category c) {
-        Task t = new Task(null, null, new Date(), new Date(), null, 0, 0, 0, 0, 0, 0, c.getId());
+        Task t = new Task(null, null, "", new Date(), new Date(), null, 0, null, 0, 0, 0, 0, c.getId());
         return t;
     }
 
     public Task newTask() {
-        Task t = new Task(null, null, new Date(), new Date(), null, 0, 0, 0, 0, 0, 0, -1);
+        Task t = new Task(null, null, "", new Date(), new Date(), null, 0, null, 0, 0, 0, 0, -1);
         return t;
     }
 

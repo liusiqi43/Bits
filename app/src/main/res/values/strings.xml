@@ -31,4 +31,6 @@
     <string name="duplicated_title_error">A bit with same title already exists, make that a habit first!</string>
     <string name="empty_title_error">Bit needs a title to get started!</string>
     <string name="done_on_time_rate">Done on time rate</string>
+    <string name="added_recently">Added recently!</string>
+    <string name="done">Done</string>
 </resources>

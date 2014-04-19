@@ -180,7 +180,6 @@ public class NewBitFragment extends Fragment {
             /**
              * Save the model here
              */
-            mTask.setLastDone(System.currentTimeMillis());
             mTask.setDescription(mBitTitleEditText.getText().toString().trim());
             mTask.setCreatedOn(new Date());
             mTask.setModifiedOn(new Date());
@@ -194,9 +193,8 @@ public class NewBitFragment extends Fragment {
 
             int daysCount = IntervalToDays.get(rbInterval.getText().toString());
 
-            mTask.setInterval((long) daysCount * 24 * 3600 * 1000/(Integer.parseInt(rbFreq.getText().toString())));
-            mTask.setLastDone(System.currentTimeMillis());
-            mTask.setNextScheduledTime(mTask.getLastDone() + mTask.getInterval());
+            mTask.setInterval((long) daysCount * 24 * 3600 * 1000 / (Integer.parseInt(rbFreq.getText().toString())));
+            mTask.setNextScheduledTime(System.currentTimeMillis() + mTask.getInterval());
 
             try {
                 TaskManager.getInstance(getActivity().getApplicationContext()).insertTask(mTask);

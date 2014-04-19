@@ -30,16 +30,17 @@ public class TaskDao extends AbstractDao<Task, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Description = new Property(1, String.class, "description", false, "DESCRIPTION");
-        public final static Property CreatedOn = new Property(2, java.util.Date.class, "createdOn", false, "CREATED_ON");
-        public final static Property ModifiedOn = new Property(3, java.util.Date.class, "modifiedOn", false, "MODIFIED_ON");
-        public final static Property DeletedOn = new Property(4, java.util.Date.class, "deletedOn", false, "DELETED_ON");
-        public final static Property Interval = new Property(5, long.class, "interval", false, "INTERVAL");
-        public final static Property LastDone = new Property(6, long.class, "lastDone", false, "LAST_DONE");
-        public final static Property NextScheduledTime = new Property(7, long.class, "nextScheduledTime", false, "NEXT_SCHEDULED_TIME");
-        public final static Property DoneCount = new Property(8, int.class, "doneCount", false, "DONE_COUNT");
-        public final static Property SkipCount = new Property(9, int.class, "skipCount", false, "SKIP_COUNT");
-        public final static Property LateCount = new Property(10, int.class, "lateCount", false, "LATE_COUNT");
-        public final static Property CategoryId = new Property(11, long.class, "categoryId", false, "CATEGORY_ID");
+        public final static Property History = new Property(2, String.class, "history", false, "HISTORY");
+        public final static Property CreatedOn = new Property(3, java.util.Date.class, "createdOn", false, "CREATED_ON");
+        public final static Property ModifiedOn = new Property(4, java.util.Date.class, "modifiedOn", false, "MODIFIED_ON");
+        public final static Property DeletedOn = new Property(5, java.util.Date.class, "deletedOn", false, "DELETED_ON");
+        public final static Property Interval = new Property(6, long.class, "interval", false, "INTERVAL");
+        public final static Property LastDone = new Property(7, Long.class, "lastDone", false, "LAST_DONE");
+        public final static Property NextScheduledTime = new Property(8, long.class, "nextScheduledTime", false, "NEXT_SCHEDULED_TIME");
+        public final static Property DoneCount = new Property(9, int.class, "doneCount", false, "DONE_COUNT");
+        public final static Property SkipCount = new Property(10, int.class, "skipCount", false, "SKIP_COUNT");
+        public final static Property LateCount = new Property(11, int.class, "lateCount", false, "LATE_COUNT");
+        public final static Property CategoryId = new Property(12, long.class, "categoryId", false, "CATEGORY_ID");
     };
 
     private DaoSession daoSession;
@@ -61,16 +62,17 @@ public class TaskDao extends AbstractDao<Task, Long> {
         db.execSQL("CREATE TABLE " + constraint + "'TASK' (" + //
                 "'_id' INTEGER PRIMARY KEY ," + // 0: id
                 "'DESCRIPTION' TEXT NOT NULL ," + // 1: description
-                "'CREATED_ON' INTEGER NOT NULL ," + // 2: createdOn
-                "'MODIFIED_ON' INTEGER NOT NULL ," + // 3: modifiedOn
-                "'DELETED_ON' INTEGER," + // 4: deletedOn
-                "'INTERVAL' INTEGER NOT NULL ," + // 5: interval
-                "'LAST_DONE' INTEGER NOT NULL ," + // 6: lastDone
-                "'NEXT_SCHEDULED_TIME' INTEGER NOT NULL ," + // 7: nextScheduledTime
-                "'DONE_COUNT' INTEGER NOT NULL ," + // 8: doneCount
-                "'SKIP_COUNT' INTEGER NOT NULL ," + // 9: skipCount
-                "'LATE_COUNT' INTEGER NOT NULL ," + // 10: lateCount
-                "'CATEGORY_ID' INTEGER NOT NULL );"); // 11: categoryId
+                "'HISTORY' TEXT NOT NULL ," + // 2: history
+                "'CREATED_ON' INTEGER NOT NULL ," + // 3: createdOn
+                "'MODIFIED_ON' INTEGER NOT NULL ," + // 4: modifiedOn
+                "'DELETED_ON' INTEGER," + // 5: deletedOn
+                "'INTERVAL' INTEGER NOT NULL ," + // 6: interval
+                "'LAST_DONE' INTEGER," + // 7: lastDone
+                "'NEXT_SCHEDULED_TIME' INTEGER NOT NULL ," + // 8: nextScheduledTime
+                "'DONE_COUNT' INTEGER NOT NULL ," + // 9: doneCount
+                "'SKIP_COUNT' INTEGER NOT NULL ," + // 10: skipCount
+                "'LATE_COUNT' INTEGER NOT NULL ," + // 11: lateCount
+                "'CATEGORY_ID' INTEGER NOT NULL );"); // 12: categoryId
     }
 
     /** Drops the underlying database table. */
@@ -89,20 +91,25 @@ public class TaskDao extends AbstractDao<Task, Long> {
             stmt.bindLong(1, id);
         }
         stmt.bindString(2, entity.getDescription());
-        stmt.bindLong(3, entity.getCreatedOn().getTime());
-        stmt.bindLong(4, entity.getModifiedOn().getTime());
+        stmt.bindString(3, entity.getHistory());
+        stmt.bindLong(4, entity.getCreatedOn().getTime());
+        stmt.bindLong(5, entity.getModifiedOn().getTime());
  
         java.util.Date deletedOn = entity.getDeletedOn();
         if (deletedOn != null) {
-            stmt.bindLong(5, deletedOn.getTime());
+            stmt.bindLong(6, deletedOn.getTime());
         }
-        stmt.bindLong(6, entity.getInterval());
-        stmt.bindLong(7, entity.getLastDone());
-        stmt.bindLong(8, entity.getNextScheduledTime());
-        stmt.bindLong(9, entity.getDoneCount());
-        stmt.bindLong(10, entity.getSkipCount());
-        stmt.bindLong(11, entity.getLateCount());
-        stmt.bindLong(12, entity.getCategoryId());
+        stmt.bindLong(7, entity.getInterval());
+ 
+        Long lastDone = entity.getLastDone();
+        if (lastDone != null) {
+            stmt.bindLong(8, lastDone);
+        }
+        stmt.bindLong(9, entity.getNextScheduledTime());
+        stmt.bindLong(10, entity.getDoneCount());
+        stmt.bindLong(11, entity.getSkipCount());
+        stmt.bindLong(12, entity.getLateCount());
+        stmt.bindLong(13, entity.getCategoryId());
     }
 
     @Override
@@ -123,16 +130,17 @@ public class TaskDao extends AbstractDao<Task, Long> {
         Task entity = new Task( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getString(offset + 1), // description
-            new java.util.Date(cursor.getLong(offset + 2)), // createdOn
-            new java.util.Date(cursor.getLong(offset + 3)), // modifiedOn
-            cursor.isNull(offset + 4) ? null : new java.util.Date(cursor.getLong(offset + 4)), // deletedOn
-            cursor.getLong(offset + 5), // interval
-            cursor.getLong(offset + 6), // lastDone
-            cursor.getLong(offset + 7), // nextScheduledTime
-            cursor.getInt(offset + 8), // doneCount
-            cursor.getInt(offset + 9), // skipCount
-            cursor.getInt(offset + 10), // lateCount
-            cursor.getLong(offset + 11) // categoryId
+            cursor.getString(offset + 2), // history
+            new java.util.Date(cursor.getLong(offset + 3)), // createdOn
+            new java.util.Date(cursor.getLong(offset + 4)), // modifiedOn
+            cursor.isNull(offset + 5) ? null : new java.util.Date(cursor.getLong(offset + 5)), // deletedOn
+            cursor.getLong(offset + 6), // interval
+            cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7), // lastDone
+            cursor.getLong(offset + 8), // nextScheduledTime
+            cursor.getInt(offset + 9), // doneCount
+            cursor.getInt(offset + 10), // skipCount
+            cursor.getInt(offset + 11), // lateCount
+            cursor.getLong(offset + 12) // categoryId
         );
         return entity;
     }
@@ -142,16 +150,17 @@ public class TaskDao extends AbstractDao<Task, Long> {
     public void readEntity(Cursor cursor, Task entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setDescription(cursor.getString(offset + 1));
-        entity.setCreatedOn(new java.util.Date(cursor.getLong(offset + 2)));
-        entity.setModifiedOn(new java.util.Date(cursor.getLong(offset + 3)));
-        entity.setDeletedOn(cursor.isNull(offset + 4) ? null : new java.util.Date(cursor.getLong(offset + 4)));
-        entity.setInterval(cursor.getLong(offset + 5));
-        entity.setLastDone(cursor.getLong(offset + 6));
-        entity.setNextScheduledTime(cursor.getLong(offset + 7));
-        entity.setDoneCount(cursor.getInt(offset + 8));
-        entity.setSkipCount(cursor.getInt(offset + 9));
-        entity.setLateCount(cursor.getInt(offset + 10));
-        entity.setCategoryId(cursor.getLong(offset + 11));
+        entity.setHistory(cursor.getString(offset + 2));
+        entity.setCreatedOn(new java.util.Date(cursor.getLong(offset + 3)));
+        entity.setModifiedOn(new java.util.Date(cursor.getLong(offset + 4)));
+        entity.setDeletedOn(cursor.isNull(offset + 5) ? null : new java.util.Date(cursor.getLong(offset + 5)));
+        entity.setInterval(cursor.getLong(offset + 6));
+        entity.setLastDone(cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7));
+        entity.setNextScheduledTime(cursor.getLong(offset + 8));
+        entity.setDoneCount(cursor.getInt(offset + 9));
+        entity.setSkipCount(cursor.getInt(offset + 10));
+        entity.setLateCount(cursor.getInt(offset + 11));
+        entity.setCategoryId(cursor.getLong(offset + 12));
      }
     
     /** @inheritdoc */
