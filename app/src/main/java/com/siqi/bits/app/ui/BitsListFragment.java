@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.LruCache;
 import android.util.Log;
@@ -23,6 +24,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
@@ -55,6 +57,7 @@ public class BitsListFragment extends Fragment {
 
     SwipeListView mBitsListView;
     BitListArrayAdapter mAdapter;
+    AnimateDismissAdapter mAnimateDismissAdapter;
 
     private OnBitListInteractionListener mListener;
 
@@ -93,10 +96,10 @@ public class BitsListFragment extends Fragment {
         cm = CategoryManager.getInstance(this.getActivity().getApplicationContext());
 
         mAdapter = new BitListArrayAdapter(getActivity().getApplicationContext(), tm.getAllSortedTasks());
-        final AnimateDismissAdapter animateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
+        mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
 
         // Swing from bottom anim & dismiss anim
-        SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(animateDismissAdapter);
+        SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAnimateDismissAdapter);
         swingBottomInAnimationAdapter.setInitialDelayMillis(200);
         swingBottomInAnimationAdapter.setAnimationDurationMillis(400);
         swingBottomInAnimationAdapter.setAbsListView(mBitsListView);
@@ -134,12 +137,14 @@ public class BitsListFragment extends Fragment {
         mBitsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Task item = mAdapter.getItem(position);
-                item.setDeletedOn(new Date());
-                tm.updateTask(item);
-                // Implicitly calls datasetChanged() method
+                final ViewSwitcher viewSwitcher = (ViewSwitcher) view.findViewById(R.id.card_viewswitcher);
+                viewSwitcher.showNext();
 
-                animateDismissAdapter.animateDismiss(position);
+                new Handler().postDelayed(new Runnable() { public void run() {
+                    viewSwitcher.showPrevious();
+                }
+                }, 1000 * 3);
+
                 return true;
             }
         });
@@ -211,7 +216,7 @@ public class BitsListFragment extends Fragment {
         }
 
         @Override
-        public View getTitleView(int position, View convertView, ViewGroup parent) {
+        public View getTitleView(final int position, View convertView, ViewGroup parent) {
             Log.d("TEST", "getTitleVlew:"+position);
             View v = convertView;
             BitTitleHolder holder;
@@ -228,11 +233,32 @@ public class BitsListFragment extends Fragment {
                 holder.progressBar = (ProgressBar) v.findViewById(R.id.timeAgoProgressBar);
                 holder.doneButton = (Button) v.findViewById(R.id.done_button);
                 holder.skipButton = (Button) v.findViewById(R.id.skip_button);
+                holder.editButton = (Button) v.findViewById(R.id.edit_button);
+                holder.deleteButton = (Button) v.findViewById(R.id.delete_button);
 
                 v.setTag(holder);
             } else {
                 holder = (BitTitleHolder) v.getTag();
             }
+
+            holder.deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Task item = mAdapter.getItem(position);
+                    item.setDeletedOn(new Date());
+                    tm.updateTask(item);
+                    // Implicitly calls datasetChanged() method
+
+                    mAnimateDismissAdapter.animateDismiss(position);
+                }
+            });
+
+            holder.editButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.d("EditButton", "Clicked: " + position);
+                }
+            });
 
             final Task t = getItem(position);
 
@@ -402,7 +428,8 @@ public class BitsListFragment extends Fragment {
         TextView title;
         TextView timeAgo;
         ProgressBar progressBar;
-        Button skipButton, doneButton;
+        Button skipButton, doneButton, editButton, deleteButton;
+        ViewSwitcher viewSwitcher;
     }
 
     private static class BitContentHolder {

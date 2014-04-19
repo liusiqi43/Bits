@@ -28,6 +28,8 @@
     <color name="skipColor">@color/PeterRiver</color>
     <color name="lateColor">@color/Alizarin</color>
     <color name="noneColor">@color/concrete</color>
+    <color name="editColor">@color/BelizeHole</color>
+    <color name="deleteColor">@color/Pomegranate</color>
 
     <color name="radiobutton_inactive">@android:color/transparent</color>
 
