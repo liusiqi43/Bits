@@ -254,7 +254,7 @@ public class Task {
     public void incrementSkipCount() {
         // Call AppendLateCount before setting new LastDoneTime, because of the dependancy of this attribute
         appendLateCount();
-        setNextScheduledTime(System.currentTimeMillis());
+        setNextScheduledTime(System.currentTimeMillis() + getInterval());
         this.setSkipCount(this.getSkipCount() + 1);
         setHistory(getHistory()+'s');
     }
@@ -275,7 +275,7 @@ public class Task {
 
     public int getProgress() {
         long duration = getNextScheduledTime() - System.currentTimeMillis();
-        return (int) (100 - ((long) 100*duration / getInterval()));
+        return (int) (100 - ((long) 100 * duration / getInterval()));
     }
 
     public void incrementDoneCount() {

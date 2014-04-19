@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -137,15 +138,17 @@ public class BitsListFragment extends Fragment {
 
         mBitsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+            public boolean onItemLongClick(AdapterView<?> adapterView, final View view, int position, long id) {
+
                 final ViewSwitcher viewSwitcher = (ViewSwitcher) view.findViewById(R.id.card_viewswitcher);
                 viewSwitcher.showNext();
 
-                    new Handler().postDelayed(new Runnable() { public void run() {
+                new Handler().postDelayed(new Runnable() { public void run() {
+                    if(viewSwitcher.getDisplayedChild() == 1) {
                         viewSwitcher.setDisplayedChild(0);
                     }
-                    }, getResources().getInteger(R.integer.actionview_timeout));
-
+                }
+                }, getResources().getInteger(R.integer.actionview_timeout));
                 return true;
             }
         });
@@ -220,7 +223,7 @@ public class BitsListFragment extends Fragment {
         public View getTitleView(final int position, View convertView, ViewGroup parent) {
             Log.d("TEST", "getTitleVlew:"+position);
             View v = convertView;
-            BitTitleHolder holder;
+            final BitTitleHolder holder;
 
             if (v == null) {
                 LayoutInflater li = getActivity().getLayoutInflater();
@@ -246,6 +249,7 @@ public class BitsListFragment extends Fragment {
             holder.deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    holder.viewSwitcher.setDisplayedChild(0);
                     Task item = mAdapter.getItem(position);
                     item.setDeletedOn(new Date());
                     tm.updateTask(item);
@@ -335,9 +339,11 @@ public class BitsListFragment extends Fragment {
             holder.timeAgo.setText(t.getTimesAgoDescription(getString(R.string.done), getString(R.string.added_recently), prettyTime));
             holder.progressBar.setProgress(t.getProgress());
 
-            holder.viewSwitcher.setInAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left));
-            holder.viewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right));
+            Animation inAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left); inAnimation.setDuration(300);
+            Animation outAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right); outAnimation.setDuration(300);
 
+            holder.viewSwitcher.setInAnimation(inAnimation);
+            holder.viewSwitcher.setOutAnimation(outAnimation);
 //            if (progress > 100) {
 //                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Pomegranate));
 //            } else {
