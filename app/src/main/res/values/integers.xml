@@ -2,4 +2,7 @@
 <resources>
     <integer name="timeline_rect_per_row">15</integer>
     <integer name="actionview_timeout">3000</integer>
+
+    <integer name="card_flip_time_full">300</integer>
+    <integer name="card_flip_time_half">150</integer>
 </resources>

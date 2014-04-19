@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -235,6 +236,7 @@ public class BitsListFragment extends Fragment {
                 holder.skipButton = (Button) v.findViewById(R.id.skip_button);
                 holder.editButton = (Button) v.findViewById(R.id.edit_button);
                 holder.deleteButton = (Button) v.findViewById(R.id.delete_button);
+                holder.viewSwitcher = (ViewSwitcher) v.findViewById(R.id.card_viewswitcher);
 
                 v.setTag(holder);
             } else {
@@ -332,6 +334,9 @@ public class BitsListFragment extends Fragment {
             holder.title.setText(t.getDescription());
             holder.timeAgo.setText(t.getTimesAgoDescription(getString(R.string.done), getString(R.string.added_recently), prettyTime));
             holder.progressBar.setProgress(t.getProgress());
+
+            holder.viewSwitcher.setInAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left));
+            holder.viewSwitcher.setOutAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right));
 
 //            if (progress > 100) {
 //                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Pomegranate));
