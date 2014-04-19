@@ -109,7 +109,6 @@ public class BitsListFragment extends Fragment {
                 if (mAdapter.isExpanded(position))
                     mAdapter.toggle(position);
                 Task item = mAdapter.getItem(position);
-                item.setNextScheduledTime(System.currentTimeMillis() + item.getInterval());
                 item.incrementSkipCount();
                 tm.updateTask(item);
                 // Implicitly calls datasetChanged() method
@@ -122,7 +121,6 @@ public class BitsListFragment extends Fragment {
                 if (mAdapter.isExpanded(position))
                     mAdapter.toggle(position);
                 Task item = mAdapter.getItem(position);
-                item.setLastDoneAndUpdateNextScheduleTime(System.currentTimeMillis());
                 item.incrementDoneCount();
                 tm.updateTask(item);
                 // Implicitly calls datasetChanged() method
@@ -369,6 +367,20 @@ public class BitsListFragment extends Fragment {
             }
 
             Task t = mAdapter.getItem(position);
+
+            int thisDoneRate = tm.getDoneRate(t);
+            int othersDoneRate = tm.getDoneRateExcept(t);
+
+            if (thisDoneRate > othersDoneRate) {
+                holder.bitDoneRate.setTextColor(getResources().getColor(R.color.doneColor));
+                holder.othersDoneRate.setTextColor(getResources().getColor(R.color.lateColor));
+            } else if (thisDoneRate < othersDoneRate) {
+                holder.bitDoneRate.setTextColor(getResources().getColor(R.color.lateColor));
+                holder.othersDoneRate.setTextColor(getResources().getColor(R.color.doneColor));
+            } else {
+                holder.bitDoneRate.setTextColor(getResources().getColor(R.color.noneColor));
+                holder.othersDoneRate.setTextColor(getResources().getColor(R.color.noneColor));
+            }
 
             holder.bitDoneRate.setText(tm.getDoneRate(t) + " %");
             holder.othersDoneRate.setText(tm.getDoneRateExcept(t) + " %");
