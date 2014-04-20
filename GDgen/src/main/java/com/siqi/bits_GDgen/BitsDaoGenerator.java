@@ -30,6 +30,7 @@ public class BitsDaoGenerator {
         task.addIntProperty("doneCount").notNull();
         task.addIntProperty("skipCount").notNull();
         task.addIntProperty("lateCount").notNull();
+        task.addStringProperty("frequencyIntervalPair").notNull();
 
 
         /**

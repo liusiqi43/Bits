@@ -1,7 +1,5 @@
 package com.siqi.bits;
 
-import android.util.Log;
-
 import com.google.common.primitives.Chars;
 
 import org.ocpsoft.prettytime.PrettyTime;
@@ -9,6 +7,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.greenrobot.dao.DaoException;
 
@@ -37,6 +36,8 @@ public class Task {
     private int doneCount;
     private int skipCount;
     private int lateCount;
+    /** Not-null value. */
+    private String frequencyIntervalPair;
     private long categoryId;
 
     /** Used to resolve relations */
@@ -59,7 +60,7 @@ public class Task {
         this.id = id;
     }
 
-    public Task(Long id, String description, String history, java.util.Date createdOn, java.util.Date modifiedOn, java.util.Date deletedOn, long interval, Long lastDone, long nextScheduledTime, int doneCount, int skipCount, int lateCount, long categoryId) {
+    public Task(Long id, String description, String history, java.util.Date createdOn, java.util.Date modifiedOn, java.util.Date deletedOn, long interval, Long lastDone, long nextScheduledTime, int doneCount, int skipCount, int lateCount, String frequencyIntervalPair, long categoryId) {
         this.id = id;
         this.description = description;
         this.history = history;
@@ -72,6 +73,7 @@ public class Task {
         this.doneCount = doneCount;
         this.skipCount = skipCount;
         this.lateCount = lateCount;
+        this.frequencyIntervalPair = frequencyIntervalPair;
         this.categoryId = categoryId;
     }
 
@@ -183,6 +185,16 @@ public class Task {
 
     public void setLateCount(int lateCount) {
         this.lateCount = lateCount;
+    }
+
+    /** Not-null value. */
+    public String getFrequencyIntervalPair() {
+        return frequencyIntervalPair;
+    }
+
+    /** Not-null value; ensure this value is available before it is saved to the database. */
+    public void setFrequencyIntervalPair(String frequencyIntervalPair) {
+        this.frequencyIntervalPair = frequencyIntervalPair;
     }
 
     public long getCategoryId() {
