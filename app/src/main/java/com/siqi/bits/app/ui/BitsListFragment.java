@@ -262,7 +262,7 @@ public class BitsListFragment extends Fragment {
             holder.editButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.d("EditButton", "Clicked: " + position);
+                    mListener.startEditBitFragment(mAdapter.getItem(position).getId());
                 }
             });
 
@@ -369,6 +369,9 @@ public class BitsListFragment extends Fragment {
 //            } else {
 //                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Emerald));
 //            }
+
+            Log.d("BitListFrag", t.getDescription() + " in " + t.getCategory().getName());
+
             return v;
         }
 

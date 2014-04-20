@@ -11,9 +11,9 @@
 
     <ImageView
         android:id="@+id/grid_item_image"
+        android:background="@color/MidnightBlue"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:background="@color/MidnightBlue"
         android:scaleType="centerInside" />
 
 </LinearLayout>

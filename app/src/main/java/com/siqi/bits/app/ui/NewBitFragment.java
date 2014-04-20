@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import model.CategoryManager;
 import model.TaskManager;
@@ -47,10 +47,10 @@ import model.TaskManager;
  */
 public class NewBitFragment extends Fragment {
     public static final int FRAGMENT_ID = 9;
-    private static final String BIT_ID = "bit_id";
-    private final ConcurrentHashMap<String, Integer> IntervalToDays = new ConcurrentHashMap<String, Integer>();
+    private static final String EDITING_BIT_ID = "bit_id";
 
-    private long mBitID;
+
+    private Long mEditingBitID;
     private Task mTask;
 
     private EditText mBitTitleEditText;
@@ -69,7 +69,7 @@ public class NewBitFragment extends Fragment {
     private TaskManager tm;
 
     private AdapterView.OnItemClickListener mOnClickListener;
-    private View mLastSelected;
+    private View mLastSelected = null;
 
     /**
      * Use this factory method to create a new instance of
@@ -83,7 +83,7 @@ public class NewBitFragment extends Fragment {
         NewBitFragment fragment = new NewBitFragment();
         if (id != null) {
             Bundle args = new Bundle();
-            args.putLong(BIT_ID, id);
+            args.putLong(EDITING_BIT_ID, id);
             fragment.setArguments(args);
         }
         return fragment;
@@ -100,18 +100,9 @@ public class NewBitFragment extends Fragment {
         tm = TaskManager.getInstance(this.getActivity().getApplicationContext());
         cm = CategoryManager.getInstance(this.getActivity().getApplicationContext());
 
-        /**
-         * TODO Optimize this so that there is only one copy of hashmap...
-         * Well this is in a Frag so there should be only one copy...how bad it can be??
-         */
-        IntervalToDays.put(getString(R.string.radio_day), 1);
-        IntervalToDays.put(getString(R.string.radio_week), 7);
-        IntervalToDays.put(getString(R.string.radio_month), 30);
-        IntervalToDays.put(getString(R.string.radio_year), 365);
-
         if (getArguments() != null) {
-            mBitID = getArguments().getLong(BIT_ID);
-            mTask = tm.getTask(mBitID);
+            mEditingBitID = getArguments().getLong(EDITING_BIT_ID);
+            mTask = tm.getTask(mEditingBitID);
         } else {
             mTask = tm.newTask();
         }
@@ -145,10 +136,63 @@ public class NewBitFragment extends Fragment {
                 if (mLastSelected != null && mLastSelected != v)
                     mLastSelected.setBackgroundResource(android.R.color.transparent);
                 mLastSelected = v;
+
+                Log.d("BitListFrag", "Detected Click on View with tag: "+ ((Category) mLastSelected.getTag()).getName());
             }
         };
 
         mCategoryGridView.setOnItemClickListener(mOnClickListener);
+
+
+        if (mEditingBitID != null) {
+            Log.d("BitListFrag", "Loading bit to edit");
+            // Editing!!
+            mBitTitleEditText.setText(mTask.getDescription());
+
+            String frequencyInterval = mTask.getFrequencyIntervalPair();
+            switch (frequencyInterval.charAt(0)) {
+                case 'd':
+                    mIntervalRBtnGroup.check(R.id.radio_day);
+                    break;
+                case 'w':
+                    mIntervalRBtnGroup.check(R.id.radio_week);
+                    break;
+                case 'm':
+                    mIntervalRBtnGroup.check(R.id.radio_month);
+                    break;
+                case 'y':
+                    mIntervalRBtnGroup.check(R.id.radio_year);
+                    break;
+                default:
+                    Log.e("NEW_BIT_FRAGMENT", "Unknown interval code");
+            }
+
+            switch (frequencyInterval.charAt(1)) {
+                case '1':
+                    mFrequencyRBtnGroup.check(R.id.radio_1);
+                    break;
+                case '2':
+                    mFrequencyRBtnGroup.check(R.id.radio_2);
+                    break;
+                case '3':
+                    mFrequencyRBtnGroup.check(R.id.radio_3);
+                    break;
+                case '4':
+                    mFrequencyRBtnGroup.check(R.id.radio_4);
+                    break;
+                case '5':
+                    mFrequencyRBtnGroup.check(R.id.radio_5);
+                    break;
+                case '6':
+                    mFrequencyRBtnGroup.check(R.id.radio_6);
+                    break;
+                default:
+                    Log.d("NEW_BIT_FRAGMENT", "Unknown frequency code");
+            }
+        } else {
+            Log.d("BitListFrag", "Handling new bit");
+            mTask.setCategory(cm.getDefaultCategory());
+        }
 
         return v;
     }
@@ -172,32 +216,29 @@ public class NewBitFragment extends Fragment {
                 return true;
             }
 
-            if (mLastSelected == null) {
-                Toast.makeText(this.getActivity(), "Please select a category for the Bit", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-
             /**
-             * Save the model here
+             * Save task model here
              */
             mTask.setDescription(mBitTitleEditText.getText().toString().trim());
-            mTask.setCreatedOn(new Date());
             mTask.setModifiedOn(new Date());
-            mTask.setDoneCount(0);
-            mTask.setSkipCount(0);
-            mTask.setLateCount(0);
             mTask.setCategory((Category) mLastSelected.getTag());
+
+            Log.d("BitListFrag", mTask.getDescription() + " in " + ((Category) mLastSelected.getTag()).getName() + " Now ");
 
             RadioButton rbFreq = (RadioButton) this.getView().findViewById(this.mFrequencyRBtnGroup.getCheckedRadioButtonId());
             RadioButton rbInterval = (RadioButton) this.getView().findViewById(this.mIntervalRBtnGroup.getCheckedRadioButtonId());
 
-            int daysCount = IntervalToDays.get(rbInterval.getText().toString());
+            tm.setIntervalFrequencyForTask(mTask, rbInterval.getText().toString(), rbFreq.getText().toString());
 
-            mTask.setInterval((long) daysCount * 24 * 3600 * 1000 / (Integer.parseInt(rbFreq.getText().toString())));
             mTask.setNextScheduledTime(System.currentTimeMillis() + mTask.getInterval());
 
             try {
-                TaskManager.getInstance(getActivity().getApplicationContext()).insertTask(mTask);
+                if (mEditingBitID == null) {
+                    mTask.setCreatedOn(new Date());
+                    tm.insertTask(mTask);
+                } else {
+                    tm.updateTask(mTask);
+                }
                 mListener.onNewDisposeInteraction();
             } catch (TaskManager.DuplicatedTaskException e) {
                 mBitTitleEditText.setError(getString(R.string.duplicated_title_error));
@@ -246,7 +287,7 @@ public class NewBitFragment extends Fragment {
         List<Category> mItems;
 
         public CategoryAdapter(Context ctx, List<Category> t) {
-            super(ctx, R.layout.category_gridview_item, t);
+            super(ctx, R.layout.fragment_new_bit_category_gridview_item, t);
             mItems = t;
         }
 
@@ -256,7 +297,7 @@ public class NewBitFragment extends Fragment {
 
             if (v == null) {
                 LayoutInflater li = getActivity().getLayoutInflater();
-                v = li.inflate(R.layout.category_gridview_item, parent, false);
+                v = li.inflate(R.layout.fragment_new_bit_category_gridview_item, parent, false);
             }
 
             ImageView icon = (ImageView) v.findViewById(R.id.grid_item_image);
@@ -281,8 +322,22 @@ public class NewBitFragment extends Fragment {
                 }
             }
 
+            if (mTask.getCategoryId() != -1 && mLastSelected == null && mAdapter.getItem(position).getId() == mTask.getCategory().getId()) {
+                v.setBackgroundColor(getResources().getColor(R.color.MidnightBlue));
+                mLastSelected = v;
+            }
+
             v.setTag(c);
             return v;
+        }
+
+        public int getPositionById(Category category) {
+            for (int i = 0; i < mItems.size(); ++i) {
+                if (category.getId() == mItems.get(i).getId()){
+                    return i;
+                }
+            }
+            return -1;
         }
     }
 }

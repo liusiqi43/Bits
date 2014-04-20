@@ -190,7 +190,8 @@
             android:horizontalSpacing="10dp"
             android:stretchMode="columnWidth"
             android:gravity="center"
-            android:clickable="false"
+            android:clickable="true"
+            android:drawSelectorOnTop="true"
             android:focusable="true"/>
 
 
