@@ -180,17 +180,6 @@
             android:text="@string/put_in_category"
             android:layout_gravity="center_horizontal" />
 
-        <TextSwitcher
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:layout_marginBottom="20dp"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/white"
-            android:text="Category"
-            android:id="@+id/category_selected"
-            android:layout_gravity="center_horizontal" />
-
         <views.ExpandingGridView
             android:id="@+id/category_gridview"
             android:layout_width="match_parent"
