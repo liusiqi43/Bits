@@ -25,7 +25,7 @@
     <string name="radio_year">year</string>
     <string name="I_want_to_do_this">I want to do this</string>
     <string name="times_a">times a</string>
-    <string name="put_in_category">put the bit in appropriate category</string>
+    <string name="put_in_category">select an icon for the Bit</string>
     <string name="create_new_bit">Create New Bit</string>
     <string name="whats_on_your_mind">What\'s on your mind? </string>
     <string name="duplicated_title_error">A bit with same title already exists, make that a habit first!</string>

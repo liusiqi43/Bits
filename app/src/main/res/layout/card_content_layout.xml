@@ -5,6 +5,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/WetAsphalt"
+    android:padding="5dp"
     android:layout_gravity="center">
 
     <TextView
@@ -79,24 +80,20 @@
         android:textStyle="bold"
         android:text="Timeline for this activity"/>
 
-    <GridView xmlns:android="http://schemas.android.com/apk/res/android"
+    <views.ExpandingGridView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/timeline_gridview"
-        android:layout_width="match_parent"
-        android:layout_height="77dp"
-        android:columnWidth="20dp"
-        android:numColumns="@integer/timeline_rect_per_row"
-        android:verticalSpacing="3dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:columnWidth="15dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="1dp"
         android:paddingRight="20dp"
         android:paddingLeft="20dp"
         android:paddingBottom="20dp"
         android:horizontalSpacing="1dp"
         android:gravity="center"
-        android:clickable="false"
-        android:focusable="false"
         tools:listitem="@android:layout/simple_list_item_1"
-        android:stretchMode="columnWidth"
-        android:longClickable="false"
-        android:scrollingCache="true"
-        android:stackFromBottom="false" />
+        android:stretchMode="spacingWidthUniform"
+        android:scrollingCache="true"/>
 
 </LinearLayout>

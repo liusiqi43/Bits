@@ -20,8 +20,14 @@ android {
     }
 
     buildTypes {
-        release {
+        debug {
             runProguard false
+            debuggable false
+        }
+
+        release {
+            runProguard true
+            debuggable false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
