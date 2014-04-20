@@ -339,8 +339,8 @@ public class BitsListFragment extends Fragment {
             holder.timeAgo.setText(t.getTimesAgoDescription(getString(R.string.done), getString(R.string.added_recently), prettyTime));
             holder.progressBar.setProgress(t.getProgress());
 
-            Animation inAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left); inAnimation.setDuration(300);
-            Animation outAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right); outAnimation.setDuration(300);
+            Animation inAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.card_flip_top_in); //inAnimation.setDuration(300);
+            Animation outAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.card_flip_bottom_out); //outAnimation.setDuration(300);
 
             holder.viewSwitcher.setInAnimation(inAnimation);
             holder.viewSwitcher.setOutAnimation(outAnimation);
