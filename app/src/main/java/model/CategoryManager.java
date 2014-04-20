@@ -119,4 +119,8 @@ public class CategoryManager {
         List<Category> categories = mCategoryDao.queryBuilder().where(CategoryDao.Properties.DeletedOn.isNull()).list();
         return categories;
     }
+
+    public Category getDefaultCategory() {
+        return this.getAllCategories().get(0);
+    }
 }

@@ -8,11 +8,13 @@ import com.siqi.bits.DaoMaster;
 import com.siqi.bits.DaoSession;
 import com.siqi.bits.Task;
 import com.siqi.bits.TaskDao;
+import com.siqi.bits.app.R;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by me on 4/9/14.
@@ -22,6 +24,8 @@ public class TaskManager {
     private DaoMaster mDaoMaster;
     private DaoSession mDaoSession;
     private TaskDao mTaskDao;
+
+    private final ConcurrentHashMap<String, Integer> IntervalToDays = new ConcurrentHashMap<String, Integer>();
 
     private static TaskManager INSTANCE = null;
 
@@ -37,6 +41,11 @@ public class TaskManager {
         mDaoMaster = new DaoMaster(mDB);
         mDaoSession = mDaoMaster.newSession();
         mTaskDao = mDaoSession.getTaskDao();
+
+        IntervalToDays.put(ctx.getString(R.string.radio_day), 1);
+        IntervalToDays.put(ctx.getString(R.string.radio_week), 7);
+        IntervalToDays.put(ctx.getString(R.string.radio_month), 30);
+        IntervalToDays.put(ctx.getString(R.string.radio_year), 365);
     }
 
     public static TaskManager getInstance(Context ctx) {
@@ -55,12 +64,12 @@ public class TaskManager {
     }
 
     public Task newTask(Category c) {
-        Task t = new Task(null, null, "", new Date(), new Date(), null, 0, null, 0, 0, 0, 0, c.getId());
+        Task t = new Task(null, null, "", new Date(), new Date(), null, 0, null, 0, 0, 0, 0, null, c.getId());
         return t;
     }
 
     public Task newTask() {
-        Task t = new Task(null, null, "", new Date(), new Date(), null, 0, null, 0, 0, 0, 0, -1);
+        Task t = new Task(null, null, "", new Date(), new Date(), null, 0, null, 0, 0, 0, 0, null, -1);
         return t;
     }
 
@@ -115,6 +124,14 @@ public class TaskManager {
         }
 
         return ((int) (100 * sum/total));
+    }
+
+    public void setIntervalFrequencyForTask(Task t, String interval, String frequency) {
+        int daysCount = IntervalToDays.get(interval);
+        int freq = Integer.parseInt(frequency);
+        t.setInterval((long) daysCount * 24 * 3600 * 1000 / freq);
+        // d3 w4 m3 y4 alike
+        t.setFrequencyIntervalPair(interval.charAt(0)+frequency);
     }
 
     public class DuplicatedTaskException extends Throwable {
