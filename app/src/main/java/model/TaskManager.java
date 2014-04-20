@@ -2,6 +2,7 @@ package model;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.siqi.bits.Category;
 import com.siqi.bits.DaoMaster;
@@ -96,6 +97,10 @@ public class TaskManager {
                 }
             }
         });
+
+        for (Task t : tasks) {
+            Log.d("GETALLSORTEDTASK", t.getDescription() + ":" + t.getNextScheduledTime() + " interval: " + t.getInterval());
+        }
 
         return tasks;
     }

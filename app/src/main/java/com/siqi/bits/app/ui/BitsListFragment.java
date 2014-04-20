@@ -268,48 +268,6 @@ public class BitsListFragment extends Fragment {
 
             final Task t = getItem(position);
 
-
-//            holder.iconFrameLayout.getHolder().addCallback(new SurfaceHolder.Callback() {
-//                @Override
-//                public void surfaceCreated(SurfaceHolder surfaceHolder) {
-//                    // Do some drawing when surface is ready
-//                    Canvas canvas = surfaceHolder.lockCanvas();
-//                    SVG svg = null;
-//                    try {
-//                        svg = SVG.getFromAsset(getActivity().getAssets(), t.getCategory().getIconDrawableName());
-//                    } catch (SVGParseException e){
-//                        e.printStackTrace();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    if (svg != null)
-//                        canvas.drawPicture(svg.renderToPicture(60, 60));
-//
-//                    surfaceHolder.unlockCanvasAndPost(canvas);
-//                }
-//
-//                @Override
-//                public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i2, int i3) {
-//
-//                }
-//
-//                @Override
-//                public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-//
-//                }
-//            });
-
-
-
-
-//            SVGImageView svgImageView = new SVGImageView(getActivity());
-//            svgImageView.setImageAsset(t.getCategory().getIconDrawableName());
-//
-//            holder.iconFrameLayout.removeAllViews();
-//            holder.iconFrameLayout.addView(svgImageView,
-//                    new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
             Bitmap bitmap = mMemoryCache.get(t.getCategory().getIconDrawableName());
             if (bitmap == null) {
                 InputStream is = null;
@@ -344,31 +302,6 @@ public class BitsListFragment extends Fragment {
 
             holder.viewSwitcher.setInAnimation(inAnimation);
             holder.viewSwitcher.setOutAnimation(outAnimation);
-//            if (progress > 100) {
-//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Pomegranate));
-//            } else {
-//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Emerald));
-//            }
-//            else if (progress > 90) {
-//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Alizarin));
-//            }
-//            else if (progress > 80) {
-//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Pumpkin));
-//            } else if (progress > 70) {
-//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Carrot));
-//            } else if (progress > 60) {
-//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Orange));
-//            } else if (progress > 50) {
-//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Sunflower));
-//            } else if (progress > 40) {
-//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.BelizeHole));
-//            } else if (progress > 30) {
-//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.PeterRiver));
-//            } else if (progress > 20) {
-//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Nephritis));
-//            } else {
-//                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.color.Emerald));
-//            }
 
             Log.d("BitListFrag", t.getDescription() + " in " + t.getCategory().getName());
 

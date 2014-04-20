@@ -76,15 +76,28 @@ public class CategoryManager {
     }
 
     private void initWithCategories() {
-        if (mCategoryDao.count() < 6) {
+        if (mCategoryDao.count() < 19) {
             mCategoryDao.deleteAll();
 
-            addCategoryWithNameAndIcon("Music", "music");
-            addCategoryWithNameAndIcon("Sports", "bicycle");
-            addCategoryWithNameAndIcon("News", "news_paper");
-            addCategoryWithNameAndIcon("Reading", "notebook");
-            addCategoryWithNameAndIcon("Study", "study");
-            addCategoryWithNameAndIcon("Goal", "target");
+            addCategoryWithNameAndIcon("Reading", "literature-75");
+            addCategoryWithNameAndIcon("Love", "two_hearts-75");
+            addCategoryWithNameAndIcon("Culture", "university-75");
+            addCategoryWithNameAndIcon("Arts", "origami-75");
+            addCategoryWithNameAndIcon("Social", "message-75");
+            addCategoryWithNameAndIcon("Study", "student-75");
+            addCategoryWithNameAndIcon("Project", "compass2-75");
+            addCategoryWithNameAndIcon("Sports", "football2-75");
+            addCategoryWithNameAndIcon("Finance", "USD-75");
+            addCategoryWithNameAndIcon("Food", "diningroom-75");
+            addCategoryWithNameAndIcon("Movie", "film_reel-75");
+            addCategoryWithNameAndIcon("Concert", "french_horn-75");
+            addCategoryWithNameAndIcon("Health", "heart_monitor-75");
+            addCategoryWithNameAndIcon("Inspiration", "idea-75");
+            addCategoryWithNameAndIcon("Music", "music-75");
+            addCategoryWithNameAndIcon("Photography", "slr_camera2-75");
+            addCategoryWithNameAndIcon("Memory", "stack_of_photos-75");
+            addCategoryWithNameAndIcon("Excursion", "mountain_biking-75");
+            addCategoryWithNameAndIcon("Advanture", "treasury_map-75");
         }
     }
 

@@ -1,5 +1,7 @@
 package com.siqi.bits;
 
+import android.util.Log;
+
 import com.google.common.primitives.Chars;
 
 import org.ocpsoft.prettytime.PrettyTime;
@@ -7,7 +9,6 @@ import org.ocpsoft.prettytime.PrettyTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import de.greenrobot.dao.DaoException;
 
@@ -260,13 +261,15 @@ public class Task {
     // KEEP METHODS - put your custom methods here
     public void setLastDoneAndUpdateNextScheduleTime(long lastDone) {
         this.setLastDone(lastDone);
-        this.setNextScheduledTime(lastDone + this.getInterval());
+        this.setNextScheduledTime(getNextScheduledTime() + this.getInterval());
+
+        Log.d("TASK", "Setting " + this.getDescription() + " next scheduled time : lastDone=" + lastDone +" interval=" + this.getInterval() + " == " + (lastDone + this.getInterval()));
     }
 
     public void incrementSkipCount() {
         // Call AppendLateCount before setting new LastDoneTime, because of the dependancy of this attribute
         appendLateCount();
-        setNextScheduledTime(System.currentTimeMillis() + getInterval());
+        setNextScheduledTime(getNextScheduledTime() + getInterval());
         this.setSkipCount(this.getSkipCount() + 1);
         setHistory(getHistory()+'s');
     }
@@ -295,7 +298,7 @@ public class Task {
         appendLateCount();
         setLastDoneAndUpdateNextScheduleTime(System.currentTimeMillis());
         this.setDoneCount(this.getDoneCount() + 1);
-        setHistory(getHistory()+'d');
+        setHistory(getHistory() + 'd');
     }
 
     public List<Character> getHistoryAsCharArray(int rowLength) {

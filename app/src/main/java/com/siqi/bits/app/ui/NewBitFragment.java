@@ -7,20 +7,23 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
+import android.widget.TextSwitcher;
+import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 import com.siqi.bits.Category;
@@ -34,6 +37,7 @@ import java.util.List;
 
 import model.CategoryManager;
 import model.TaskManager;
+import views.ExpandingGridView;
 
 
 /**
@@ -59,7 +63,9 @@ public class NewBitFragment extends Fragment {
     // per week
     private RadioGroup mIntervalRBtnGroup;
 
-    private GridView mCategoryGridView;
+    private ExpandingGridView mCategoryGridView;
+
+    private TextSwitcher mCategorySelectedTV;
 
     private CategoryAdapter mAdapter;
 
@@ -118,7 +124,25 @@ public class NewBitFragment extends Fragment {
         mBitTitleEditText = (EditText) v.findViewById(R.id.bit_title_edittext);
         mFrequencyRBtnGroup = (RadioGroup) v.findViewById(R.id.frequency_radio_group);
         mIntervalRBtnGroup = (RadioGroup) v.findViewById(R.id.interval_radio_group);
-        mCategoryGridView = (GridView) v.findViewById(R.id.category_gridview);
+        mCategorySelectedTV = (TextSwitcher) v.findViewById(R.id.category_selected);
+        mCategoryGridView = (ExpandingGridView) v.findViewById(R.id.category_gridview);
+
+        mBitTitleEditText.requestFocus();
+
+        mCategorySelectedTV.setFactory(new ViewSwitcher.ViewFactory() {
+            @Override
+            public View makeView() {
+                TextView t = new TextView(getActivity());
+                t.setGravity(Gravity.CENTER_HORIZONTAL);
+                t.setBackgroundColor(getResources().getColor(R.color.MidnightBlue));
+                t.setPadding(5, 5, 5, 5);
+                t.setTextAppearance(getActivity(), android.R.style.TextAppearance_Holo_Large_Inverse);
+                return t;
+            }
+        });
+
+        mCategorySelectedTV.setInAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.card_flip_top_in));
+        mCategorySelectedTV.setOutAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.card_flip_bottom_out));
 
         // Inflate the layout for this fragment
         mAdapter = new CategoryAdapter(this.getActivity(), cm.getAllCategories());
@@ -130,7 +154,7 @@ public class NewBitFragment extends Fragment {
 
         mOnClickListener = new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                Toast.makeText(getActivity(), mAdapter.getItem(position).getName(), Toast.LENGTH_SHORT).show();
+                mCategorySelectedTV.setText(mAdapter.getItem(position).getName());
                 v.setBackgroundResource(R.color.MidnightBlue);
 
                 if (mLastSelected != null && mLastSelected != v)
@@ -262,6 +286,12 @@ public class NewBitFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mCategorySelectedTV.setText(mTask.getCategory().getName());
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
@@ -325,6 +355,7 @@ public class NewBitFragment extends Fragment {
             if (mTask.getCategoryId() != -1 && mLastSelected == null && mAdapter.getItem(position).getId() == mTask.getCategory().getId()) {
                 v.setBackgroundColor(getResources().getColor(R.color.MidnightBlue));
                 mLastSelected = v;
+                Log.d("INIT", "METHOD CALLED FOR CAT " + mTask.getCategory().getName());
             }
 
             v.setTag(c);
