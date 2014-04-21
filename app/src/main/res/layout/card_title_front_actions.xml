@@ -14,6 +14,7 @@
         style="@style/AppTheme.actionbutton.inverse"
         android:text="Edit"
         android:id="@+id/edit_button"
+        android:longClickable="false"
         android:layout_height="match_parent" />
 
     <Button
@@ -21,6 +22,7 @@
         android:layout_weight="1"
         android:text="Delete"
         android:id="@+id/delete_button"
+        android:longClickable="false"
         style="@style/AppTheme.actionbutton.inverse"
         android:background="@color/deleteColor"
         android:layout_height="match_parent" />

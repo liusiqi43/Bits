@@ -56,7 +56,7 @@ public class NewBitFragment extends Fragment {
     // n times
     private RadioGroup mFrequencyRBtnGroup;
     // per week
-    private RadioGroup mIntervalRBtnGroup;
+    private RadioGroup mPeriodRBtnGroup;
 
     private ExpandingGridView mCategoryGridView;
 
@@ -116,7 +116,7 @@ public class NewBitFragment extends Fragment {
 
         mBitTitleEditText = (EditText) v.findViewById(R.id.bit_title_edittext);
         mFrequencyRBtnGroup = (RadioGroup) v.findViewById(R.id.frequency_radio_group);
-        mIntervalRBtnGroup = (RadioGroup) v.findViewById(R.id.interval_radio_group);
+        mPeriodRBtnGroup = (RadioGroup) v.findViewById(R.id.interval_radio_group);
         mCategoryGridView = (ExpandingGridView) v.findViewById(R.id.category_gridview);
 
         mBitTitleEditText.requestFocus();
@@ -149,41 +149,41 @@ public class NewBitFragment extends Fragment {
             // Editing!!
             mBitTitleEditText.setText(mTask.getDescription());
 
-            String frequencyInterval = mTask.getFrequencyIntervalPair();
-            switch (frequencyInterval.charAt(0)) {
-                case 'd':
-                    mIntervalRBtnGroup.check(R.id.radio_day);
+            long period = mTask.getPeriod();
+            switch (TaskManager.PeriodToDays.get(period)) {
+                case 1:
+                    mPeriodRBtnGroup.check(R.id.radio_day);
                     break;
-                case 'w':
-                    mIntervalRBtnGroup.check(R.id.radio_week);
+                case 7:
+                    mPeriodRBtnGroup.check(R.id.radio_week);
                     break;
-                case 'm':
-                    mIntervalRBtnGroup.check(R.id.radio_month);
+                case 30:
+                    mPeriodRBtnGroup.check(R.id.radio_month);
                     break;
-                case 'y':
-                    mIntervalRBtnGroup.check(R.id.radio_year);
+                case 365:
+                    mPeriodRBtnGroup.check(R.id.radio_year);
                     break;
                 default:
                     Log.e("NEW_BIT_FRAGMENT", "Unknown interval code");
             }
 
-            switch (frequencyInterval.charAt(1)) {
-                case '1':
+            switch (mTask.getFrequency()) {
+                case 1:
                     mFrequencyRBtnGroup.check(R.id.radio_1);
                     break;
-                case '2':
+                case 2:
                     mFrequencyRBtnGroup.check(R.id.radio_2);
                     break;
-                case '3':
+                case 3:
                     mFrequencyRBtnGroup.check(R.id.radio_3);
                     break;
-                case '4':
+                case 4:
                     mFrequencyRBtnGroup.check(R.id.radio_4);
                     break;
-                case '5':
+                case 5:
                     mFrequencyRBtnGroup.check(R.id.radio_5);
                     break;
-                case '6':
+                case 6:
                     mFrequencyRBtnGroup.check(R.id.radio_6);
                     break;
                 default:
@@ -221,20 +221,20 @@ public class NewBitFragment extends Fragment {
              */
             mTask.setDescription(mBitTitleEditText.getText().toString().trim());
             mTask.setModifiedOn(new Date());
+            if (mTask.getCreatedOn() == null)
+                mTask.setCreatedOn(new Date());
             mTask.setCategory((Category) mLastSelected.getTag());
 
             Log.d("BitListFrag", mTask.getDescription() + " in " + ((Category) mLastSelected.getTag()).getName() + " Now ");
-
             RadioButton rbFreq = (RadioButton) this.getView().findViewById(this.mFrequencyRBtnGroup.getCheckedRadioButtonId());
-            RadioButton rbInterval = (RadioButton) this.getView().findViewById(this.mIntervalRBtnGroup.getCheckedRadioButtonId());
+            RadioButton rbPeriod = (RadioButton) this.getView().findViewById(this.mPeriodRBtnGroup.getCheckedRadioButtonId());
 
-            tm.setIntervalFrequencyForTask(mTask, rbInterval.getText().toString(), rbFreq.getText().toString());
-
-            mTask.setNextScheduledTime(System.currentTimeMillis() + mTask.getInterval());
+            mTask.setPeriod(TaskManager.PeriodStringToDays.get(rbPeriod.getText().toString()) * TaskManager.DAY_TO_MILLIS);
+            mTask.setFrequency(Integer.parseInt(rbFreq.getText().toString()));
+            tm.setNextScheduledTimeForTask(mTask);
 
             try {
                 if (mEditingBitID == null) {
-                    mTask.setCreatedOn(new Date());
                     tm.insertTask(mTask);
                 } else {
                     tm.updateTask(mTask);

@@ -32,16 +32,16 @@ import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
+import com.siqi.bits.ActionRecord;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.MainActivity;
 import com.siqi.bits.app.R;
 import com.siqi.bits.swipelistview.BaseSwipeListViewListener;
 import com.siqi.bits.swipelistview.SwipeListView;
 
-import org.ocpsoft.prettytime.PrettyTime;
-
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -114,11 +114,13 @@ public class BitsListFragment extends Fragment {
                 if (mAdapter.isExpanded(position))
                     mAdapter.toggle(position);
                 Task item = mAdapter.getItem(position);
-                item.incrementSkipCount();
-                tm.updateTask(item);
+                tm.setActionRecordForTask(item, TaskManager.ACTION_TYPE_SKIP);
+                tm.setNextScheduledTimeForTask(item);
                 // Implicitly calls datasetChanged() method
-                mAdapter.remove(item);
-                mAdapter.add(item);
+//                mAdapter.remove(item);
+                mAdapter.clear();
+                mAdapter.addAll(tm.getAllSortedTasks());
+//                mAdapter.add(item);
             }
 
             @Override
@@ -126,11 +128,14 @@ public class BitsListFragment extends Fragment {
                 if (mAdapter.isExpanded(position))
                     mAdapter.toggle(position);
                 Task item = mAdapter.getItem(position);
-                item.incrementDoneCount();
-                tm.updateTask(item);
+                tm.setActionRecordForTask(item, TaskManager.ACTION_TYPE_DONE);
+                tm.setNextScheduledTimeForTask(item);
                 // Implicitly calls datasetChanged() method
-                mAdapter.remove(item);
-                mAdapter.add(item);
+//                mAdapter.remove(item);
+//                mAdapter.add(item);
+
+                mAdapter.clear();
+                mAdapter.addAll(tm.getAllSortedTasks());
             }
 
         });
@@ -199,7 +204,6 @@ public class BitsListFragment extends Fragment {
     private class BitListArrayAdapter extends ExpandableListItemAdapter<Task> {
 
         List<Task> mItems;
-        PrettyTime prettyTime = new PrettyTime();
         private final LruCache<String, Bitmap> mMemoryCache;
 
 
@@ -294,8 +298,15 @@ public class BitsListFragment extends Fragment {
             holder.icon.setMaxWidth(holder.icon.getHeight());
             holder.icon.setImageBitmap(bitmap);
             holder.title.setText(t.getDescription());
-            holder.timeAgo.setText(t.getTimesAgoDescription(getString(R.string.done), getString(R.string.added_recently), prettyTime));
-            holder.progressBar.setProgress(t.getProgress());
+            holder.timeAgo.setText(tm.getTimesAgoDescriptionForTask(t));
+
+            int progress = tm.getProgressForTask(t);
+            if (progress > 100) {
+                // Only triggered when t.getFrequency() - actionCountSinceBeginOfInternval > 0, and progress > 100, which means... well, late!
+                tm.updateActionRecordForTask(t);
+            }
+            holder.progressBar.setProgress(progress);
+            Log.d("Progress for " + t.getDescription(), progress + "");
 
             Animation inAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left); inAnimation.setDuration(300);
             Animation outAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right); outAnimation.setDuration(300);
@@ -303,7 +314,7 @@ public class BitsListFragment extends Fragment {
             holder.viewSwitcher.setInAnimation(inAnimation);
             holder.viewSwitcher.setOutAnimation(outAnimation);
 
-            Log.d("BitListFrag", t.getDescription() + " in " + t.getCategory().getName());
+            Log.d("BitListFrag", t.getDescription() + " : " + t.getNextScheduledTime());
 
             return v;
         }
@@ -357,7 +368,9 @@ public class BitsListFragment extends Fragment {
 
             holder.bitDoneRate.setText(tm.getDoneRate(t) + " %");
             holder.othersDoneRate.setText(tm.getDoneRateExcept(t) + " %");
-            TimeLineAdapter adapter = new TimeLineAdapter(getActivity(), t.getHistoryAsCharArray(getResources().getInteger(R.integer.timeline_rect_per_row)));
+            TimeLineAdapter adapter = new TimeLineAdapter(getActivity(), t.getActionsRecords());
+            Log.d("GetActionsRecords", t.getActionsRecords().size() + "");
+
             holder.timeLine.setAdapter(adapter);
             return v;
         }
@@ -386,11 +399,12 @@ public class BitsListFragment extends Fragment {
     }
 
 
-    private class TimeLineAdapter extends ArrayAdapter<Character> {
-        List<Character> mItems;
+    private class TimeLineAdapter extends ArrayAdapter<ActionRecord> {
+        List<ActionRecord> mItems;
 
-        public TimeLineAdapter(Context ctx, List<Character> t) {
+        public TimeLineAdapter(Context ctx, List<ActionRecord> t) {
             super(ctx, R.layout.timeline_girdview_item, t);
+            Collections.reverse(t);
             mItems = t;
         }
 
@@ -405,17 +419,17 @@ public class BitsListFragment extends Fragment {
 
             FrameLayout item = (FrameLayout) v.findViewById(R.id.timeline_item);
 
-            switch (mItems.get(position)) {
-                case 'l':
+            switch (mItems.get(position).getAction()) {
+                case TaskManager.ACTION_TYPE_LATE:
                     item.setBackgroundColor(getResources().getColor(R.color.lateColor));
                     break;
-                case 'd':
+                case TaskManager.ACTION_TYPE_DONE:
                     item.setBackgroundColor(getResources().getColor(R.color.doneColor));
                     break;
-                case 's':
+                case TaskManager.ACTION_TYPE_SKIP:
                     item.setBackgroundColor(getResources().getColor(R.color.skipColor));
                     break;
-                case 'n':
+                default:
                     item.setBackgroundColor(getResources().getColor(R.color.noneColor));
                     break;
             }
