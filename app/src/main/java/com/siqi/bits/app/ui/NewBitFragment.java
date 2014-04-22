@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -195,6 +196,20 @@ public class NewBitFragment extends Fragment {
         }
 
         return v;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        hideSoftKeyBoard();
+    }
+
+    private void hideSoftKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        if(imm.isAcceptingText()) { // verify if the soft keyboard is open
+            imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

@@ -209,6 +209,7 @@ public class TaskManager {
             case ACTION_TYPE_LATE:
                 t.setLateCount(t.getLateCount()+1);
         }
+        t.update();
         ActionRecord record = new ActionRecord(null, ACTION_TYPE, date, t.getId());
         mActionRecordDao.insert(record);
         t.resetActionsRecords();

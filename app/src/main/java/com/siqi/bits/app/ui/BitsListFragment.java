@@ -370,6 +370,8 @@ public class BitsListFragment extends Fragment {
             int thisDoneRate = tm.getDoneRate(t);
             int othersDoneRate = tm.getDoneRateExcept(t);
 
+            Log.d("THIS_DONE_RATE", t.getDescription() + ":" + thisDoneRate);
+
             if (thisDoneRate > othersDoneRate) {
                 holder.bitDoneRate.setTextColor(getResources().getColor(R.color.doneColor));
                 holder.othersDoneRate.setTextColor(getResources().getColor(R.color.lateColor));
