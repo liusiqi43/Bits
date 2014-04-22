@@ -1,9 +1,13 @@
 package com.siqi.bits.app.ui;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -47,11 +51,12 @@ import java.util.List;
 
 import model.CategoryManager;
 import model.TaskManager;
+import utils.ShakeEventListener;
 
 /**
  * Created by me on 4/8/14.
  */
-public class BitsListFragment extends Fragment {
+public class BitsListFragment extends Fragment implements ShakeEventListener.OnShakeListener {
     public static final int FRAGMENT_ID = 1;
 
     public static final int CARD_INFO = 0;
@@ -64,24 +69,19 @@ public class BitsListFragment extends Fragment {
     BitListArrayAdapter mAdapter;
     AnimateDismissAdapter mAnimateDismissAdapter;
 
+    private SensorManager mSensorManager;
+    private ShakeEventListener mSensorListener;
+
     private OnBitListInteractionListener mListener;
 
-    public static BitsListFragment newInstance() {
-        BitsListFragment fragment = new BitsListFragment();
-        return fragment;
-    }
+    private boolean mUndoDialogDisplayed = false;
 
     public BitsListFragment() {
     }
 
-    private class OnBitDismissCallback implements OnDismissCallback {
-
-        @Override
-        public void onDismiss(final AbsListView listView, final int[] reverseSortedPositions) {
-            for (int position : reverseSortedPositions) {
-                mAdapter.remove(mAdapter.getItem(position));
-            }
-        }
+    public static BitsListFragment newInstance() {
+        BitsListFragment fragment = new BitsListFragment();
+        return fragment;
     }
 
     @Override
@@ -163,6 +163,11 @@ public class BitsListFragment extends Fragment {
 
         mAdapter.setLimit(1);
 
+        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        mSensorListener = new ShakeEventListener();
+
+        mSensorListener.setOnShakeListener(this);
+
         return rootView;
     }
 
@@ -181,6 +186,20 @@ public class BitsListFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mSensorManager.registerListener(mSensorListener,
+                mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_UI);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mSensorManager.unregisterListener(mSensorListener);
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
@@ -191,7 +210,6 @@ public class BitsListFragment extends Fragment {
 
         super.onCreateOptionsMenu(menu, inflater);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -204,10 +222,85 @@ public class BitsListFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onShake() {
+        if (mUndoDialogDisplayed)
+            return;
+
+        final ActionRecord record = tm.getLastActionForActiveTask();
+
+        if (record != null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+            StringBuilder msgBulder = new StringBuilder()
+                    .append(getString(R.string.last_record_seems_to_be))
+                    .append(" \"")
+                    .append(record.getAction() == TaskManager.ACTION_TYPE_DONE ? getString(R.string.done) : getString(R.string.skip))
+                    .append("\" ")
+                    .append(getString(R.string.on_task))
+                    .append(" ")
+                    .append(" \"")
+                    .append(record.getTask().getDescription())
+                    .append("\"");
+
+            builder.setMessage(msgBulder.toString());
+            builder.setTitle(getString(R.string.do_you_want_to_undo_it));
+
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    tm.removeActionRecordById(record.getId());
+                    mAdapter.notifyDataSetChanged();
+                    dialog.cancel();
+                    mUndoDialogDisplayed = false;
+                }
+            });
+
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.cancel();
+                    mUndoDialogDisplayed = false;
+                }
+            });
+
+            builder.show();
+            mUndoDialogDisplayed = true;
+        }
+    }
+
+
+    public interface OnBitListInteractionListener {
+        public void startEditBitFragment(Long id);
+    }
+
+    private static class BitTitleHolder {
+        ImageView icon;
+        TextView title;
+        TextView timeAgo;
+        ProgressBar progressBar;
+        Button skipButton, doneButton, editButton, deleteButton;
+        ViewSwitcher viewSwitcher;
+    }
+
+    private static class BitContentHolder {
+        TextView bitDoneRate;
+        TextView othersDoneRate;
+        GridView timeLine;
+    }
+
+    private class OnBitDismissCallback implements OnDismissCallback {
+
+        @Override
+        public void onDismiss(final AbsListView listView, final int[] reverseSortedPositions) {
+            for (int position : reverseSortedPositions) {
+                mAdapter.remove(mAdapter.getItem(position));
+            }
+        }
+    }
+
     private class BitListArrayAdapter extends ExpandableListItemAdapter<Task> {
 
-        List<Task> mItems;
         private final LruCache<String, Bitmap> mMemoryCache;
+        List<Task> mItems;
 
 
         public BitListArrayAdapter(Context ctx, List<Task> t) {
@@ -393,28 +486,6 @@ public class BitsListFragment extends Fragment {
         }
 
     }
-
-
-    public interface OnBitListInteractionListener {
-        public void startEditBitFragment(Long id);
-    }
-
-
-    private static class BitTitleHolder {
-        ImageView icon;
-        TextView title;
-        TextView timeAgo;
-        ProgressBar progressBar;
-        Button skipButton, doneButton, editButton, deleteButton;
-        ViewSwitcher viewSwitcher;
-    }
-
-    private static class BitContentHolder {
-        TextView bitDoneRate;
-        TextView othersDoneRate;
-        GridView timeLine;
-    }
-
 
     private class TimeLineAdapter extends ArrayAdapter<ActionRecord> {
         List<ActionRecord> mItems;

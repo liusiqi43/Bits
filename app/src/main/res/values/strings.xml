@@ -33,5 +33,13 @@
     <string name="done_on_time_rate">Done on time rate</string>
     <string name="added_recently">Added recently!</string>
     <string name="done">Done</string>
+    <string name="skip">Skip</string>
     <string name="actionview_tag">ACTION</string>
+
+    <string name="last_record_seems_to_be">Your last action seems to be a </string>
+    <string name="do_you_want_to_undo_it">\nDo you want to undo it?</string>
+    <string name="on_task"> on task </string>
+    <string name="ok">Yes</string>
+    <string name="cancel">Cancel</string>
+
 </resources>

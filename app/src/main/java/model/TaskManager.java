@@ -27,6 +27,14 @@ import de.greenrobot.dao.query.QueryBuilder;
  * Created by me on 4/9/14.
  */
 public class TaskManager {
+    public static final ConcurrentHashMap<String, Integer> PeriodStringToDays = new ConcurrentHashMap<String, Integer>();
+    public static final ConcurrentHashMap<Long, Integer> PeriodToDays = new ConcurrentHashMap<Long, Integer>();
+    public static final long DAY_TO_MILLIS = 24 * 3600 * 1000;
+    public static final int ACTION_TYPE_DONE = 1;
+    public static final int ACTION_TYPE_SKIP = 2;
+    public static final int ACTION_TYPE_LATE = 3;
+    public static final int ACTION_TYPE_ANY = 4;
+    private static TaskManager INSTANCE = null;
     private SQLiteDatabase mDB;
     private DaoMaster mDaoMaster;
     private DaoSession mDaoSession;
@@ -34,17 +42,6 @@ public class TaskManager {
     private ActionRecordDao mActionRecordDao;
     private PrettyTime mPrettyTime;
     private Context mContext;
-
-    public static final ConcurrentHashMap<String, Integer> PeriodStringToDays = new ConcurrentHashMap<String, Integer>();
-    public static final ConcurrentHashMap<Long, Integer> PeriodToDays = new ConcurrentHashMap<Long, Integer>();
-
-    private static TaskManager INSTANCE = null;
-
-    public static final long DAY_TO_MILLIS = 24 * 3600 * 1000;
-
-    public static final int ACTION_TYPE_DONE = 1;
-    public static final int ACTION_TYPE_SKIP = 2;
-    public static final int ACTION_TYPE_LATE = 3;
 
     private TaskManager(Context ctx) {
         /**
@@ -122,9 +119,9 @@ public class TaskManager {
             }
         });
 
-        for (Task t : tasks) {
-            Log.d("GETALLSORTEDTASK", t.getDescription() + ":" + t.getNextScheduledTime() + " interval: " + t.getCurrentInterval());
-        }
+//        for (Task t : tasks) {
+//            Log.d("GETALLSORTEDTASK", t.getDescription() + ":" + t.getNextScheduledTime() + " interval: " + t.getCurrentInterval());
+//        }
 
         return tasks;
     }
@@ -174,13 +171,38 @@ public class TaskManager {
         ).count();
     }
 
-    public List<ActionRecord> getLastActionsForTask(Task t, int ACTION_TYPE) {
+    public List<ActionRecord> getLastActionForTask(Task t, int ACTION_TYPE) {
         if (t.getId() == null)
             return new ArrayList<ActionRecord>();
-        return mActionRecordDao.queryBuilder().
-                where(ActionRecordDao.Properties.TaskId.eq(t.getId()),
-                        ActionRecordDao.Properties.Action.eq(ACTION_TYPE))
-                .orderDesc(ActionRecordDao.Properties.RecordOn).limit(1).list();
+
+        if (ACTION_TYPE != ACTION_TYPE_ANY) {
+            return mActionRecordDao.queryBuilder().
+                    where(ActionRecordDao.Properties.TaskId.eq(t.getId()),
+                            ActionRecordDao.Properties.Action.eq(ACTION_TYPE))
+                    .orderDesc(ActionRecordDao.Properties.RecordOn).limit(1).list();
+        } else {
+            return mActionRecordDao.queryBuilder().
+                    where(ActionRecordDao.Properties.TaskId.eq(t.getId()))
+                    .orderDesc(ActionRecordDao.Properties.RecordOn).limit(1).list();
+        }
+    }
+
+    public ActionRecord getLastActionForActiveTask() {
+        QueryBuilder qb = mActionRecordDao.queryBuilder();
+
+        List<ActionRecord> records = qb.where(
+                qb.or(
+                        ActionRecordDao.Properties.Action.eq(ACTION_TYPE_DONE),
+                        ActionRecordDao.Properties.Action.eq(ACTION_TYPE_SKIP)))
+                .orderDesc(ActionRecordDao.Properties.RecordOn).list();
+
+        for (ActionRecord r : records) {
+            if (r.getTask().getDeletedOn() == null){
+                return r;
+            }
+        }
+
+        return null;
     }
 
     public void setNextScheduledTimeForTask(Task t) {
@@ -250,7 +272,7 @@ public class TaskManager {
     }
 
     public String getTimesAgoDescriptionForTask(Task t) {
-        List<ActionRecord> records = getLastActionsForTask(t, ACTION_TYPE_DONE);
+        List<ActionRecord> records = getLastActionForTask(t, ACTION_TYPE_DONE);
 
         if (records.size() > 0)
             return new StringBuilder()
@@ -260,6 +282,23 @@ public class TaskManager {
         else {
             return mContext.getResources().getString(R.string.added_recently);
         }
+    }
+
+    public void removeActionRecordById(long id) {
+        ActionRecord record = mActionRecordDao.load(id);
+
+        switch (record.getAction()){
+            case ACTION_TYPE_DONE:
+                record.getTask().setDoneCount(record.getTask().getDoneCount() - 1);
+                break;
+            case ACTION_TYPE_SKIP:
+                record.getTask().setSkipCount(record.getTask().getSkipCount() - 1);
+                break;
+        }
+
+        record.getTask().update();
+        mActionRecordDao.delete(record);
+        record.getTask().resetActionsRecords();
     }
 
     public class DuplicatedTaskException extends Throwable {
