@@ -25,6 +25,7 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v4.view.MotionEventCompat;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -54,7 +55,7 @@ import static com.nineoldandroids.view.ViewPropertyAnimator.animate;
  */
 public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener {
 
-    private static final int DISPLACE_CHOICE = 170;
+    private static final int DISPLACE_CHOICE = 340;
 
     private int swipeMode = SwipeListView.SWIPE_MODE_BOTH;
     private boolean swipeOpenOnLongPress = true;
@@ -812,9 +813,9 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
                 }
                 generateAnimate(frontView, swap, swapRight, downPosition);
                 // Left action
-                if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == DISPLACE_CHOICE) {
+                if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == getDisplayChoiceInDp()) {
                     this.swipeListView.onLeftChoiceAction(downPosition);
-                } else if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == -DISPLACE_CHOICE) {
+                } else if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == -getDisplayChoiceInDp()) {
                     this.swipeListView.onRightChoiceAction(downPosition);
                 }
 
@@ -968,8 +969,8 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
 
             int sign = p > 0 ? 1 : -1;
 
-            float newPosX = Math.abs(p) < DISPLACE_CHOICE ? p : sign * DISPLACE_CHOICE;
-            if (Math.abs(posX) < DISPLACE_CHOICE || Math.abs(newPosX) < DISPLACE_CHOICE)
+            float newPosX = Math.abs(p) < getDisplayChoiceInDp() ? p : sign * getDisplayChoiceInDp();
+            if (Math.abs(posX) < getDisplayChoiceInDp() || Math.abs(newPosX) < getDisplayChoiceInDp())
                 setTranslationX(frontView, newPosX);
         } else {
             setTranslationX(frontView, deltaX);
@@ -1070,6 +1071,13 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
 
         resetPendingDismisses();
 
+    }
+
+    private float getDisplayChoiceInDp() {
+        Resources resources = swipeListView.getContext().getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float dp = DISPLACE_CHOICE / (metrics.densityDpi / 160f);
+        return dp;
     }
 
 }
