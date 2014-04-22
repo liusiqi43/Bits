@@ -54,6 +54,9 @@ import model.TaskManager;
 public class BitsListFragment extends Fragment {
     public static final int FRAGMENT_ID = 1;
 
+    public static final int CARD_INFO = 0;
+    public static final int CARD_ACTION = 1;
+
     private CategoryManager cm;
     private TaskManager tm;
 
@@ -149,8 +152,8 @@ public class BitsListFragment extends Fragment {
                 viewSwitcher.showNext();
 
                 new Handler().postDelayed(new Runnable() { public void run() {
-                    if(viewSwitcher.getDisplayedChild() == 1) {
-                        viewSwitcher.setDisplayedChild(0);
+                    if(viewSwitcher.getDisplayedChild() == CARD_ACTION) {
+                        viewSwitcher.setDisplayedChild(CARD_INFO);
                     }
                 }
                 }, getResources().getInteger(R.integer.actionview_timeout));
@@ -248,12 +251,24 @@ public class BitsListFragment extends Fragment {
                 v.setTag(holder);
             } else {
                 holder = (BitTitleHolder) v.getTag();
+                holder.viewSwitcher = (ViewSwitcher) v.findViewById(R.id.card_viewswitcher);
+                if (holder.viewSwitcher.getDisplayedChild() == CARD_ACTION) {
+                    holder.viewSwitcher.setInAnimation(null);
+                    holder.viewSwitcher.setOutAnimation(null);
+                    holder.viewSwitcher.setDisplayedChild(CARD_INFO);
+
+                    Animation inAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left); inAnimation.setDuration(300);
+                    Animation outAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right); outAnimation.setDuration(300);
+
+                    holder.viewSwitcher.setInAnimation(inAnimation);
+                    holder.viewSwitcher.setOutAnimation(outAnimation);
+                }
             }
 
             holder.deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    holder.viewSwitcher.setDisplayedChild(0);
+                    holder.viewSwitcher.setDisplayedChild(CARD_INFO);
                     Task item = mAdapter.getItem(position);
                     item.setDeletedOn(new Date());
                     tm.updateTask(item);
