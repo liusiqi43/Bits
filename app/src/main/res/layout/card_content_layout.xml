@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/WetAsphalt"
     android:padding="5dp"
+    android:id="@+id/card_content_global_layout"
     android:layout_gravity="center">
 
     <TextView

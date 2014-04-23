@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.LruCache;
+import android.text.Html;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +30,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
@@ -222,6 +225,12 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         return super.onOptionsItemSelected(item);
     }
 
+    public int dpToPx(int dp) {
+        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        return px;
+    }
+
     @Override
     public void onShake() {
         if (mUndoDialogDisplayed)
@@ -234,16 +243,21 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
             StringBuilder msgBulder = new StringBuilder()
                     .append(getString(R.string.last_record_seems_to_be))
-                    .append(" \"")
-                    .append(record.getAction() == TaskManager.ACTION_TYPE_DONE ? getString(R.string.done) : getString(R.string.skip))
-                    .append("\" ")
-                    .append(getString(R.string.on_task))
+                    .append(record.getAction() == TaskManager.ACTION_TYPE_DONE ?
+                            " <font color='#2ecc71'>" + getString(R.string.done) + "</font>"
+                             : " <font color='#3498db'>" + getString(R.string.skip) + "</font>")
                     .append(" ")
-                    .append(" \"")
+                    .append(getString(R.string.on_task))
+                    .append(" <b>")
                     .append(record.getTask().getDescription())
-                    .append("\"");
+                    .append("</b>");
 
-            builder.setMessage(msgBulder.toString());
+            TextView tv = new TextView(getActivity());
+            int padInPx = dpToPx(15);
+            tv.setPadding(padInPx, padInPx, padInPx, padInPx);
+            tv.setTextAppearance(getActivity(), android.R.style.TextAppearance_Holo_Large);
+            tv.setText(Html.fromHtml(msgBulder.toString()), TextView.BufferType.SPANNABLE);
+            builder.setView(tv);
             builder.setTitle(getString(R.string.do_you_want_to_undo_it));
 
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -285,6 +299,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         TextView bitDoneRate;
         TextView othersDoneRate;
         GridView timeLine;
+        LinearLayout globalLayout;
     }
 
     private class OnBitDismissCallback implements OnDismissCallback {
@@ -440,6 +455,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         @Override
         public View getContentView(int position, View convertView, ViewGroup parent) {
             Log.d("TEST", "getContentVlew:"+position);
+            Task t = mAdapter.getItem(position);
+
             View v = convertView;
             BitContentHolder holder;
 
@@ -452,36 +469,41 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                 holder.bitDoneRate = (TextView) v.findViewById(R.id.bit_done_rate);
                 holder.othersDoneRate = (TextView) v.findViewById(R.id.others_done_rate);
                 holder.timeLine = (GridView) v.findViewById(R.id.timeline_gridview);
+                holder.globalLayout = (LinearLayout) v.findViewById(R.id.card_content_global_layout);
 
                 v.setTag(holder);
             } else {
                 holder = (BitContentHolder) v.getTag();
             }
 
-            Task t = mAdapter.getItem(position);
-
-            int thisDoneRate = tm.getDoneRate(t);
-            int othersDoneRate = tm.getDoneRateExcept(t);
-
-            Log.d("THIS_DONE_RATE", t.getDescription() + ":" + thisDoneRate);
-
-            if (thisDoneRate > othersDoneRate) {
-                holder.bitDoneRate.setTextColor(getResources().getColor(R.color.doneColor));
-                holder.othersDoneRate.setTextColor(getResources().getColor(R.color.lateColor));
-            } else if (thisDoneRate < othersDoneRate) {
-                holder.bitDoneRate.setTextColor(getResources().getColor(R.color.lateColor));
-                holder.othersDoneRate.setTextColor(getResources().getColor(R.color.doneColor));
+            if (t.getActionsRecords().isEmpty()) {
+                holder.globalLayout.setVisibility(View.GONE);
             } else {
-                holder.bitDoneRate.setTextColor(getResources().getColor(R.color.noneColor));
-                holder.othersDoneRate.setTextColor(getResources().getColor(R.color.noneColor));
+                holder.globalLayout.setVisibility(View.VISIBLE);
+                int thisDoneRate = tm.getDoneRate(t);
+                int othersDoneRate = tm.getDoneRateExcept(t);
+
+                Log.d("THIS_DONE_RATE", t.getDescription() + ":" + thisDoneRate);
+
+                if (thisDoneRate > othersDoneRate) {
+                    holder.bitDoneRate.setTextColor(getResources().getColor(R.color.doneColor));
+                    holder.othersDoneRate.setTextColor(getResources().getColor(R.color.lateColor));
+                } else if (thisDoneRate < othersDoneRate) {
+                    holder.bitDoneRate.setTextColor(getResources().getColor(R.color.lateColor));
+                    holder.othersDoneRate.setTextColor(getResources().getColor(R.color.doneColor));
+                } else {
+                    holder.bitDoneRate.setTextColor(getResources().getColor(R.color.noneColor));
+                    holder.othersDoneRate.setTextColor(getResources().getColor(R.color.noneColor));
+                }
+
+                holder.bitDoneRate.setText(tm.getDoneRate(t) + " %");
+                holder.othersDoneRate.setText(tm.getDoneRateExcept(t) + " %");
+
+
+                TimeLineAdapter adapter = new TimeLineAdapter(getActivity(), t.getActionsRecords());
+                holder.timeLine.setAdapter(adapter);
             }
 
-            holder.bitDoneRate.setText(tm.getDoneRate(t) + " %");
-            holder.othersDoneRate.setText(tm.getDoneRateExcept(t) + " %");
-            TimeLineAdapter adapter = new TimeLineAdapter(getActivity(), t.getActionsRecords());
-            Log.d("GetActionsRecords", t.getActionsRecords().size() + "");
-
-            holder.timeLine.setAdapter(adapter);
             return v;
         }
 
