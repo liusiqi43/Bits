@@ -21,8 +21,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -50,6 +53,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import model.CategoryManager;
@@ -78,6 +82,10 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     private OnBitListInteractionListener mListener;
 
     private boolean mUndoDialogDisplayed = false;
+
+    // Reordering animation
+    HashMap<Task, Integer> mSavedState = new HashMap<Task, Integer>();
+    Interpolator mInterpolator = new AccelerateDecelerateInterpolator();
 
     public BitsListFragment() {
     }
@@ -122,11 +130,11 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                 Task item = mAdapter.getItem(position);
                 tm.setActionRecordForTask(item, TaskManager.ACTION_TYPE_SKIP);
                 tm.setNextScheduledTimeForTask(item);
-                // Implicitly calls datasetChanged() method
-//                mAdapter.remove(item);
+                item.update();
+                saveState();
                 mAdapter.clear();
                 mAdapter.addAll(tm.getAllSortedTasks());
-//                mAdapter.add(item);
+                animateNewState();
             }
 
             @Override
@@ -136,12 +144,11 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                 Task item = mAdapter.getItem(position);
                 tm.setActionRecordForTask(item, TaskManager.ACTION_TYPE_DONE);
                 tm.setNextScheduledTimeForTask(item);
-                // Implicitly calls datasetChanged() method
-//                mAdapter.remove(item);
-//                mAdapter.add(item);
-
+                item.update();
+                saveState();
                 mAdapter.clear();
                 mAdapter.addAll(tm.getAllSortedTasks());
+                animateNewState();
             }
 
         });
@@ -263,8 +270,10 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     tm.removeActionRecordById(record.getId());
+                    saveState();
                     mAdapter.clear();
                     mAdapter.addAll(tm.getAllSortedTasks());
+                    animateNewState();
                     dialog.cancel();
                     mUndoDialogDisplayed = false;
                 }
@@ -279,6 +288,56 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
             builder.show();
             mUndoDialogDisplayed = true;
+        }
+    }
+
+    private void saveState() {
+        mSavedState.clear();
+
+        int first = mBitsListView.getFirstVisiblePosition();
+        int last = mBitsListView.getLastVisiblePosition();
+        for(int i=0; i<mAdapter.size(); i++) {
+            if( i >= first && i <= last) {
+                View v = mBitsListView.getChildAt(i-first);
+                int top = v.getTop();
+                int dataIdx = i;
+                Task dataId = mAdapter.get(dataIdx);
+                mSavedState.put(dataId, top);
+            } else if( i < first ) {
+                int top = mBitsListView.getTop() - mBitsListView.getHeight()/2;
+                Task dataId = mAdapter.get(i);
+                mSavedState.put(dataId, top);
+            } else if( i > last ) {
+                int top = mBitsListView.getBottom() + mBitsListView.getHeight()/2;
+                Task dataId = mAdapter.get(i);
+                mSavedState.put(dataId, top);
+            }
+        }
+        for(int i=0; i < mBitsListView.getChildCount(); i++) {
+            View v = mBitsListView.getChildAt(i);
+            int top = v.getTop();
+            int dataIdx = first + i;
+            Task dataId = mAdapter.get(dataIdx);
+            mSavedState.put(dataId, top);
+        }
+    }
+
+    private void animateNewState() {
+        int first = mBitsListView.getFirstVisiblePosition();
+        int last = mBitsListView.getLastVisiblePosition();
+        for(int i=0; i < mBitsListView.getChildCount(); i++) {
+            int dataIdx = first + i;
+            Task dataId = mAdapter.get(dataIdx);
+            if( mSavedState.containsKey(dataId) ) {
+                View v = mBitsListView.getChildAt(i);
+                int top = v.getTop();
+                int oldTop = mSavedState.get(dataId);
+                int hDiff = top - oldTop;
+                TranslateAnimation anim = new TranslateAnimation(0, 0, -hDiff, 0);
+                anim.setInterpolator(mInterpolator);
+                anim.setDuration(333);
+                v.startAnimation(anim);
+            }
         }
     }
 
