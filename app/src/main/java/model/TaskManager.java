@@ -235,7 +235,6 @@ public class TaskManager {
         ActionRecord record = new ActionRecord(null, ACTION_TYPE, date, t.getId());
         mActionRecordDao.insert(record);
         t.resetActionsRecords();
-        Log.d("DB_MIGRATION_1", "Add action " + ACTION_TYPE + " for " + t.getDescription());
     }
 
     /**
@@ -295,6 +294,8 @@ public class TaskManager {
                 record.getTask().setSkipCount(record.getTask().getSkipCount() - 1);
                 break;
         }
+
+        setNextScheduledTimeForTask(record.getTask());
 
         record.getTask().update();
         mActionRecordDao.delete(record);

@@ -263,7 +263,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     tm.removeActionRecordById(record.getId());
-                    mAdapter.notifyDataSetChanged();
+                    mAdapter.clear();
+                    mAdapter.addAll(tm.getAllSortedTasks());
                     dialog.cancel();
                     mUndoDialogDisplayed = false;
                 }
