@@ -106,9 +106,14 @@ public class TaskManager {
             @Override
             public int compare(Task task, Task task2) {
                 long c1 = getActionCountForTaskSinceTimestamp(task);
+                long c2 = getActionCountForTaskSinceTimestamp(task2);
                 if (task.getFrequency() <= c1) {
                     return 1;
+                } else if (task2.getFrequency() <= c2) {
+                    return -1;
                 }
+
+
                 if (task.getNextScheduledTime() < task2.getNextScheduledTime()) {
                     return -1;
                 } else if (task2.getNextScheduledTime() < task.getNextScheduledTime()) {
