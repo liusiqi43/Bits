@@ -2,7 +2,13 @@ package model;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.siqi.bits.ActionRecord;
 import com.siqi.bits.ActionRecordDao;
@@ -19,6 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.greenrobot.dao.query.QueryBuilder;
@@ -42,6 +49,10 @@ public class TaskManager {
     private ActionRecordDao mActionRecordDao;
     private PrettyTime mPrettyTime;
     private Context mContext;
+
+    private ArrayList<String> mDoneSlogans = new ArrayList<String>();
+    private ArrayList<String> mSkipSlogans = new ArrayList<String>();
+    private Random mRandomiser;
 
     private TaskManager(Context ctx) {
         /**
@@ -67,8 +78,21 @@ public class TaskManager {
         PeriodToDays.put((long) 30 * 24 * 60 * 60 * 1000, 30);
         PeriodToDays.put((long) 365 * 24 * 60 * 60 * 1000, 365);
 
+        mDoneSlogans.add("Great Job!");
+        mDoneSlogans.add("You Rock!");
+        mDoneSlogans.add("Awesome!");
+        mDoneSlogans.add("Incredible!");
+        mDoneSlogans.add("Impressive!");
+        mDoneSlogans.add("Bravo!");
+
+        mSkipSlogans.add("Maybe next time!");
+        mSkipSlogans.add("Get back to this soon!");
+        mSkipSlogans.add("See you soon!");
+        mSkipSlogans.add("You can do this!");
+
         mPrettyTime = new PrettyTime();
         mContext = ctx;
+        mRandomiser = new Random();
     }
 
     public static TaskManager getInstance(Context ctx) {
@@ -222,6 +246,36 @@ public class TaskManager {
     }
 
     public void setActionRecordForTask(Task t, int ACTION_TYPE) {
+
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        View view = inflater.inflate( R.layout.toast_action_layout, null);
+        View layout = view.findViewById(R.id.toast_layout_root);
+        TextView text = (TextView) layout.findViewById(R.id.text);
+
+        if (ACTION_TYPE == ACTION_TYPE_DONE) {
+            text.setBackgroundColor(mContext.getResources().getColor(R.color.toast_done_label_background));
+            layout.setBackgroundColor(mContext.getResources().getColor(R.color.toast_done_background));
+            text.setText(mDoneSlogans.get(mRandomiser.nextInt(mDoneSlogans.size())));
+        } else if (ACTION_TYPE == ACTION_TYPE_SKIP) {
+            text.setBackgroundColor(mContext.getResources().getColor(R.color.toast_skip_label_background));
+            layout.setBackgroundColor(mContext.getResources().getColor(R.color.toast_skip_background));
+            text.setText(mSkipSlogans.get(mRandomiser.nextInt(mSkipSlogans.size())));
+        }
+
+        final Toast toast = new Toast(mContext.getApplicationContext());
+        toast.setView(layout);
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.FILL, 0, 0);
+        toast.show();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                toast.cancel();
+            }
+        }, 1500);
+
         setActionRecordForTaskAtDate(t, ACTION_TYPE, new Date());
     }
 

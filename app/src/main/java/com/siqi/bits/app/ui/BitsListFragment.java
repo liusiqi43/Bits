@@ -116,10 +116,11 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
         // Swing from bottom anim & dismiss anim
         SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAnimateDismissAdapter);
-        swingBottomInAnimationAdapter.setInitialDelayMillis(200);
-        swingBottomInAnimationAdapter.setAnimationDurationMillis(400);
-        swingBottomInAnimationAdapter.setAbsListView(mBitsListView);
+//        swingBottomInAnimationAdapter.setInitialDelayMillis(100);
+//        swingBottomInAnimationAdapter.setAnimationDurationMillis(300);
+
         this.mBitsListView.setAdapter(swingBottomInAnimationAdapter);
+        swingBottomInAnimationAdapter.setAbsListView(mBitsListView);
 
 
         this.mBitsListView.setSwipeListViewListener(new BaseSwipeListViewListener(){
@@ -141,6 +142,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
             public void onRightChoiceAction(int position) {
                 if (mAdapter.isExpanded(position))
                     mAdapter.toggle(position);
+
                 Task item = mAdapter.getItem(position);
                 tm.setActionRecordForTask(item, TaskManager.ACTION_TYPE_DONE);
                 tm.setNextScheduledTimeForTask(item);
@@ -148,6 +150,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                 saveState();
                 mAdapter.clear();
                 mAdapter.addAll(tm.getAllSortedTasks());
+
+
                 animateNewState();
             }
 
@@ -167,6 +171,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                     }
                 }
                 }, getResources().getInteger(R.integer.actionview_timeout));
+
                 return true;
             }
         });
@@ -335,7 +340,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                 int hDiff = top - oldTop;
                 TranslateAnimation anim = new TranslateAnimation(0, 0, -hDiff, 0);
                 anim.setInterpolator(mInterpolator);
-                anim.setDuration(333);
+                anim.setDuration(330);
                 v.startAnimation(anim);
             }
         }
@@ -504,7 +509,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Log.d("TEST", "getVlew:"+position);
+            Log.d("TEST", "getVlew:" + position);
             View v = super.getView(position, convertView, parent);
 
             ((SwipeListView) parent).recycle(v, position);
