@@ -20,10 +20,12 @@
 
 package com.siqi.bits.swipelistview;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.support.v4.view.MotionEventCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -108,6 +110,8 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
     private int oldSwipeActionRight;
     private int oldSwipeActionLeft;
 
+    private Vibrator hapticFeedbackVibrator;
+
     private LinkedList<Float> posXQueue = new LimitedLinkedList<Float>(3);
 
     private class LimitedLinkedList<E> extends LinkedList<E> {
@@ -134,7 +138,7 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
      * @param swipeFrontView front view Identifier
      * @param swipeBackView  back view Identifier
      */
-    public SwipeListViewTouchListener(SwipeListView swipeListView, int swipeFrontView, int swipeBackView) {
+    public SwipeListViewTouchListener(Context ctx, SwipeListView swipeListView, int swipeFrontView, int swipeBackView) {
         this.swipeFrontView = swipeFrontView;
         this.swipeBackView = swipeBackView;
         ViewConfiguration vc = ViewConfiguration.get(swipeListView.getContext());
@@ -144,6 +148,7 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
         configShortAnimationTime = swipeListView.getContext().getResources().getInteger(android.R.integer.config_shortAnimTime);
         animationTime = configShortAnimationTime;
         this.swipeListView = swipeListView;
+        hapticFeedbackVibrator = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     /**
@@ -934,6 +939,8 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
         swipeActionLeft = oldSwipeActionLeft;
     }
 
+    private boolean vibrated = false;
+
     /**
      * Moves the view
      *
@@ -970,8 +977,14 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
             int sign = p > 0 ? 1 : -1;
 
             float newPosX = Math.abs(p) < getDisplayChoiceInDp() ? p : sign * getDisplayChoiceInDp();
-            if (Math.abs(posX) < getDisplayChoiceInDp() || Math.abs(newPosX) < getDisplayChoiceInDp())
+            if (Math.abs(posX) < getDisplayChoiceInDp() || Math.abs(newPosX) < getDisplayChoiceInDp()){
                 setTranslationX(frontView, newPosX);
+                vibrated = false;
+            }
+            else if (Math.abs(newPosX) == getDisplayChoiceInDp() && !vibrated){
+                hapticFeedbackVibrator.vibrate(50);
+                vibrated = true;
+            }
         } else {
             setTranslationX(frontView, deltaX);
         }

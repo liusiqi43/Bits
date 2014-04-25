@@ -203,7 +203,7 @@ public class SwipeListView extends ListView {
 
         final ViewConfiguration configuration = ViewConfiguration.get(getContext());
         touchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
-        touchListener = new SwipeListViewTouchListener(this, swipeFrontView, swipeBackView);
+        touchListener = new SwipeListViewTouchListener(getContext(), this, swipeFrontView, swipeBackView);
         if (swipeAnimationTime > 0) {
             touchListener.setAnimationTime(swipeAnimationTime);
         }
