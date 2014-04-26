@@ -41,5 +41,6 @@
     <string name="on_task"> on task </string>
     <string name="ok">Yes</string>
     <string name="cancel">Cancel</string>
+    <string name="task_reminder_publisher">TaskReminderPublisher</string>
 
 </resources>

@@ -33,6 +33,7 @@ import java.util.List;
 
 import model.CategoryManager;
 import model.TaskManager;
+import utils.BitmapProcessor;
 import views.ExpandingGridView;
 
 
@@ -324,7 +325,7 @@ public class NewBitFragment extends Fragment {
             try {
                 is = getActivity().getAssets().open(c.getIconDrawableName());
                 Bitmap bitmap = BitmapFactory.decodeStream(is);
-                icon.setImageBitmap(CategoryManager.invertImage(bitmap));
+                icon.setImageBitmap(BitmapProcessor.invertImage(bitmap));
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {

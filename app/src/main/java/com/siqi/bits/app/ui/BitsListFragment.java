@@ -2,14 +2,17 @@ package com.siqi.bits.app.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.LruCache;
 import android.text.Html;
@@ -50,7 +53,6 @@ import com.siqi.bits.swipelistview.BaseSwipeListViewListener;
 import com.siqi.bits.swipelistview.SwipeListView;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -58,6 +60,7 @@ import java.util.List;
 
 import model.CategoryManager;
 import model.TaskManager;
+import service.ReminderScheduleService;
 import utils.ShakeEventListener;
 
 /**
@@ -83,9 +86,44 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
     private boolean mUndoDialogDisplayed = false;
 
+    private ReminderScheduleService mScheduleService = null;
+    private boolean mIsBound = false;
+
     // Reordering animation
     HashMap<Task, Integer> mSavedState = new HashMap<Task, Integer>();
     Interpolator mInterpolator = new AccelerateDecelerateInterpolator();
+
+    void doBindService() {
+        // Establish a connection with the service.  We use an explicit
+        // class name because we want a specific service implementation that
+        // we know will be running in our own process (and thus won't be
+        // supporting component replacement by other applications).
+        getActivity().bindService(new Intent(getActivity(),
+                ReminderScheduleService.class), mConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = true;
+    }
+
+    void doUnbindService() {
+        if (mIsBound) {
+            // Detach our existing connection.
+            getActivity().unbindService(mConnection);
+            mIsBound = false;
+        }
+    }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d("ReminderScheduleService", "onServiceConnected");
+            mScheduleService = ((ReminderScheduleService.LocalBinder) service).getService();
+            tm.setScheduleService(mScheduleService);
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            Log.d("ReminderScheduleService", "onServiceDisconnected");
+            mScheduleService = null;
+            tm.setScheduleService(mScheduleService);
+        }
+    };
 
     public BitsListFragment() {
     }
@@ -129,9 +167,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                 if (mAdapter.isExpanded(position))
                     mAdapter.toggle(position);
                 Task item = mAdapter.getItem(position);
-                tm.setActionRecordForTask(item, TaskManager.ACTION_TYPE_SKIP);
-                tm.setNextScheduledTimeForTask(item);
-                item.update();
+                tm.setSkipActionForTask(item);
                 saveState();
                 mAdapter.clear();
                 mAdapter.addAll(tm.getAllSortedTasks());
@@ -144,9 +180,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                     mAdapter.toggle(position);
 
                 Task item = mAdapter.getItem(position);
-                tm.setActionRecordForTask(item, TaskManager.ACTION_TYPE_DONE);
-                tm.setNextScheduledTimeForTask(item);
-                item.update();
+                tm.setDoneActionForTask(item);
                 saveState();
                 mAdapter.clear();
                 mAdapter.addAll(tm.getAllSortedTasks());
@@ -182,6 +216,11 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         mSensorListener = new ShakeEventListener();
 
         mSensorListener.setOnShakeListener(this);
+
+        /**
+         * Service binding
+         */
+        doBindService();
 
         return rootView;
     }
@@ -462,24 +501,13 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
             Bitmap bitmap = mMemoryCache.get(t.getCategory().getIconDrawableName());
             if (bitmap == null) {
-                InputStream is = null;
                 try {
-                    is = getActivity().getAssets().open(t.getCategory().getIconDrawableName());
-                    bitmap = BitmapFactory.decodeStream(is);
-                    // Invert bitmap color
-                    bitmap = CategoryManager.invertImage(bitmap);
-                    if (bitmap != null)
+                    bitmap = t.getCategory().getIconBitmap(getActivity());
+                    if (bitmap != null) {
                         mMemoryCache.put(t.getCategory().getIconDrawableName(), bitmap);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
-                } finally {
-                    if(is!=null) {
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
                 }
             }
 

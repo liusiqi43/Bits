@@ -29,6 +29,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.greenrobot.dao.query.QueryBuilder;
+import service.ReminderScheduleService;
 
 /**
  * Created by me on 4/9/14.
@@ -53,6 +54,12 @@ public class TaskManager {
     private ArrayList<String> mDoneSlogans = new ArrayList<String>();
     private ArrayList<String> mSkipSlogans = new ArrayList<String>();
     private Random mRandomiser;
+
+    public void setScheduleService(ReminderScheduleService mScheduleService) {
+        this.mScheduleService = mScheduleService;
+    }
+
+    private ReminderScheduleService mScheduleService = null;
 
     private TaskManager(Context ctx) {
         /**
@@ -235,6 +242,13 @@ public class TaskManager {
     }
 
     public void setNextScheduledTimeForTask(Task t) {
+        Log.d("ReminderScheduleService", "setNextScheduledTimeForTask");
+        if (mScheduleService != null)
+            mScheduleService.unScheduleForTask(t);
+        else {
+            Log.d("ReminderScheduleService", "mScheduleService == null");
+        }
+
         long actionCountSinceBeginOfInternval = getActionCountForTaskSinceTimestamp(t);
         if (t.getFrequency() - actionCountSinceBeginOfInternval > 0) {
             long delta = (t.getPeriod() - t.getPastMillisOfCurrentPeriod()) / (t.getFrequency() - actionCountSinceBeginOfInternval);
@@ -243,6 +257,8 @@ public class TaskManager {
         }
 
         Log.d("ScheduledTimeUpdate", "T:"+t.getDescription()+" freq:"+t.getFrequency() + " actionCount:"+actionCountSinceBeginOfInternval);
+        if (mScheduleService != null)
+            mScheduleService.scheduleForTask(t);
     }
 
     public void setActionRecordForTask(Task t, int ACTION_TYPE) {
@@ -359,6 +375,18 @@ public class TaskManager {
         record.getTask().update();
         mActionRecordDao.delete(record);
         record.getTask().resetActionsRecords();
+    }
+
+    public void setSkipActionForTask(Task t) {
+        setActionRecordForTask(t, TaskManager.ACTION_TYPE_SKIP);
+        setNextScheduledTimeForTask(t);
+        t.update();
+    }
+
+    public void setDoneActionForTask(Task t) {
+        setActionRecordForTask(t, TaskManager.ACTION_TYPE_DONE);
+        setNextScheduledTimeForTask(t);
+        t.update();
     }
 
     public class DuplicatedTaskException extends Throwable {
