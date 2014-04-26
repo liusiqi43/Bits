@@ -57,7 +57,7 @@ import static com.nineoldandroids.view.ViewPropertyAnimator.animate;
  */
 public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener {
 
-    private static final int DISPLACE_CHOICE = 340;
+    private static final int DISPLACE_CHOICE = 85;
 
     private int swipeMode = SwipeListView.SWIPE_MODE_BOTH;
     private boolean swipeOpenOnLongPress = true;
@@ -818,9 +818,9 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
                 }
                 generateAnimate(frontView, swap, swapRight, downPosition);
                 // Left action
-                if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == getDisplayChoiceInDp()) {
+                if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == getDisplayChoiceInPx()) {
                     this.swipeListView.onLeftChoiceAction(downPosition);
-                } else if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == -getDisplayChoiceInDp()) {
+                } else if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == -getDisplayChoiceInPx()) {
                     this.swipeListView.onRightChoiceAction(downPosition);
                 }
 
@@ -976,12 +976,12 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
 
             int sign = p > 0 ? 1 : -1;
 
-            float newPosX = Math.abs(p) < getDisplayChoiceInDp() ? p : sign * getDisplayChoiceInDp();
-            if (Math.abs(posX) < getDisplayChoiceInDp() || Math.abs(newPosX) < getDisplayChoiceInDp()){
+            float newPosX = Math.abs(p) < getDisplayChoiceInPx() ? p : sign * getDisplayChoiceInPx();
+            if (Math.abs(posX) < getDisplayChoiceInPx() || Math.abs(newPosX) < getDisplayChoiceInPx()){
                 setTranslationX(frontView, newPosX);
                 vibrated = false;
             }
-            else if (Math.abs(newPosX) == getDisplayChoiceInDp() && !vibrated){
+            else if (Math.abs(newPosX) == getDisplayChoiceInPx() && !vibrated){
                 hapticFeedbackVibrator.vibrate(50);
                 vibrated = true;
             }
@@ -1086,11 +1086,10 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
 
     }
 
-    private float getDisplayChoiceInDp() {
+    private float getDisplayChoiceInPx() {
         Resources resources = swipeListView.getContext().getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
-        float dp = DISPLACE_CHOICE / (metrics.densityDpi / 160f);
-        return dp;
+        return DISPLACE_CHOICE * metrics.density;
     }
 
 }
