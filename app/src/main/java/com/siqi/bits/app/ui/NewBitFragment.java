@@ -237,8 +237,16 @@ public class NewBitFragment extends Fragment {
              */
             mTask.setDescription(mBitTitleEditText.getText().toString().trim());
             mTask.setModifiedOn(new Date());
-            if (mTask.getCreatedOn() == null)
+            if (mEditingBitID == null) {
                 mTask.setCreatedOn(new Date());
+                try {
+                    tm.insertTask(mTask);
+                } catch (TaskManager.DuplicatedTaskException e) {
+                    mBitTitleEditText.setError(getString(R.string.duplicated_title_error));
+                    e.printStackTrace();
+                }
+            }
+
             mTask.setCategory((Category) mLastSelected.getTag());
 
             Log.d("BitListFrag", mTask.getDescription() + " in " + ((Category) mLastSelected.getTag()).getName() + " Now ");
@@ -249,16 +257,8 @@ public class NewBitFragment extends Fragment {
             mTask.setFrequency(Integer.parseInt(rbFreq.getText().toString()));
             tm.setNextScheduledTimeForTask(mTask);
 
-            try {
-                if (mEditingBitID == null) {
-                    tm.insertTask(mTask);
-                } else {
-                    tm.updateTask(mTask);
-                }
-                mListener.onNewDisposeInteraction();
-            } catch (TaskManager.DuplicatedTaskException e) {
-                mBitTitleEditText.setError(getString(R.string.duplicated_title_error));
-            }
+            tm.updateTask(mTask);
+            mListener.onNewDisposeInteraction();
 
             return true;
         }

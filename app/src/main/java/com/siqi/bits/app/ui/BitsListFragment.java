@@ -484,6 +484,10 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                     Task item = mAdapter.getItem(position);
                     item.setDeletedOn(new Date());
                     tm.updateTask(item);
+                    if (mScheduleService != null)
+                        mScheduleService.unScheduleForTask(item);
+                    else
+                        Log.d("ReminderScheduleService", "mScheduleService == null, deleted item still scheduled");
                     // Implicitly calls datasetChanged() method
 
                     mAnimateDismissAdapter.animateDismiss(position);
