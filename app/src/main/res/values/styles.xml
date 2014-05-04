@@ -6,7 +6,7 @@
     </style>
 
     <style name="AppTheme.progressbar.light" parent="@android:style/Widget.ProgressBar.Horizontal">
-        <item name="android:progressDrawable">@drawable/progress_horizontal</item>
+        <item name="android:progressDrawable">@drawable/progress_horizontal_success</item>
     </style>
 
     <style name="AppTheme.actionbutton.inverse" parent="android:TextAppearance.Large.Inverse">

@@ -558,6 +558,14 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                 tm.updateActionRecordForTask(t);
             }
             holder.progressBar.setProgress(progress);
+            if (progress < 50) {
+                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_horizontal_success));
+            } else if (progress < 80) {
+                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_horizontal_warning));
+            } else {
+                holder.progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_horizontal_danger));
+            }
+
             Log.d("Progress for " + t.getDescription(), progress + "");
 
             Animation inAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left); inAnimation.setDuration(300);

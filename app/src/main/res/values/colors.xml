@@ -43,4 +43,8 @@
     <color name="grey_font">#ff9e9e9e</color>
     <color name="text_shadow">#7F000000</color>
     <color name="text_shadow_white">#FFFFFF</color>
+
+    <color name="success_progress_color">@color/Emerald</color>
+    <color name="warning_progress_color">@color/Orange</color>
+    <color name="danger_progress_color">@color/Pomegranate</color>
 </resources>
