@@ -26,8 +26,8 @@ public class ReminderScheduleService extends Service {
     // This is the object that receives interactions from clients.  See
     // RemoteService for a more complete example.
     private final IBinder mBinder = new LocalBinder();
-    private List<Task> mTasks;
     AlarmManager mAlarmManager;
+    private List<Task> mTasks;
 
     private void scheduleAllAlarms() {
         reloadTasks();
@@ -81,6 +81,7 @@ public class ReminderScheduleService extends Service {
     public void onCreate() {
         super.onCreate();
         mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
         scheduleAllAlarms();
     }
 

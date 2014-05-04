@@ -1,5 +1,7 @@
 package com.siqi.bits.app;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -41,6 +43,14 @@ public class MainActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Clear all notification
+        NotificationManager nMgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nMgr.cancelAll();
     }
 
     @Override
@@ -135,6 +145,7 @@ public class MainActivity extends ActionBarActivity
         fragmentManager.popBackStack();
         onSectionAttached(BitsListFragment.FRAGMENT_ID);
     }
+
 
     @Override
     public void startEditBitFragment(Long id) {
