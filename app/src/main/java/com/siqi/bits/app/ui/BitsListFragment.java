@@ -64,7 +64,10 @@ import service.ReminderScheduleService;
 import utils.ShakeEventListener;
 
 /**
- * Created by me on 4/8/14.
+ * Proudly powered by me on 4/8/14.
+ * Part of android productivity application Bits
+ * A tool that helps you to architect your life to
+ * its fullness!
  */
 public class BitsListFragment extends Fragment implements ShakeEventListener.OnShakeListener {
     public static final int FRAGMENT_ID = 1;

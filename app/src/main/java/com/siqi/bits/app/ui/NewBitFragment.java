@@ -37,15 +37,6 @@ import utils.BitmapProcessor;
 import views.ExpandingGridView;
 
 
-/**
- * A simple {@link android.support.v4.app.Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link NewBitFragment.OnNewBitInteractionListener} interface
- * to handle interaction events.
- * Use the {@link NewBitFragment#newInstance} factory method to
- * create an instance of this fragment.
- *
- */
 public class NewBitFragment extends Fragment {
     public static final int FRAGMENT_ID = 9;
     private static final String EDITING_BIT_ID = "bit_id";
