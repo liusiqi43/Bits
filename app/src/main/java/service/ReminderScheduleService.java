@@ -44,6 +44,9 @@ public class ReminderScheduleService extends Service {
     }
 
     public void scheduleForTask(Task t) {
+        if (t.getNextScheduledTime() < System.currentTimeMillis())
+            return;
+
         // Display a notification about us starting.  We put an icon in the status bar.
         Intent displayTaskIntent = new Intent(this, ReminderPublishReceiver.class);
         displayTaskIntent.putExtra(TASK_ID, t.getId());

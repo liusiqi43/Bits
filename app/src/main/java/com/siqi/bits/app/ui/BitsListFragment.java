@@ -71,27 +71,44 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
     public static final int CARD_INFO = 0;
     public static final int CARD_ACTION = 1;
-
-    private CategoryManager cm;
-    private TaskManager tm;
-
+    private static final int REFRESH_PERIOD = 60 * 1000;
     SwipeListView mBitsListView;
     BitListArrayAdapter mAdapter;
     AnimateDismissAdapter mAnimateDismissAdapter;
-
-    private SensorManager mSensorManager;
-    private ShakeEventListener mSensorListener;
-
-    private OnBitListInteractionListener mListener;
-
-    private boolean mUndoDialogDisplayed = false;
-
-    private ReminderScheduleService mScheduleService = null;
-    private boolean mIsBound = false;
-
     // Reordering animation
     HashMap<Task, Integer> mSavedState = new HashMap<Task, Integer>();
     Interpolator mInterpolator = new AccelerateDecelerateInterpolator();
+    private CategoryManager cm;
+    private TaskManager tm;
+    private SensorManager mSensorManager;
+    private ShakeEventListener mSensorListener;
+    private OnBitListInteractionListener mListener;
+    private boolean mUndoDialogDisplayed = false;
+    private ReminderScheduleService mScheduleService = null;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d("ReminderScheduleService", "onServiceConnected");
+            mScheduleService = ((ReminderScheduleService.LocalBinder) service).getService();
+            tm.setScheduleService(mScheduleService);
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            Log.d("ReminderScheduleService", "onServiceDisconnected");
+            mScheduleService = null;
+            tm.setScheduleService(null);
+        }
+    };
+    private boolean mIsBound = false;
+    private Runnable mListReloader;
+    private Handler mListRefresherHandle = new Handler();
+
+    public BitsListFragment() {
+    }
+
+    public static BitsListFragment newInstance() {
+        BitsListFragment fragment = new BitsListFragment();
+        return fragment;
+    }
 
     void doBindService() {
         // Establish a connection with the service.  We use an explicit
@@ -109,28 +126,6 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
             getActivity().unbindService(mConnection);
             mIsBound = false;
         }
-    }
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d("ReminderScheduleService", "onServiceConnected");
-            mScheduleService = ((ReminderScheduleService.LocalBinder) service).getService();
-            tm.setScheduleService(mScheduleService);
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            Log.d("ReminderScheduleService", "onServiceDisconnected");
-            mScheduleService = null;
-            tm.setScheduleService(mScheduleService);
-        }
-    };
-
-    public BitsListFragment() {
-    }
-
-    public static BitsListFragment newInstance() {
-        BitsListFragment fragment = new BitsListFragment();
-        return fragment;
     }
 
     @Override
@@ -217,10 +212,13 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
         mSensorListener.setOnShakeListener(this);
 
-        /**
-         * Service binding
-         */
-        doBindService();
+        mListReloader = new Runnable() {
+            @Override
+            public void run() {
+                refreshBitsList();
+                mListRefresherHandle.postDelayed(mListReloader, REFRESH_PERIOD);
+            }
+        };
 
         return rootView;
     }
@@ -245,12 +243,47 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         mSensorManager.registerListener(mSensorListener,
                 mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_UI);
+        /**
+         * Service binding
+         */
+        doBindService();
+
+        /**
+         * UI refresher start
+         */
+        startPeriodicRefresh();
+    }
+
+    private void refreshBitsList() {
+        Log.d("periodic", "Refresh now");
+        saveState();
+        mAdapter.clear();
+        mAdapter.addAll(tm.getAllSortedTasks());
+        animateNewState();
+    }
+
+    private void startPeriodicRefresh() {
+        mListReloader.run();
+    }
+
+    private void stopPeriodicRefresh() {
+        Log.d("periodic", "Refresh stops now");
+        mListRefresherHandle.removeCallbacks(mListReloader);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mSensorManager.unregisterListener(mSensorListener);
+        /**
+         * Service Unbinding
+         */
+        doUnbindService();
+
+        /**
+         * UI refresher stops here
+         */
+        stopPeriodicRefresh();
     }
 
     @Override
@@ -384,7 +417,6 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
             }
         }
     }
-
 
     public interface OnBitListInteractionListener {
         public void startEditBitFragment(Long id);

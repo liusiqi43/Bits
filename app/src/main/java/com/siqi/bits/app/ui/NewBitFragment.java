@@ -72,6 +72,10 @@ public class NewBitFragment extends Fragment {
     private AdapterView.OnItemClickListener mOnClickListener;
     private View mLastSelected = null;
 
+    public NewBitFragment() {
+        // Required empty public constructor
+    }
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -88,10 +92,6 @@ public class NewBitFragment extends Fragment {
             fragment.setArguments(args);
         }
         return fragment;
-    }
-
-    public NewBitFragment() {
-        // Required empty public constructor
     }
 
     @Override
