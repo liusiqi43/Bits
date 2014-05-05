@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.siqi.bits.ActionRecord;
 import com.siqi.bits.ActionRecordDao;
+import com.siqi.bits.BitsDevOpenHelper;
 import com.siqi.bits.DaoMaster;
 import com.siqi.bits.DaoSession;
 import com.siqi.bits.Task;
@@ -54,18 +55,13 @@ public class TaskManager {
     private ArrayList<String> mDoneSlogans = new ArrayList<String>();
     private ArrayList<String> mSkipSlogans = new ArrayList<String>();
     private Random mRandomiser;
-
-    public void setScheduleService(ReminderScheduleService mScheduleService) {
-        this.mScheduleService = mScheduleService;
-    }
-
     private ReminderScheduleService mScheduleService = null;
 
     private TaskManager(Context ctx) {
         /**
          * DB init
          */
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(
+        BitsDevOpenHelper helper = new BitsDevOpenHelper(
                 ctx,
                 "bits-db",
                 null);
@@ -108,6 +104,10 @@ public class TaskManager {
         return INSTANCE;
     }
 
+    public void setScheduleService(ReminderScheduleService mScheduleService) {
+        this.mScheduleService = mScheduleService;
+    }
+
     public void insertTask(Task t) throws DuplicatedTaskException {
         if (mTaskDao.queryBuilder()
                 .where(TaskDao.Properties.Description.eq(t.getDescription()), TaskDao.Properties.DeletedOn.isNull())
@@ -127,7 +127,7 @@ public class TaskManager {
     }
 
     public List<Task> getAllTasks() {
-        List<Task> tasks = mTaskDao.queryBuilder().where(TaskDao.Properties.DeletedOn.isNull()).list();
+        List<Task> tasks = mTaskDao.queryBuilder().where(TaskDao.Properties.DeletedOn.isNull(), TaskDao.Properties.Archieved_on.isNull()).list();
         return tasks;
     }
 

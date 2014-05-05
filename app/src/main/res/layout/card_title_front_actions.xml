@@ -3,28 +3,38 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:tag="@string/actionview_tag"
     android:layout_centerVertical="true"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:tag="@string/actionview_tag">
 
-    <Button
+    <ImageButton
+        android:id="@+id/edit_button"
+        style="@style/AppTheme.actionbutton.inverse"
         android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="@color/editColor"
-        style="@style/AppTheme.actionbutton.inverse"
-        android:text="Edit"
-        android:id="@+id/edit_button"
         android:longClickable="false"
-        android:layout_height="match_parent" />
+        android:src="@drawable/ic_action_edit" />
 
-    <Button
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:text="Delete"
-        android:id="@+id/delete_button"
-        android:longClickable="false"
+    <ImageButton
+        android:id="@+id/achieve_button"
         style="@style/AppTheme.actionbutton.inverse"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@color/achieveColor"
+        android:longClickable="false"
+        android:src="@drawable/ic_action_read" />
+
+    <ImageButton
+        android:id="@+id/delete_button"
+        style="@style/AppTheme.actionbutton.inverse"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
         android:background="@color/deleteColor"
-        android:layout_height="match_parent" />
+        android:longClickable="false"
+        android:src="@drawable/ic_action_delete" />
 
 </LinearLayout>

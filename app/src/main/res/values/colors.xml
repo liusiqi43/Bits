@@ -47,4 +47,5 @@
     <color name="success_progress_color">@color/Emerald</color>
     <color name="warning_progress_color">@color/Orange</color>
     <color name="danger_progress_color">@color/Pomegranate</color>
+    <color name="achieveColor">@color/doneColor</color>
 </resources>

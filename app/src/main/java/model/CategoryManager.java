@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.siqi.bits.BitsDevOpenHelper;
 import com.siqi.bits.Category;
 import com.siqi.bits.CategoryDao;
 import com.siqi.bits.DaoMaster;
@@ -17,18 +18,17 @@ import java.util.List;
  */
 public class CategoryManager {
     private static final String CATEGORIES_ICON_EXTENSION = ".png";
+    private static CategoryManager INSTANCE = null;
     private SQLiteDatabase mDB;
     private DaoMaster mDaoMaster;
     private DaoSession mDaoSession;
     private CategoryDao mCategoryDao;
 
-    private static CategoryManager INSTANCE = null;
-
     private CategoryManager(Context ctx) {
         /**
          * DB init
          */
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(
+        BitsDevOpenHelper helper = new BitsDevOpenHelper(
                 ctx,
                 "bits-db",
                 null);
@@ -38,6 +38,12 @@ public class CategoryManager {
         mCategoryDao = mDaoSession.getCategoryDao();
 
         initWithCategories();
+    }
+
+    public static CategoryManager getInstance(Context ctx) {
+        if (INSTANCE == null)
+            INSTANCE = new CategoryManager(ctx);
+        return INSTANCE;
     }
 
     private void initWithCategories() {
@@ -73,19 +79,13 @@ public class CategoryManager {
         insertCategory(c);
     }
 
-    public static CategoryManager getInstance(Context ctx) {
-        if (INSTANCE == null)
-            INSTANCE = new CategoryManager(ctx);
-        return INSTANCE;
-    }
-
     public Category getCategory(long id) {
         return mCategoryDao.load(id);
     }
 
     public void insertCategory(Category c) {
         mCategoryDao.insert(c);
-        Log.d(getClass().getName(), c.getClass().getName()+ ":" + c.getName() + " inserted in DAO");
+        Log.d(getClass().getName(), c.getClass().getName() + ":" + c.getName() + " inserted in DAO");
     }
 
     public Category newCategory() {

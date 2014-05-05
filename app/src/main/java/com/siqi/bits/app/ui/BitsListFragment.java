@@ -35,6 +35,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -430,7 +431,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         TextView title;
         TextView timeAgo;
         ProgressBar progressBar;
-        Button skipButton, doneButton, editButton, deleteButton;
+        Button skipButton, doneButton;
+        ImageButton editButton, deleteButton, achieveButton;
         ViewSwitcher viewSwitcher;
     }
 
@@ -491,8 +493,9 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                 holder.progressBar = (ProgressBar) v.findViewById(R.id.timeAgoProgressBar);
                 holder.doneButton = (Button) v.findViewById(R.id.done_button);
                 holder.skipButton = (Button) v.findViewById(R.id.skip_button);
-                holder.editButton = (Button) v.findViewById(R.id.edit_button);
-                holder.deleteButton = (Button) v.findViewById(R.id.delete_button);
+                holder.editButton = (ImageButton) v.findViewById(R.id.edit_button);
+                holder.achieveButton = (ImageButton) v.findViewById(R.id.achieve_button);
+                holder.deleteButton = (ImageButton) v.findViewById(R.id.delete_button);
                 holder.viewSwitcher = (ViewSwitcher) v.findViewById(R.id.card_viewswitcher);
 
                 v.setTag(holder);
@@ -518,6 +521,23 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                     holder.viewSwitcher.setDisplayedChild(CARD_INFO);
                     Task item = mAdapter.getItem(position);
                     item.setDeletedOn(new Date());
+                    tm.updateTask(item);
+                    if (mScheduleService != null)
+                        mScheduleService.unScheduleForTask(item);
+                    else
+                        Log.d("ReminderScheduleService", "mScheduleService == null, deleted item still scheduled");
+                    // Implicitly calls datasetChanged() method
+
+                    mAnimateDismissAdapter.animateDismiss(position);
+                }
+            });
+
+            holder.achieveButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    holder.viewSwitcher.setDisplayedChild(CARD_INFO);
+                    Task item = mAdapter.getItem(position);
+                    item.setArchieved_on(new Date());
                     tm.updateTask(item);
                     if (mScheduleService != null)
                         mScheduleService.unScheduleForTask(item);
