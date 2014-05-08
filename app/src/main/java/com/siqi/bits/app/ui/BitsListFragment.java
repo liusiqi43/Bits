@@ -59,7 +59,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import model.CategoryManager;
 import model.TaskManager;
 import service.ReminderScheduleService;
 import utils.ShakeEventListener;
@@ -71,7 +70,7 @@ import utils.ShakeEventListener;
  * its fullness!
  */
 public class BitsListFragment extends Fragment implements ShakeEventListener.OnShakeListener {
-    public static final int FRAGMENT_ID = 1;
+    public static final int FRAGMENT_ID = 0;
 
     public static final int CARD_INFO = 0;
     public static final int CARD_ACTION = 1;
@@ -82,7 +81,6 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     // Reordering animation
     HashMap<Task, Integer> mSavedState = new HashMap<Task, Integer>();
     Interpolator mInterpolator = new AccelerateDecelerateInterpolator();
-    private CategoryManager cm;
     private TaskManager tm;
     private SensorManager mSensorManager;
     private ShakeEventListener mSensorListener;
@@ -139,14 +137,13 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         /**
          * View Binding
          */
-        View rootView = inflater.inflate(R.layout.fragment_bitslist, container, false);
+        View rootView = inflater.inflate(R.layout.bitslist_fragment, container, false);
         mBitsListView = (SwipeListView) rootView.findViewById(R.id.bitslist);
 
         /**
          * Data Loading
          */
         tm = TaskManager.getInstance(this.getActivity().getApplicationContext());
-        cm = CategoryManager.getInstance(this.getActivity().getApplicationContext());
 
         mAdapter = new BitListArrayAdapter(getActivity().getApplicationContext(), tm.getAllSortedTasks());
         mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
@@ -489,7 +486,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
                 holder.icon = (ImageView) v.findViewById(R.id.taskIcon);
                 holder.title = (TextView) v.findViewById(R.id.taskTitle);
-                holder.timeAgo = (TextView) v.findViewById(R.id.timeAgo);
+                holder.timeAgo = (TextView) v.findViewById(R.id.taskSubtitle);
                 holder.progressBar = (ProgressBar) v.findViewById(R.id.timeAgoProgressBar);
                 holder.doneButton = (Button) v.findViewById(R.id.done_button);
                 holder.skipButton = (Button) v.findViewById(R.id.skip_button);

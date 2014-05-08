@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/achievement_stat_bg"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        style="@style/AppTheme.countLayoutStyle"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/achievement_done_count"
+            style="@style/AppTheme.achievement.stats.countStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="37" />
+
+        <TextView
+            style="@style/AppTheme.achievement.stats.textStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Done" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/white" />
+
+    <LinearLayout
+        style="@style/AppTheme.countLayoutStyle"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/achievement_skip_count"
+            style="@style/AppTheme.achievement.stats.countStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="37" />
+
+        <TextView
+            style="@style/AppTheme.achievement.stats.textStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Skip" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/white" />
+
+    <LinearLayout
+        style="@style/AppTheme.countLayoutStyle"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/achievement_late_count"
+            style="@style/AppTheme.achievement.stats.countStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="37" />
+
+        <TextView
+            style="@style/AppTheme.achievement.stats.textStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Late" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/white" />
+
+    <LinearLayout
+        style="@style/AppTheme.countLayoutStyle"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/achievement_day_count"
+            style="@style/AppTheme.achievement.stats.countStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="37" />
+
+        <TextView
+            style="@style/AppTheme.achievement.stats.textStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Days" />
+    </LinearLayout>
+
+    <RelativeLayout
+        style="@style/AppTheme.countLayoutStyle"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="3"
+        android:background="@color/Emerald">
+
+        <RelativeLayout
+            android:id="@+id/actual_freq_count_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/achievement_actual_freq_count"
+                style="@style/AppTheme.achievement.stats.countStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:text="2.75"
+                android:textColor="@color/cloud" />
+
+            <TextView
+                android:id="@+id/achievement_freq_interval"
+                style="@style/AppTheme.achievement.stats.textStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/achievement_actual_freq_count"
+                android:layout_alignBottom="@+id/achievement_actual_freq_count"
+                android:layout_toRightOf="@+id/achievement_actual_freq_count"
+                android:text="t/wk"
+                android:textColor="@color/cloud" />
+        </RelativeLayout>
+
+        <TextView
+            style="@style/AppTheme.achievement.stats.textStyle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/actual_freq_count_layout"
+            android:text="Actual Frequency"
+            android:textColor="@color/cloud" />
+    </RelativeLayout>
+
+</LinearLayout>

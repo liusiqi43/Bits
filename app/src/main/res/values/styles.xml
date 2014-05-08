@@ -14,6 +14,14 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="AppTheme.actionbutton.inverse.normal" parent="android:TextAppearance.Large.Inverse">
+        <item name="android:textColor">@color/cloud</item>
+    </style>
+
+    <style name="AppTheme.actionbutton.medium.inverse.normal" parent="android:TextAppearance.Medium.Inverse">
+        <item name="android:textColor">@color/cloud</item>
+    </style>
+
     <style name="AppTheme.toast.textStyle" parent="android:TextAppearance.Large.Inverse">
         <item name="android:textSize">40sp</item>
         <item name="android:textStyle">bold</item>
@@ -26,4 +34,24 @@
         <item name="android:shadowRadius">6</item>
     </style>
 
+    <style name="AppTheme.achievement_seperator">
+        <item name="android:padding">5dp</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="AppTheme.achievement.stats.countStyle" parent="android:TextAppearance.DeviceDefault.Large">
+        <item name="android:textColor">@color/Asbestos</item>
+        <item name="android:textSize">35sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="AppTheme.achievement.stats.textStyle" parent="android:TextAppearance.DeviceDefault.Small">
+        <item name="android:textColor">@color/Asbestos</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="AppTheme.countLayoutStyle">
+        <item name="android:padding">5dp</item>
+    </style>
 </resources>

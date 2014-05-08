@@ -31,6 +31,8 @@
     <color name="editColor">@color/BelizeHole</color>
     <color name="deleteColor">@color/Pomegranate</color>
 
+    <color name="achievement_stat_bg">#EAEAEA</color>
+
     <color name="radiobutton_inactive">@android:color/transparent</color>
 
     <color name="toast_done_background">#95ecf0f1</color>

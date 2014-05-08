@@ -8,9 +8,11 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.siqi.bits.app.ui.AchievementsFragment;
 import com.siqi.bits.app.ui.BitsListFragment;
 import com.siqi.bits.app.ui.NewBitFragment;
 
@@ -58,18 +60,23 @@ public class MainActivity extends ActionBarActivity
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
 
-        // TODO: remove this when other sections implemented
-        if (position != 0){
-            return;
-        }
+        Log.d("Nav", "selected: " + position);
 
         switch (position) {
-            case 0:
+            case BitsListFragment.FRAGMENT_ID:
                 fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, BitsListFragment.newInstance())
                         .commit();
                 onSectionAttached(BitsListFragment.FRAGMENT_ID);
+                break;
+            case AchievementsFragment.FRAGMENT_ID:
+                fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, AchievementsFragment.newInstance())
+                        .commit();
+                onSectionAttached(AchievementsFragment.FRAGMENT_ID);
+                break;
         }
     }
 
@@ -82,26 +89,8 @@ public class MainActivity extends ActionBarActivity
             case BitsListFragment.FRAGMENT_ID:
                 mTitle = getString(R.string.bits);
                 break;
-            case 2:
-                mTitle = getString(R.string.statistics);
-                break;
-            case 3:
-                mTitle = getString(R.string.settings);
-                break;
-            case 4:
-                mTitle = getString(R.string.rewards);
-                break;
-            case 5:
-                mTitle = getString(R.string.feedback);
-                break;
-            case 6:
-                mTitle = getString(R.string.help);
-                break;
-            case 7:
-                mTitle = getString(R.string.share_fb);
-                break;
-            case 8:
-                mTitle = getString(R.string.share_email);
+            case AchievementsFragment.FRAGMENT_ID:
+                mTitle = getString(R.string.achievements);
                 break;
             case NewBitFragment.FRAGMENT_ID:
                 mTitle = getString(R.string.create_new_bit);

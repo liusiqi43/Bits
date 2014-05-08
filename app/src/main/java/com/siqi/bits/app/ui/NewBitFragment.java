@@ -104,7 +104,7 @@ public class NewBitFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_new_bit, container, false);
+        View v = inflater.inflate(R.layout.new_bit_fragment, container, false);
         setHasOptionsMenu(true);
 
         mBitTitleEditText = (EditText) v.findViewById(R.id.bit_title_edittext);
@@ -244,7 +244,7 @@ public class NewBitFragment extends Fragment {
             RadioButton rbFreq = (RadioButton) this.getView().findViewById(this.mFrequencyRBtnGroup.getCheckedRadioButtonId());
             RadioButton rbPeriod = (RadioButton) this.getView().findViewById(this.mPeriodRBtnGroup.getCheckedRadioButtonId());
 
-            mTask.setPeriod(TaskManager.PeriodStringToDays.get(rbPeriod.getText().toString()) * TaskManager.DAY_TO_MILLIS);
+            mTask.setPeriod(TaskManager.PeriodStringToDays.get(rbPeriod.getText().toString()) * TaskManager.DAY_IN_MILLIS);
             mTask.setFrequency(Integer.parseInt(rbFreq.getText().toString()));
             tm.setNextScheduledTimeForTask(mTask);
 

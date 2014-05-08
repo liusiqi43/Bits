@@ -1,6 +1,7 @@
 package com.siqi.bits.app;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,7 +21,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import java.util.HashMap;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -51,6 +57,7 @@ public class NavigationDrawerFragment extends Fragment {
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerListView;
+    private NavDrawerAdapter mAdapter;
     private View mFragmentContainerView;
 
     private int mCurrentSelectedPosition = 0;
@@ -79,7 +86,7 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     @Override
-    public void onActivityCreated (Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         // Indicate that this fragment would like to influence the set of actions in the action bar.
         setHasOptionsMenu(true);
@@ -87,31 +94,30 @@ public class NavigationDrawerFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        mDrawerListView = (ListView) inflater.inflate(
+                             Bundle savedInstanceState) {
+        View drawerView = inflater.inflate(
                 R.layout.fragment_navigation_drawer, container, false);
+
+        mDrawerListView = (ListView) drawerView.findViewById(R.id.drawer_listview);
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 selectItem(position);
             }
         });
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
-                android.R.layout.simple_list_item_1,
-                android.R.id.text1,
-                new String[]{
-                        getString(R.string.bits),
-                        getString(R.string.statistics),
-                        getString(R.string.settings),
-                        getString(R.string.rewards),
-                        getString(R.string.feedback),
-                        getString(R.string.help),
-                        getString(R.string.share_fb),
-                        getString(R.string.share_email),
-                }));
+
+        mAdapter = new NavDrawerAdapter(getActivity(), new String[]{
+                getString(R.string.bits),
+                getString(R.string.achievements),
+                getString(R.string.statistics),
+                getString(R.string.settings),
+                getString(R.string.help),
+                getString(R.string.feedback),
+        });
+
+        mDrawerListView.setAdapter(mAdapter);
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
-        return mDrawerListView;
+        return drawerView;
     }
 
     public boolean isDrawerOpen() {
@@ -238,10 +244,10 @@ public class NavigationDrawerFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // If the drawer is open, show the global app actions in the action bar. See also
         // showGlobalContextActionBar, which controls the top-left area of the action bar.
-//        if (mDrawerLayout != null && isDrawerOpen()) {
+        if (mDrawerLayout != null && isDrawerOpen()) {
 //            inflater.inflate(R.menu.global, menu);
-//            showGlobalContextActionBar();
-//        }
+            showGlobalContextActionBar();
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -277,5 +283,42 @@ public class NavigationDrawerFragment extends Fragment {
          * Called when an item in the navigation drawer is selected.
          */
         void onNavigationDrawerItemSelected(int position);
+    }
+
+
+    public class NavDrawerAdapter extends ArrayAdapter<String> {
+        private final Context mContext;
+        private final String[] mTitles;
+        private final HashMap<String, Integer> titleToIcon = new HashMap<String, Integer>(6);
+
+        public NavDrawerAdapter(Context context, String[] values) {
+            super(context, R.layout.navigation_drawer_item, values);
+            this.mContext = context;
+            this.mTitles = values;
+
+            titleToIcon.put(getString(R.string.bits), R.drawable.ic_action_task);
+            titleToIcon.put(getString(R.string.achievements), R.drawable.ic_action_reward);
+            titleToIcon.put(getString(R.string.settings), R.drawable.ic_action_setting);
+            titleToIcon.put(getString(R.string.feedback), R.drawable.ic_action_feedback);
+            titleToIcon.put(getString(R.string.help), R.drawable.ic_action_help);
+            titleToIcon.put(getString(R.string.statistics), R.drawable.ic_action_stats);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater inflater = (LayoutInflater) mContext
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            View rowView = inflater.inflate(R.layout.navigation_drawer_item, parent, false);
+            TextView textView = (TextView) rowView.findViewById(R.id.navdrawer_title);
+            ImageView imageView = (ImageView) rowView.findViewById(R.id.navdrawer_icon);
+            textView.setText(mTitles[position]);
+
+            Log.d("NavDrawer", mTitles[position]);
+
+            imageView.setImageResource(titleToIcon.get(mTitles[position]));
+
+            return rowView;
+        }
     }
 }

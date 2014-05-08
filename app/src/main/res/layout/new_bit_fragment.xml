@@ -1,39 +1,36 @@
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
+    android:layout_height="fill_parent">
 
-    <LinearLayout
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="@color/white"
-        tools:context="com.siqi.bits.app.ui.NewBitFragment"
-        android:padding="15dp">
+        android:orientation="vertical"
+        android:padding="15dp"
+        tools:context="com.siqi.bits.app.ui.NewBitFragment">
 
 
         <EditText
+            android:id="@+id/bit_title_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/bit_title_edittext"
-            android:hint="@string/whats_on_your_mind"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="20dp"
+            android:hint="@string/whats_on_your_mind" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginBottom="20dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/I_want_to_do_this"
-            android:layout_gravity="center_horizontal" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <RadioGroup
+            android:id="@+id/frequency_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:id="@+id/frequency_radio_group"
             android:layout_marginBottom="20dp"
             android:orientation="horizontal">
 
@@ -43,84 +40,84 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="1"
-                android:textSize="@dimen/large_text"
-                android:button="@null"
                 android:background="@drawable/radio_button_selector"
-                android:gravity="center_horizontal" />
+                android:button="@null"
+                android:gravity="center_horizontal"
+                android:text="1"
+                android:textSize="@dimen/large_text" />
 
             <RadioButton
                 android:id="@+id/radio_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="2"
-                android:textSize="@dimen/large_text"
-                android:button="@null"
                 android:background="@drawable/radio_button_selector"
-                android:gravity="center_horizontal" />
+                android:button="@null"
+                android:gravity="center_horizontal"
+                android:text="2"
+                android:textSize="@dimen/large_text" />
 
             <RadioButton
                 android:id="@+id/radio_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="3"
-                android:checked="true"
-                android:textSize="@dimen/large_text"
-                android:button="@null"
                 android:background="@drawable/radio_button_selector"
-                android:gravity="center_horizontal" />
+                android:button="@null"
+                android:checked="true"
+                android:gravity="center_horizontal"
+                android:text="3"
+                android:textSize="@dimen/large_text" />
 
             <RadioButton
                 android:id="@+id/radio_4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="4"
-                android:textSize="@dimen/large_text"
-                android:button="@null"
                 android:background="@drawable/radio_button_selector"
-                android:gravity="center_horizontal" />
+                android:button="@null"
+                android:gravity="center_horizontal"
+                android:text="4"
+                android:textSize="@dimen/large_text" />
 
             <RadioButton
                 android:id="@+id/radio_5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="5"
-                android:textSize="@dimen/large_text"
-                android:button="@null"
                 android:background="@drawable/radio_button_selector"
-                android:gravity="center_horizontal" />
+                android:button="@null"
+                android:gravity="center_horizontal"
+                android:text="5"
+                android:textSize="@dimen/large_text" />
 
             <RadioButton
                 android:id="@+id/radio_6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="6"
-                android:textSize="@dimen/large_text"
-                android:button="@null"
                 android:background="@drawable/radio_button_selector"
-                android:gravity="center_horizontal" />
+                android:button="@null"
+                android:gravity="center_horizontal"
+                android:text="6"
+                android:textSize="@dimen/large_text" />
 
         </RadioGroup>
 
         <TextView
+            android:id="@+id/times_a"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginBottom="20dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/times_a"
-            android:id="@+id/times_a"
-            android:layout_gravity="center_horizontal" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <RadioGroup
+            android:id="@+id/interval_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:id="@+id/interval_radio_group"
             android:layout_marginBottom="20dp"
             android:orientation="horizontal">
 
@@ -130,68 +127,68 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/radio_day"
-                android:textSize="@dimen/large_text"
                 android:background="@drawable/radio_button_selector"
                 android:button="@null"
-                android:gravity="center_horizontal" />
+                android:gravity="center_horizontal"
+                android:text="@string/radio_day"
+                android:textSize="@dimen/large_text" />
 
             <RadioButton
                 android:id="@+id/radio_week"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/radio_week"
-                android:checked="true"
-                android:textSize="@dimen/large_text"
                 android:background="@drawable/radio_button_selector"
                 android:button="@null"
-                android:gravity="center_horizontal" />
+                android:checked="true"
+                android:gravity="center_horizontal"
+                android:text="@string/radio_week"
+                android:textSize="@dimen/large_text" />
 
             <RadioButton
                 android:id="@+id/radio_month"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/radio_month"
-                android:textSize="@dimen/large_text"
                 android:background="@drawable/radio_button_selector"
                 android:button="@null"
-                android:gravity="center_horizontal" />
+                android:gravity="center_horizontal"
+                android:text="@string/radio_month"
+                android:textSize="@dimen/large_text" />
 
             <RadioButton
                 android:id="@+id/radio_year"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/radio_year"
-                android:textSize="@dimen/large_text"
                 android:background="@drawable/radio_button_selector"
                 android:button="@null"
-                android:gravity="center_horizontal" />
+                android:gravity="center_horizontal"
+                android:text="@string/radio_year"
+                android:textSize="@dimen/large_text" />
 
         </RadioGroup>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginBottom="10dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/put_in_category"
-            android:layout_gravity="center_horizontal" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <views.ExpandingGridView
             android:id="@+id/category_gridview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:numColumns="auto_fit"
-            android:columnWidth="60dp"
-            android:verticalSpacing="5dp"
-            android:horizontalSpacing="5dp"
-            android:stretchMode="spacingWidthUniform"
-            android:gravity="center"
             android:clickable="true"
-            android:focusable="true"/>
+            android:columnWidth="60dp"
+            android:focusable="true"
+            android:gravity="center"
+            android:horizontalSpacing="5dp"
+            android:numColumns="auto_fit"
+            android:stretchMode="spacingWidthUniform"
+            android:verticalSpacing="5dp" />
 
 
     </LinearLayout>

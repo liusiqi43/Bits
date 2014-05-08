@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.siqi.bits.ActionRecord;
 import com.siqi.bits.ActionRecordDao;
 import com.siqi.bits.BitsDevOpenHelper;
@@ -36,9 +38,9 @@ import service.ReminderScheduleService;
  * Created by me on 4/9/14.
  */
 public class TaskManager {
-    public static final ConcurrentHashMap<String, Integer> PeriodStringToDays = new ConcurrentHashMap<String, Integer>();
+    public static final BiMap<String, Integer> PeriodStringToDays = HashBiMap.create();
     public static final ConcurrentHashMap<Long, Integer> PeriodToDays = new ConcurrentHashMap<Long, Integer>();
-    public static final long DAY_TO_MILLIS = 24 * 3600 * 1000;
+    public static final long DAY_IN_MILLIS = 24 * 3600 * 1000;
     public static final int ACTION_TYPE_DONE = 1;
     public static final int ACTION_TYPE_SKIP = 2;
     public static final int ACTION_TYPE_LATE = 3;
@@ -155,10 +157,11 @@ public class TaskManager {
             }
         });
 
-//        for (Task t : tasks) {
-//            Log.d("GETALLSORTEDTASK", t.getDescription() + ":" + t.getNextScheduledTime() + " interval: " + t.getCurrentInterval());
-//        }
+        return tasks;
+    }
 
+    public List<Task> getAllSortedArchivedTasks() {
+        List<Task> tasks = mTaskDao.queryBuilder().where(TaskDao.Properties.DeletedOn.isNull(), TaskDao.Properties.Archieved_on.isNotNull()).orderDesc(TaskDao.Properties.Archieved_on).list();
         return tasks;
     }
 
@@ -357,6 +360,16 @@ public class TaskManager {
             return mContext.getResources().getString(R.string.added_recently);
         }
     }
+
+    public String getArchivedDescriptionForTask(Task t) {
+        return new StringBuilder()
+                .append(mContext.getResources().getString(R.string.achieved))
+                .append(' ')
+                .append(mPrettyTime.format(t.getArchieved_on()))
+                .toString();
+    }
+
+
 
     public void removeActionRecordById(long id) {
         ActionRecord record = mActionRecordDao.load(id);

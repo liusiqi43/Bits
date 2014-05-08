@@ -1,30 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/front"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:id="@+id/front"
-    android:tag="front"
     android:background="@color/white"
+    android:tag="front"
     android:weightSum="1">
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:id="@+id/card_info"
-        android:layout_height="match_parent"/>
-
-    <ImageView
-        android:layout_width="100dp"
-        android:layout_height="match_parent"
-        android:scaleType="centerInside"
+    <views.SquareImageView
         android:id="@+id/taskIcon"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_centerVertical="true"
         android:background="@color/MidnightBlue"
-        android:layout_centerVertical="true"/>
+        android:scaleType="centerInside" />
 
     <ViewSwitcher
+        android:id="@+id/card_viewswitcher"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/card_viewswitcher"
         android:layout_toRightOf="@id/taskIcon">
 
         <include layout="@layout/card_title_front_info"/>
