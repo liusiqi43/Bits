@@ -4,14 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/cloud"
-    android:orientation="vertical"
-    android:padding="5dp">
+    android:orientation="vertical">
 
     <ListView
         android:id="@+id/achievement_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:divider="@android:color/transparent"
-        android:longClickable="true" />
+        android:listSelector="@android:color/transparent" />
 
 </LinearLayout>
