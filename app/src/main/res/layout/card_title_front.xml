@@ -1,28 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/front"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
     android:background="@color/white"
-    android:tag="front"
-    android:weightSum="1">
+    android:orientation="horizontal"
+    android:tag="front">
 
-    <views.SquareImageView
+    <ImageView
         android:id="@+id/taskIcon"
-        android:layout_width="fill_parent"
+        android:layout_width="100dp"
         android:layout_height="fill_parent"
-        android:layout_centerVertical="true"
+        android:layout_gravity="center"
         android:background="@color/MidnightBlue"
-        android:scaleType="centerInside" />
+        android:scaleType="center" />
 
     <ViewSwitcher
         android:id="@+id/card_viewswitcher"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/taskIcon">
+        android:layout_height="wrap_content">
 
-        <include layout="@layout/card_title_front_info"/>
+    <include layout="@layout/card_title_front_info"/>
         <include layout="@layout/card_title_front_actions"/>
     </ViewSwitcher>
-</RelativeLayout>
+</LinearLayout>

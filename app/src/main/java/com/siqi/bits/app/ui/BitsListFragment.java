@@ -157,7 +157,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         swingBottomInAnimationAdapter.setAbsListView(mBitsListView);
 
 
-        this.mBitsListView.setSwipeListViewListener(new BaseSwipeListViewListener(){
+        this.mBitsListView.setSwipeListViewListener(new BaseSwipeListViewListener() {
             @Override
             public void onLeftChoiceAction(int position) {
                 if (mAdapter.isExpanded(position))
@@ -195,11 +195,12 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                 final ViewSwitcher viewSwitcher = (ViewSwitcher) view.findViewById(R.id.card_viewswitcher);
                 viewSwitcher.showNext();
 
-                new Handler().postDelayed(new Runnable() { public void run() {
-                    if(viewSwitcher.getDisplayedChild() == CARD_ACTION) {
-                        viewSwitcher.setDisplayedChild(CARD_INFO);
+                new Handler().postDelayed(new Runnable() {
+                    public void run() {
+                        if (viewSwitcher.getDisplayedChild() == CARD_ACTION) {
+                            viewSwitcher.setDisplayedChild(CARD_INFO);
+                        }
                     }
-                }
                 }, getResources().getInteger(R.integer.actionview_timeout));
 
                 return true;
@@ -330,7 +331,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                     .append(getString(R.string.last_record_seems_to_be))
                     .append(record.getAction() == TaskManager.ACTION_TYPE_DONE ?
                             " <font color='#2ecc71'>" + getString(R.string.done) + "</font>"
-                             : " <font color='#3498db'>" + getString(R.string.skip) + "</font>")
+                            : " <font color='#3498db'>" + getString(R.string.skip) + "</font>")
                     .append(" ")
                     .append(getString(R.string.on_task))
                     .append(" <b>")
@@ -374,24 +375,24 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
         int first = mBitsListView.getFirstVisiblePosition();
         int last = mBitsListView.getLastVisiblePosition();
-        for(int i=0; i<mAdapter.size(); i++) {
-            if( i >= first && i <= last) {
-                View v = mBitsListView.getChildAt(i-first);
+        for (int i = 0; i < mAdapter.size(); i++) {
+            if (i >= first && i <= last) {
+                View v = mBitsListView.getChildAt(i - first);
                 int top = v.getTop();
                 int dataIdx = i;
                 Task dataId = mAdapter.get(dataIdx);
                 mSavedState.put(dataId, top);
-            } else if( i < first ) {
-                int top = mBitsListView.getTop() - mBitsListView.getHeight()/2;
+            } else if (i < first) {
+                int top = mBitsListView.getTop() - mBitsListView.getHeight() / 2;
                 Task dataId = mAdapter.get(i);
                 mSavedState.put(dataId, top);
-            } else if( i > last ) {
-                int top = mBitsListView.getBottom() + mBitsListView.getHeight()/2;
+            } else if (i > last) {
+                int top = mBitsListView.getBottom() + mBitsListView.getHeight() / 2;
                 Task dataId = mAdapter.get(i);
                 mSavedState.put(dataId, top);
             }
         }
-        for(int i=0; i < mBitsListView.getChildCount(); i++) {
+        for (int i = 0; i < mBitsListView.getChildCount(); i++) {
             View v = mBitsListView.getChildAt(i);
             int top = v.getTop();
             int dataIdx = first + i;
@@ -403,10 +404,10 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     private void animateNewState() {
         int first = mBitsListView.getFirstVisiblePosition();
         int last = mBitsListView.getLastVisiblePosition();
-        for(int i=0; i < mBitsListView.getChildCount(); i++) {
+        for (int i = 0; i < mBitsListView.getChildCount(); i++) {
             int dataIdx = first + i;
             Task dataId = mAdapter.get(dataIdx);
-            if( mSavedState.containsKey(dataId) ) {
+            if (mSavedState.containsKey(dataId)) {
                 View v = mBitsListView.getChildAt(i);
                 int top = v.getTop();
                 int oldTop = mSavedState.get(dataId);
@@ -474,7 +475,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
         @Override
         public View getTitleView(final int position, View convertView, ViewGroup parent) {
-            Log.d("TEST", "getTitleVlew:"+position);
+            Log.d("TEST", "getTitleVlew:" + position);
             View v = convertView;
             final BitTitleHolder holder;
 
@@ -504,8 +505,10 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                     holder.viewSwitcher.setOutAnimation(null);
                     holder.viewSwitcher.setDisplayedChild(CARD_INFO);
 
-                    Animation inAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left); inAnimation.setDuration(300);
-                    Animation outAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right); outAnimation.setDuration(300);
+                    Animation inAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left);
+                    inAnimation.setDuration(300);
+                    Animation outAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right);
+                    outAnimation.setDuration(300);
 
                     holder.viewSwitcher.setInAnimation(inAnimation);
                     holder.viewSwitcher.setOutAnimation(outAnimation);
@@ -567,7 +570,6 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                 }
             }
 
-            holder.icon.setMaxWidth(holder.icon.getHeight());
             holder.icon.setImageBitmap(bitmap);
             holder.title.setText(t.getDescription());
             holder.timeAgo.setText(tm.getTimesAgoDescriptionForTask(t));
@@ -588,8 +590,10 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
             Log.d("Progress for " + t.getDescription(), progress + "");
 
-            Animation inAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left); inAnimation.setDuration(300);
-            Animation outAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right); outAnimation.setDuration(300);
+            Animation inAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left);
+            inAnimation.setDuration(300);
+            Animation outAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right);
+            outAnimation.setDuration(300);
 
             holder.viewSwitcher.setInAnimation(inAnimation);
             holder.viewSwitcher.setOutAnimation(outAnimation);
@@ -611,7 +615,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
         @Override
         public View getContentView(int position, View convertView, ViewGroup parent) {
-            Log.d("TEST", "getContentVlew:"+position);
+            Log.d("TEST", "getContentVlew:" + position);
             Task t = mAdapter.getItem(position);
 
             View v = convertView;
