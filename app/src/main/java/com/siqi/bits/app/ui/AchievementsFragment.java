@@ -2,6 +2,7 @@ package com.siqi.bits.app.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -82,6 +83,7 @@ public class AchievementsFragment extends Fragment {
     private static class AchievementHolder {
         TextView taskTitle, taskGoal, doneCount, skipCount, lateCount, daysCount, freq, interval, separator;
         ImageView taskIcon;
+        View skipCountLayout, skipCountSeparator;
     }
 
     public class SectionedListAdapter extends ArrayAdapter<Task> {
@@ -124,6 +126,8 @@ public class AchievementsFragment extends Fragment {
                 holder.taskTitle = (TextView) v.findViewById(R.id.taskTitle);
                 holder.separator = (TextView) v.findViewById(R.id.achievement_seperator);
                 holder.taskIcon = (ImageView) v.findViewById(R.id.taskIcon);
+                holder.skipCountLayout = v.findViewById(R.id.achievement_skip_count_layout);
+                holder.skipCountSeparator = v.findViewById(R.id.achievement_skip_count_separator);
                 v.setTag(holder);
             } else {
                 holder = (AchievementHolder) v.getTag();
@@ -154,13 +158,21 @@ public class AchievementsFragment extends Fragment {
             holder.taskIcon.setImageBitmap(bitmap);
             holder.taskTitle.setText(t.getDescription());
             holder.taskGoal.setText(t.getFrequency() + " times/" + TaskManager.PeriodStringToDays.inverse().get(periodInDays));
-            holder.interval.setText("t / " + TaskManager.PeriodStringToDays.inverse().get(periodInDays));
+            holder.interval.setText("t/" + TaskManager.PeriodStringToDays.inverse().get(periodInDays));
             holder.freq.setText(freq.toString());
             holder.daysCount.setText(days.toString());
             holder.lateCount.setText(Integer.toString(t.getLateCount()));
             holder.doneCount.setText(Integer.toString(t.getDoneCount()));
             holder.skipCount.setText(Integer.toString(t.getSkipCount()));
             holder.separator.setText(tm.getArchivedDescriptionForTask(t));
+
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                holder.skipCountLayout.setVisibility(View.GONE);
+                holder.skipCountSeparator.setVisibility(View.GONE);
+            } else {
+                holder.skipCountLayout.setVisibility(View.VISIBLE);
+                holder.skipCountSeparator.setVisibility(View.VISIBLE);
+            }
 
             return v;
         }
