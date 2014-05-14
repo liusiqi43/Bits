@@ -30,7 +30,7 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
 
-    private int mCurrentSectionID;
+    private int mCurrentSectionID = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

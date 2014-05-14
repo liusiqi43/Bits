@@ -49,4 +49,6 @@
     <string name="delete">Delete</string>
     <string name="achieved">Archived</string>
 
+    <string name="nav_header_bits">Bits</string>
+    <string name="nav_header_misc">Misc.</string>
 </resources>

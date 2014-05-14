@@ -3,6 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="5dp"
     android:orientation="horizontal">
 
     <ImageView
@@ -10,6 +11,7 @@
         android:layout_width="50dp"
         android:layout_height="match_parent"
         android:background="@color/MidnightBlue"
+        android:padding="5dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_action_task" />
 
@@ -19,6 +21,7 @@
         android:layout_height="match_parent"
         android:layout_margin="10dp"
         android:text="Task"
-        android:textAppearance="@android:style/TextAppearance.Medium" />
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:textSize="22sp" />
 
 </LinearLayout>

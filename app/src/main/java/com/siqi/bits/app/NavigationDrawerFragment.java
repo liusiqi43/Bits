@@ -22,10 +22,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.HashMap;
+
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -56,7 +58,7 @@ public class NavigationDrawerFragment extends Fragment {
     private ActionBarDrawerToggle mDrawerToggle;
 
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerListView;
+    private StickyListHeadersListView mDrawerListView;
     private NavDrawerAdapter mAdapter;
     private View mFragmentContainerView;
 
@@ -96,9 +98,9 @@ public class NavigationDrawerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View drawerView = inflater.inflate(
-                R.layout.fragment_navigation_drawer, container, false);
+                R.layout.navigation_drawer_fragment, container, false);
 
-        mDrawerListView = (ListView) drawerView.findViewById(R.id.drawer_listview);
+        mDrawerListView = (StickyListHeadersListView) drawerView.findViewById(R.id.drawer_listview);
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -286,13 +288,16 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
 
-    public class NavDrawerAdapter extends ArrayAdapter<String> {
+    public class NavDrawerAdapter extends ArrayAdapter<String> implements StickyListHeadersAdapter {
         private final Context mContext;
         private final String[] mTitles;
         private final HashMap<String, Integer> titleToIcon = new HashMap<String, Integer>(6);
+        private LayoutInflater inflater;
 
         public NavDrawerAdapter(Context context, String[] values) {
             super(context, R.layout.navigation_drawer_item, values);
+            inflater = LayoutInflater.from(context);
+
             this.mContext = context;
             this.mTitles = values;
 
@@ -319,6 +324,41 @@ public class NavigationDrawerFragment extends Fragment {
             imageView.setImageResource(titleToIcon.get(mTitles[position]));
 
             return rowView;
+        }
+
+        @Override
+        public View getHeaderView(int i, View convertView, ViewGroup parent) {
+            HeaderViewHolder holder;
+            if (convertView == null) {
+                holder = new HeaderViewHolder();
+                convertView = inflater.inflate(R.layout.navigation_drawer_header, parent, false);
+                holder.text = (TextView) convertView.findViewById(R.id.header_title);
+                convertView.setTag(holder);
+            } else {
+                holder = (HeaderViewHolder) convertView.getTag();
+            }
+
+            String headerText;
+            if (i < 3) {
+                //set header text as first char in name
+                headerText = getString(R.string.nav_header_bits);
+            } else {
+                headerText = getString(R.string.nav_header_misc);
+            }
+            holder.text.setText(headerText);
+            return convertView;
+        }
+
+        @Override
+        public long getHeaderId(int i) {
+            if (i < 3)
+                return 0;
+            else
+                return 1;
+        }
+
+        class HeaderViewHolder {
+            TextView text;
         }
     }
 }

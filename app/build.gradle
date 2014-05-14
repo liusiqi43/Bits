@@ -46,6 +46,7 @@ dependencies {
     compile 'com.nhaarman.listviewanimations:library:2.6.0@jar'
     compile 'com.nineoldandroids:library:2.4.0@jar'
     compile 'com.google.guava:guava:16.0.+'
+    compile 'se.emilsjolander:stickylistheaders:2.2.0@aar'
     compile project(':swipelistview')
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
