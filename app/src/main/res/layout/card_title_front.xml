@@ -14,7 +14,8 @@
         android:layout_height="fill_parent"
         android:layout_gravity="center"
         android:background="@color/MidnightBlue"
-        android:scaleType="center" />
+        android:padding="25dp"
+        android:scaleType="fitCenter" />
 
     <ViewSwitcher
         android:id="@+id/card_viewswitcher"

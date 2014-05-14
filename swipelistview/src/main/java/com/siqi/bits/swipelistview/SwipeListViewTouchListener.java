@@ -57,7 +57,7 @@ import static com.nineoldandroids.view.ViewPropertyAnimator.animate;
  */
 public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener {
 
-    private static final int DISPLACE_CHOICE = 85;
+    private static final int DISPLACE_CHOICE = 75;
 
     private int swipeMode = SwipeListView.SWIPE_MODE_BOTH;
     private boolean swipeOpenOnLongPress = true;
@@ -113,23 +113,7 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
     private Vibrator hapticFeedbackVibrator;
 
     private LinkedList<Float> posXQueue = new LimitedLinkedList<Float>(3);
-
-    private class LimitedLinkedList<E> extends LinkedList<E> {
-        private int mLimit;
-
-        public LimitedLinkedList(int s) {
-            this.mLimit = s;
-        }
-
-        @Override
-        public boolean offer(E e) {
-            if (this.size() > mLimit){
-                this.poll();
-            }
-
-            return super.offer(e);
-        }
-    }
+    private boolean vibrated = false;
 
     /**
      * Constructor
@@ -939,8 +923,6 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
         swipeActionLeft = oldSwipeActionLeft;
     }
 
-    private boolean vibrated = false;
-
     /**
      * Moves the view
      *
@@ -970,40 +952,20 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
         } else if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE) {
             float px2dp = Resources.getSystem().getDisplayMetrics().density;
 
-            float p = (deltaX+posX)/px2dp;
+            float p = 1.2f * (deltaX + posX) / px2dp;
 
             int sign = p > 0 ? 1 : -1;
 
             float newPosX = Math.abs(p) < getDisplayChoiceInPx() ? p : sign * getDisplayChoiceInPx();
-            if (Math.abs(posX) < getDisplayChoiceInPx() || Math.abs(newPosX) < getDisplayChoiceInPx()){
+            if (Math.abs(posX) < getDisplayChoiceInPx() || Math.abs(newPosX) < getDisplayChoiceInPx()) {
                 setTranslationX(frontView, newPosX);
                 vibrated = false;
-            }
-            else if (Math.abs(newPosX) == getDisplayChoiceInPx() && !vibrated){
+            } else if (Math.abs(newPosX) == getDisplayChoiceInPx() && !vibrated) {
                 hapticFeedbackVibrator.vibrate(50);
                 vibrated = true;
             }
         } else {
             setTranslationX(frontView, deltaX);
-        }
-    }
-
-    /**
-     * Class that saves pending dismiss data
-     */
-    class PendingDismissData implements Comparable<PendingDismissData> {
-        public int position;
-        public View view;
-
-        public PendingDismissData(int position, View view) {
-            this.position = position;
-            this.view = view;
-        }
-
-        @Override
-        public int compareTo(PendingDismissData other) {
-            // Sort by descending position
-            return other.position - position;
         }
     }
 
@@ -1088,6 +1050,42 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
         Resources resources = swipeListView.getContext().getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
         return DISPLACE_CHOICE * metrics.density;
+    }
+
+    private class LimitedLinkedList<E> extends LinkedList<E> {
+        private int mLimit;
+
+        public LimitedLinkedList(int s) {
+            this.mLimit = s;
+        }
+
+        @Override
+        public boolean offer(E e) {
+            if (this.size() > mLimit) {
+                this.poll();
+            }
+
+            return super.offer(e);
+        }
+    }
+
+    /**
+     * Class that saves pending dismiss data
+     */
+    class PendingDismissData implements Comparable<PendingDismissData> {
+        public int position;
+        public View view;
+
+        public PendingDismissData(int position, View view) {
+            this.position = position;
+            this.view = view;
+        }
+
+        @Override
+        public int compareTo(PendingDismissData other) {
+            // Sort by descending position
+            return other.position - position;
+        }
     }
 
 }
