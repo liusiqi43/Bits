@@ -147,7 +147,7 @@ public class MainActivity extends ActionBarActivity
 
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        transaction.setCustomAnimations(R.anim.abc_slide_in_top, 0, 0, R.anim.abc_slide_out_top);
+        transaction.setCustomAnimations(R.anim.slide_in_top, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_top);
         transaction.replace(R.id.container, editFragment);
         transaction.addToBackStack("BitsListFragment");
 
