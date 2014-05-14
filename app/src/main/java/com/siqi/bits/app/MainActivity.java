@@ -57,22 +57,26 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
+        if (position == mCurrentSectionID)
+            return;
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_right, R.anim.slide_out_left);
 
         Log.d("Nav", "selected: " + position);
 
         switch (position) {
             case BitsListFragment.FRAGMENT_ID:
                 fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                fragmentManager.beginTransaction()
+                transaction
                         .replace(R.id.container, BitsListFragment.newInstance())
                         .commit();
                 onSectionAttached(BitsListFragment.FRAGMENT_ID);
                 break;
             case AchievementsFragment.FRAGMENT_ID:
                 fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                fragmentManager.beginTransaction()
+                transaction
                         .replace(R.id.container, AchievementsFragment.newInstance())
                         .commit();
                 onSectionAttached(AchievementsFragment.FRAGMENT_ID);
