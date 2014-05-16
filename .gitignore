@@ -37,15 +37,7 @@ local.properties
 .idea/workspace.xml
 
 # Gradle cache
-.gradle
+*.gradle
 
 # Sandbox stuff
 _sandbox
-
-app/src-gen/
-app/libs/
-GDgen/build.gradle
-app/build.gradle
-build.gradle
-settings.gradle
-swipelistview/build.gradle
