@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/WetAsphalt"
     android:padding="5dp">
 
     <TextView
@@ -13,6 +14,7 @@
         android:layout_gravity="right"
         android:paddingRight="10dp"
         android:textAlignment="gravity"
-        android:textColor="@color/grey_font"
+        android:textColor="@color/light_font"
+        android:text="Test"
         android:textSize="30sp" />
 </LinearLayout>

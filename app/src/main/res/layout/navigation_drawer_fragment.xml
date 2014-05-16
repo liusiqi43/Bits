@@ -2,13 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/MidnightBlue"
     tools:context="com.siqi.bits.app.NavigationDrawerFragment">
 
     <se.emilsjolander.stickylistheaders.StickyListHeadersListView
         android:id="@+id/drawer_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/navdrawer_list_selector"
+        android:background="@color/MidnightBlue"
         android:choiceMode="singleChoice"
         android:divider="@color/silver"
         android:dividerHeight="1dp"
@@ -21,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/MidnightBlue"
+        android:background="@color/SeaGreen"
         android:paddingBottom="10dp"
         android:paddingTop="10dp"
         android:text="@string/share" />

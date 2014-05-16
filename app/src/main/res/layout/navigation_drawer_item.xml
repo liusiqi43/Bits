@@ -3,14 +3,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="5dp"
+    android:layout_margin="0dp"
     android:orientation="horizontal">
 
     <ImageView
         android:id="@+id/navdrawer_icon"
         android:layout_width="50dp"
         android:layout_height="match_parent"
-        android:background="@color/MidnightBlue"
         android:padding="5dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_action_task" />
@@ -21,6 +20,7 @@
         android:layout_height="match_parent"
         android:layout_margin="10dp"
         android:text="Task"
+        android:textColor="@color/cloud"
         android:textAppearance="@android:style/TextAppearance.Medium"
         android:textSize="22sp" />
 
