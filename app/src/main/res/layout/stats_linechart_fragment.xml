@@ -1,15 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/MidnightBlue"
+    android:background="@color/achievement_stat_bg"
+    android:orientation="vertical"
     >
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/xychart_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/xychart_container"/>
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:layout_weight="3"
+        android:background="@drawable/card_bg"
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="20dp" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:gravity="center"
+            android:text="Highest burndown rate"
+            android:textColor="@color/grey_font"
+            android:textSize="30sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="15"
+            android:textColor="@color/grey_font"
+            android:textSize="45sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="15dp"
+            android:gravity="center"
+            android:text="Average burndown rate"
+            android:textColor="@color/grey_font"
+            android:textSize="30sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="4.5"
+            android:textColor="@color/grey_font"
+            android:textSize="45sp" />
+
+    </LinearLayout>
 </LinearLayout>

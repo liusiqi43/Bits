@@ -54,7 +54,7 @@
     <string name="burndown_chart_title">Burndown</string>
     <string name="task_category_chart_title">Task Category</string>
     <string name="burndown_chart_dateformat">\"dd/MM/yyyy\"</string>
-    <string name="chartTitle">Burndown Rate</string>
+    <string name="chartTitle">Task Burndown Rate</string>
     <string name="burndown_chart_datetitle">Date</string>
     <string name="burndown_chart_counttitle">Burndown</string>
 </resources>

@@ -63,12 +63,12 @@ public class MainActivity extends ActionBarActivity
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_right, R.anim.slide_out_left);
 
         Log.d("Nav", "selected: " + position);
 
         switch (position) {
             case BitsListFragment.FRAGMENT_ID:
+                transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
                 fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 transaction
                         .replace(R.id.container, BitsListFragment.newInstance())
@@ -76,6 +76,7 @@ public class MainActivity extends ActionBarActivity
                 onSectionAttached(BitsListFragment.FRAGMENT_ID);
                 break;
             case AchievementsFragment.FRAGMENT_ID:
+                transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
                 fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 transaction
                         .replace(R.id.container, AchievementsFragment.newInstance())
@@ -83,6 +84,7 @@ public class MainActivity extends ActionBarActivity
                 onSectionAttached(AchievementsFragment.FRAGMENT_ID);
                 break;
             case StatsFragment.FRAGMENT_ID:
+                transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
                 fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 transaction
                         .replace(R.id.container, StatsFragment.newInstance())
@@ -160,7 +162,7 @@ public class MainActivity extends ActionBarActivity
 
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        transaction.setCustomAnimations(R.anim.slide_in_top, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_top);
+        transaction.setCustomAnimations(R.anim.slide_in_top, R.anim.slide_out_bottom, R.anim.slide_in_bottom, R.anim.slide_out_top);
         transaction.replace(R.id.container, editFragment);
         transaction.addToBackStack("BitsListFragment");
 

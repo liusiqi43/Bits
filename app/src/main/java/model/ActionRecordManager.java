@@ -69,11 +69,11 @@ public class ActionRecordManager {
         List<DateBurnratePair> pairs = new ArrayList<DateBurnratePair>();
 
         String cols[] = new String[2];
-        cols[0] = "strftime('%Y-%m-%d', record_on/1000,'unixepoch') as date";
+        cols[0] = "strftime('%Y-%m-%d', record_on/1000,'unixepoch', 'localtime') as date";
         cols[1] = "count(*) as count";
 
-        String whereClause = "action = 1 AND date(record_on/1000, 'unixepoch') > date('now','-"+days+" day')";
-        String groupBy = "strftime('%Y-%m-%d', record_on/1000,'unixepoch')";
+        String whereClause = "action = 1 AND date(record_on/1000, 'unixepoch', 'localtime') > date('now','-" + days + " day')";
+        String groupBy = "strftime('%Y-%m-%d', record_on/1000,'unixepoch', 'localtime')";
         String orderBy = "record_on";
 
         Cursor burnrateCursor = mDB.query(mActionRecordDao.getTablename(), cols, whereClause, null, groupBy, null, orderBy);
@@ -94,6 +94,7 @@ public class ActionRecordManager {
                 }
             } while (burnrateCursor.moveToNext());
         }
+
         return pairs;
     }
 

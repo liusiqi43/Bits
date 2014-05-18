@@ -45,7 +45,6 @@ import android.widget.ViewSwitcher;
 import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
-import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 import com.siqi.bits.ActionRecord;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.MainActivity;
@@ -149,12 +148,12 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
 
         // Swing from bottom anim & dismiss anim
-        SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAnimateDismissAdapter);
+//        SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAnimateDismissAdapter);
 //        swingBottomInAnimationAdapter.setInitialDelayMillis(100);
 //        swingBottomInAnimationAdapter.setAnimationDurationMillis(300);
 
-        this.mBitsListView.setAdapter(swingBottomInAnimationAdapter);
-        swingBottomInAnimationAdapter.setAbsListView(mBitsListView);
+        this.mBitsListView.setAdapter(mAnimateDismissAdapter);
+        mAnimateDismissAdapter.setAbsListView(mBitsListView);
 
 
         this.mBitsListView.setSwipeListViewListener(new BaseSwipeListViewListener() {
