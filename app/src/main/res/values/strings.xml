@@ -51,4 +51,10 @@
 
     <string name="nav_header_bits">Bits</string>
     <string name="nav_header_misc">Misc.</string>
+    <string name="burndown_chart_title">Burndown</string>
+    <string name="task_category_chart_title">Task Category</string>
+    <string name="burndown_chart_dateformat">\"dd/MM/yyyy\"</string>
+    <string name="chartTitle">Burndown Rate</string>
+    <string name="burndown_chart_datetitle">Date</string>
+    <string name="burndown_chart_counttitle">Burndown</string>
 </resources>

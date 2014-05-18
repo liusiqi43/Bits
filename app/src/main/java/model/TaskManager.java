@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -400,6 +401,22 @@ public class TaskManager {
         setActionRecordForTask(t, TaskManager.ACTION_TYPE_DONE);
         setNextScheduledTimeForTask(t);
         t.update();
+    }
+
+    public HashMap<Long, Integer> getCategoryCountForTasks() {
+        List<Task> tasks = getAllTasks();
+
+        HashMap<Long, Integer> catIdToCount = new HashMap<Long, Integer>();
+
+        for (Task t : tasks) {
+            Integer i = catIdToCount.get(t.getCategory().getId());
+            if (i == null)
+                catIdToCount.put(t.getCategory().getId(), 1);
+            else
+                catIdToCount.put(t.getCategory().getId(), i+1);
+        }
+
+        return catIdToCount;
     }
 
     public class DuplicatedTaskException extends Throwable {

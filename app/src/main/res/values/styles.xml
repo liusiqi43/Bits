@@ -54,4 +54,10 @@
     <style name="AppTheme.countLayoutStyle">
         <item name="android:padding">5dp</item>
     </style>
+
+    <style name="PagerTabStripText">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/cloud</item>
+    </style>
 </resources>

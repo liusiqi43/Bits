@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import com.siqi.bits.app.ui.AchievementsFragment;
 import com.siqi.bits.app.ui.BitsListFragment;
 import com.siqi.bits.app.ui.NewBitFragment;
+import com.siqi.bits.app.ui.StatsFragment;
 
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
@@ -81,7 +82,16 @@ public class MainActivity extends ActionBarActivity
                         .commit();
                 onSectionAttached(AchievementsFragment.FRAGMENT_ID);
                 break;
+            case StatsFragment.FRAGMENT_ID:
+                fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                transaction
+                        .replace(R.id.container, StatsFragment.newInstance())
+                        .commit();
+                onSectionAttached(StatsFragment.FRAGMENT_ID);
+                break;
         }
+
+
     }
 
     // set main activity title correctly
@@ -95,6 +105,9 @@ public class MainActivity extends ActionBarActivity
                 break;
             case AchievementsFragment.FRAGMENT_ID:
                 mTitle = getString(R.string.achievements);
+                break;
+            case StatsFragment.FRAGMENT_ID:
+                mTitle = getString(R.string.statistics);
                 break;
             case NewBitFragment.FRAGMENT_ID:
                 mTitle = getString(R.string.create_new_bit);
