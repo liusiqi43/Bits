@@ -52,6 +52,8 @@ public class StatsPieChartFragment extends Fragment {
     /** The chart view that displays the data. */
     private GraphicalView mChartView;
 
+    private Toast mCurrentToast;
+
     private CheckBox mActiveCheckbox, mArchivedCheckbox;
     private boolean mActiveTasks = true, mArchivedTasks = true;
 
@@ -182,10 +184,12 @@ public class StatsPieChartFragment extends Fragment {
                             }
                         }
 
-                        final Toast toast = new Toast(getActivity());
-                        toast.setView(layout);
-                        toast.setDuration(Toast.LENGTH_SHORT);
-                        toast.show();
+                        if (mCurrentToast == null) {
+                            mCurrentToast = new Toast(getActivity());
+                        }
+                        mCurrentToast.setView(layout);
+                        mCurrentToast.setDuration(Toast.LENGTH_SHORT);
+                        mCurrentToast.show();
                     }
                 }
             });
