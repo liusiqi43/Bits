@@ -5,6 +5,7 @@
     <color name="Asbestos">#7f8c8d</color>
     <color name="concrete">#95a5a6</color>
     <color name="silver">#bdc3c7</color>
+    <color name="silver_transparent">#80bdc3c7</color>
     <color name="cloud">#ecf0f1</color>
     <color name="White">#ffffff</color>
     <color name="Alizarin">#e74c3c</color>
@@ -50,4 +51,5 @@
     <color name="warning_progress_color">@color/Orange</color>
     <color name="danger_progress_color">@color/Pomegranate</color>
     <color name="achieveColor">@color/doneColor</color>
+    <color name="black">#444444</color>
 </resources>

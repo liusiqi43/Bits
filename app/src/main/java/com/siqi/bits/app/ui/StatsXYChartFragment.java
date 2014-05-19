@@ -7,7 +7,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.siqi.bits.app.R;
 
@@ -21,9 +26,11 @@ import org.achartengine.renderer.SimpleSeriesRenderer;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
+import java.util.HashMap;
 import java.util.List;
 
 import model.ActionRecordManager;
+import model.TaskManager;
 
 /**
  * Proudly powered by me on 5/17/14.
@@ -31,18 +38,28 @@ import model.ActionRecordManager;
  * A tool that helps you to architect your life to
  * its fullness!
  */
-public class StatsXYChartFragment extends Fragment {
+public class StatsXYChartFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
-    private static final int PLOT_FOR_LAST_NB_DAYS = 14;
     private ActionRecordManager arm;
+    private Spinner mActionSpinner, mDaySpinner;
+    private TextView mMaxRateTextView, mAvgRateTextView;
+
+    private int mLastDaysCount = 14;
+    private int mDisplayedAction = TaskManager.ACTION_TYPE_DONE;
+
+    private HashMap<Integer, Integer> mActionToColor = new HashMap<Integer, Integer>(3);
 
     private LinearLayout mChartViewContainer;
 
     public StatsXYChartFragment() {
+        mActionToColor.put(TaskManager.ACTION_TYPE_DONE, R.color.doneColor);
+        mActionToColor.put(TaskManager.ACTION_TYPE_SKIP, R.color.skipColor);
+        mActionToColor.put(TaskManager.ACTION_TYPE_LATE, R.color.lateColor);
     }
 
     public static StatsXYChartFragment newInstance() {
         StatsXYChartFragment fragment = new StatsXYChartFragment();
+
         return fragment;
     }
 
@@ -53,10 +70,73 @@ public class StatsXYChartFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.stats_linechart_fragment, container, false);
         mChartViewContainer = (LinearLayout) root.findViewById(R.id.xychart_container);
+        mActionSpinner = (Spinner) root.findViewById(R.id.spinner_actions);
+        mDaySpinner = (Spinner) root.findViewById(R.id.spinner_days);
+        mMaxRateTextView = (TextView) root.findViewById(R.id.max_burnrate_tv);
+        mAvgRateTextView = (TextView) root.findViewById(R.id.avg_burnrate_tv);
 
-        BurndownChart chart = new BurndownChart();
-        mChartViewContainer.addView(chart.getView(getActivity(), arm.getBurnRateForLastDays(PLOT_FOR_LAST_NB_DAYS)));
+        ArrayAdapter<CharSequence> daysAdapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.stats_linechart_days_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        daysAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        mDaySpinner.setAdapter(daysAdapter);
+        mDaySpinner.setOnItemSelectedListener(this);
+
+        ArrayAdapter<CharSequence> actionsAdapter = ArrayAdapter.createFromResource(getActivity(),
+                R.array.stats_linechart_actions_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        actionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        mActionSpinner.setAdapter(actionsAdapter);
+        mActionSpinner.setOnItemSelectedListener(this);
+
+        reloadGraph();
+
         return root;
+    }
+
+    private void reloadGraph() {
+        List<ActionRecordManager.DateBurnratePair> items = arm.getActionRateForLastDays(mDisplayedAction, mLastDaysCount);
+        if (!items.isEmpty()) {
+            BurndownChart chart = new BurndownChart();
+            mChartViewContainer.removeAllViews();
+            mChartViewContainer.addView(chart.getView(getActivity(), arm.getActionRateForLastDays(mDisplayedAction, mLastDaysCount)));
+        } else {
+            Toast.makeText(getActivity(), "Not enough data", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long l) {
+        switch (adapterView.getId()) {
+            case R.id.spinner_actions:
+                mDisplayedAction = pos + 1;
+                break;
+            case R.id.spinner_days:
+                switch (pos) {
+                    case 0:
+                        mLastDaysCount = 14;
+                        break;
+                    case 1:
+                        mLastDaysCount = 30;
+                        break;
+                    case 2:
+                        mLastDaysCount = 90;
+                        break;
+                    case 3:
+                        mLastDaysCount = 180;
+                        break;
+                }
+                break;
+        }
+
+        reloadGraph();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 
     public class BurndownChart {
@@ -66,7 +146,7 @@ public class StatsXYChartFragment extends Fragment {
         public GraphicalView getView(Context context, List<ActionRecordManager.DateBurnratePair> results) {
             String title = context.getString(R.string.chartTitle);
 
-            int[] colors = new int[]{getResources().getColor(R.color.doneColor), getResources().getColor(R.color.PeterRiver)};
+            int[] colors = new int[]{getResources().getColor(mActionToColor.get(mDisplayedAction)), getResources().getColor(R.color.PeterRiver)};
             PointStyle[] styles = new PointStyle[]{PointStyle.CIRCLE, PointStyle.POINT};
             BasicStroke[] strokes = new BasicStroke[]{BasicStroke.SOLID, BasicStroke.DASHED};
             XYMultipleSeriesRenderer renderer = buildRenderer(colors, styles, strokes);
@@ -87,11 +167,14 @@ public class StatsXYChartFragment extends Fragment {
                 }
 
                 avg = sum / results.size();
+                mMaxRateTextView.setText(max.mBurnrate + "");
+                mAvgRateTextView.setText(avg + "");
 
                 setChartSettings(renderer, context.getString(R.string.chartTitle),
                         context.getString(R.string.burndown_chart_datetitle),
                         context.getString(R.string.burndown_chart_counttitle), results.get(0).mDate.getTime(), results.get(results.size() - 1)
-                                .mDate.getTime(), min.mBurnrate, max.mBurnrate, Color.GRAY, Color.LTGRAY);
+                                .mDate.getTime(), min.mBurnrate, max.mBurnrate, Color.LTGRAY, Color.BLACK
+                );
             }
             renderer.setXLabels(7);
             renderer.setYLabels(5);
@@ -103,6 +186,7 @@ public class StatsXYChartFragment extends Fragment {
             SimpleSeriesRenderer avgSeriesRenderer = renderer.getSeriesRendererAt(1);
             avgSeriesRenderer.setDisplayChartValues(false);
             avgSeriesRenderer.setShowLegendItem(false);
+            renderer.setShowLegend(false);
 
             return ChartFactory.getTimeChartView(context,
                     buildDateDataset(title, results, avg), renderer, DATE_FORMAT);
@@ -113,8 +197,6 @@ public class StatsXYChartFragment extends Fragment {
                                         double xMax, double yMin, double yMax, int axesColor,
                                         int labelsColor) {
             renderer.setChartTitle(title);
-//            renderer.setXTitle(xTitle);
-//            renderer.setYTitle(yTitle);
 
             renderer.setXAxisMin(xMin - 12 * 3600 * 1000);
             renderer.setXAxisMax(xMax + 12 * 3600 * 1000);
@@ -122,6 +204,8 @@ public class StatsXYChartFragment extends Fragment {
             renderer.setYAxisMax(yMax + 3);
             renderer.setAxesColor(axesColor);
             renderer.setLabelsColor(labelsColor);
+            renderer.setXLabelsColor(labelsColor);
+            renderer.setYLabelsColor(0, labelsColor);
             renderer.setZoomEnabled(false, false);
             renderer.setPanEnabled(false, false);
         }
@@ -160,7 +244,7 @@ public class StatsXYChartFragment extends Fragment {
             renderer.setLabelsTextSize(25);
             renderer.setLegendTextSize(25);
             renderer.setPointSize(5f);
-            renderer.setMargins(new int[]{20, 10, 15, 15});
+            renderer.setMargins(new int[]{20, 20, 15, 15});
             renderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
             int length = colors.length;
             for (int i = 0; i < length; i++) {

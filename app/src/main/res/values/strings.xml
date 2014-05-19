@@ -57,4 +57,9 @@
     <string name="chartTitle">Task Burndown Rate</string>
     <string name="burndown_chart_datetitle">Date</string>
     <string name="burndown_chart_counttitle">Burndown</string>
+    <string name="spinner_text_days">days</string>
+    <string name="spinner_text_for">for</string>
+    <string name="spinner_text_show">Display</string>
+    <string name="stats_linechart_maxrate">Max rate</string>
+    <string name="stats_linechart_avgrate">Avg. rate</string>
 </resources>

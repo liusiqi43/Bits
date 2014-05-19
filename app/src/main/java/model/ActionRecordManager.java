@@ -62,17 +62,18 @@ public class ActionRecordManager {
 
     /**
      * Raw query here, pay attention to hard-coded part
+     *
      * @param days
      * @return
      */
-    public List<DateBurnratePair> getBurnRateForLastDays(int days) {
+    public List<DateBurnratePair> getActionRateForLastDays(int action, int days) {
         List<DateBurnratePair> pairs = new ArrayList<DateBurnratePair>();
 
         String cols[] = new String[2];
         cols[0] = "strftime('%Y-%m-%d', record_on/1000,'unixepoch', 'localtime') as date";
         cols[1] = "count(*) as count";
 
-        String whereClause = "action = 1 AND date(record_on/1000, 'unixepoch', 'localtime') > date('now','-" + days + " day')";
+        String whereClause = "action = " + action + " AND date(record_on/1000, 'unixepoch', 'localtime') > date('now','-" + days + " day')";
         String groupBy = "strftime('%Y-%m-%d', record_on/1000,'unixepoch', 'localtime')";
         String orderBy = "record_on";
 

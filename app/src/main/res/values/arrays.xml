@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="stats_linechart_days_array">
+        <item>last 14</item>
+        <item>last 30</item>
+        <item>last 90</item>
+        <item>last 180</item>
+    </string-array>
+
+    <string-array name="stats_linechart_actions_array">
+        <item>Done</item>
+        <item>Skip</item>
+        <item>Late</item>
+    </string-array>
+</resources>
