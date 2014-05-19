@@ -1,12 +1,16 @@
 package com.siqi.bits.app.ui;
 
-import android.graphics.Color;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.siqi.bits.app.R;
@@ -18,6 +22,7 @@ import org.achartengine.model.SeriesSelection;
 import org.achartengine.renderer.DefaultRenderer;
 import org.achartengine.renderer.SimpleSeriesRenderer;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -33,19 +38,22 @@ import model.TaskManager;
  */
 public class StatsPieChartFragment extends Fragment {
 
+    /**
+     * Colors to be used for the pie slices.
+     */
+    private static int[] COLORS = new int[]{R.color.Turquoise, R.color.SeaGreen, R.color.Emerald, R.color.Nephritis, R.color.PeterRiver, R.color.BelizeHole, R.color.Amethyst, R.color.Wisteria, R.color.WetAsphalt, R.color.MidnightBlue, R.color.Sunflower, R.color.Orange, R.color.Carrot, R.color.Pumpkin, R.color.Alizarin, R.color.Pomegranate, R.color.silver, R.color.concrete, R.color.Asbestos};
     private TaskManager tm;
     private CategoryManager cm;
-
     private HashMap<Long, Integer> mCatIdToCount;
-
-    /** Colors to be used for the pie slices. */
-    private static int[] COLORS = new int[] { Color.GREEN, Color.BLUE, Color.MAGENTA, Color.CYAN };
     /** The main series that will include all the data. */
     private CategorySeries mSeries = new CategorySeries("Task by category");
     /** The main renderer for the main dataset. */
     private DefaultRenderer mRenderer = new DefaultRenderer();
     /** The chart view that displays the data. */
     private GraphicalView mChartView;
+
+    private CheckBox mActiveCheckbox, mArchivedCheckbox;
+    private boolean mActiveTasks = true, mArchivedTasks = true;
 
     private LinearLayout mChartViewContainer;
 
@@ -62,21 +70,54 @@ public class StatsPieChartFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRenderer.setZoomButtonsVisible(true);
+        mRenderer.setZoomButtonsVisible(false);
         mRenderer.setStartAngle(180);
-        mRenderer.setDisplayValues(true);
+        mRenderer.setDisplayValues(false);
 
         tm = TaskManager.getInstance(getActivity());
         cm = CategoryManager.getInstance(getActivity());
-
-        mCatIdToCount = tm.getCategoryCountForTasks();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.stats_piechart_fragment, container, false);
         mChartViewContainer = (LinearLayout) root.findViewById (R.id.piechart_container);
+        mActiveCheckbox = (CheckBox) root.findViewById(R.id.active_task_checkbox);
+        mArchivedCheckbox = (CheckBox) root.findViewById(R.id.archived_task_checkbox);
 
+        mActiveCheckbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mActiveTasks = ((CheckBox) view).isChecked();
+                if (!CheckValidation((CheckBox) view)) {
+                    mActiveTasks = true;
+                }
+                reloadData();
+                mChartView.repaint();
+            }
+        });
+
+        mArchivedCheckbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mArchivedTasks = ((CheckBox) view).isChecked();
+                if (!CheckValidation((CheckBox) view)) {
+                    mArchivedTasks = true;
+                }
+                reloadData();
+                mChartView.repaint();
+            }
+        });
+
+        reloadData();
+        mRenderer.setChartTitle(getString(R.string.task_category_chart_title));
+
+        return root;
+    }
+
+    private void reloadData() {
+        mSeries.clear();
+        mCatIdToCount = tm.getCategoryCountForTasks(mActiveTasks, mArchivedTasks);
         Iterator it = mCatIdToCount.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pairs = (Map.Entry) it.next();
@@ -85,13 +126,18 @@ public class StatsPieChartFragment extends Fragment {
 
             mSeries.add(cm.getCategory(id).getName(), count);
             SimpleSeriesRenderer renderer = new SimpleSeriesRenderer();
-            renderer.setColor(COLORS[(mSeries.getItemCount() - 1) % COLORS.length]);
-
+            renderer.setColor(getResources().getColor(COLORS[(mSeries.getItemCount() - 1) % COLORS.length]));
             mRenderer.addSeriesRenderer(renderer);
         }
+    }
 
-
-        return root;
+    private boolean CheckValidation(CheckBox cb) {
+        if (!mActiveTasks && !mArchivedTasks) {
+            cb.setChecked(true);
+            Toast.makeText(getActivity(), "Not enough data", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -101,28 +147,55 @@ public class StatsPieChartFragment extends Fragment {
         if (mChartView == null) {
             mChartView = ChartFactory.getPieChartView(getActivity(), mSeries, mRenderer);
             mRenderer.setClickEnabled(true);
+            mRenderer.setPanEnabled(false);
+            mRenderer.setZoomEnabled(true);
             mRenderer.setApplyBackgroundColor(true);
             mChartView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     SeriesSelection seriesSelection = mChartView.getCurrentSeriesAndPoint();
-                    if (seriesSelection == null) {
-                        Toast.makeText(getActivity(), "No chart element selected", Toast.LENGTH_SHORT)
-                                .show();
-                    } else {
+                    if (seriesSelection != null) {
                         for (int i = 0; i < mSeries.getItemCount(); i++) {
                             mRenderer.getSeriesRendererAt(i).setHighlighted(i == seriesSelection.getPointIndex());
                         }
                         mChartView.repaint();
-                        Toast.makeText(
-                                getActivity(),
-                                "Chart data point index " + seriesSelection.getPointIndex() + " selected"
-                                        + " point value=" + seriesSelection.getValue(), Toast.LENGTH_SHORT).show();
+
+                        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        View view = inflater.inflate(R.layout.stats_piechart_toast_layout, null);
+                        View layout = view.findViewById(R.id.toast_layout_root);
+                        TextView text = (TextView) layout.findViewById(R.id.text);
+                        ImageView categoryIcon = (ImageView) layout.findViewById(R.id.categoryIcon);
+                        text.setText((int) seriesSelection.getValue() + " " + getString(R.string.task_in_this_category));
+
+                        Iterator it = mCatIdToCount.entrySet().iterator();
+                        while (it.hasNext()) {
+                            Map.Entry pairs = (Map.Entry) it.next();
+                            Long id = (Long) pairs.getKey();
+                            Log.d("PieChart", cm.getCategory(id).getName() + " == " + mSeries.getCategory(seriesSelection.getPointIndex()) + "? ");
+                            if (cm.getCategory(id).getName().equals(mSeries.getCategory(seriesSelection.getPointIndex()))) {
+                                try {
+                                    categoryIcon.setImageBitmap(cm.getCategory(id).getIconBitmap(getActivity()));
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                break;
+                            }
+                        }
+
+                        final Toast toast = new Toast(getActivity());
+                        toast.setView(layout);
+                        toast.setDuration(Toast.LENGTH_SHORT);
+                        toast.show();
                     }
                 }
             });
             mChartViewContainer.addView(mChartView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
+            mRenderer.setMargins(new int[]{30, 30, 0, 20});
+            mRenderer.setChartTitleTextSize(60);
+            mRenderer.setLabelsTextSize(35);
+            mRenderer.setLabelsColor(getResources().getColor(R.color.black));
+            mRenderer.setShowLegend(false);
         } else {
             mChartView.repaint();
         }

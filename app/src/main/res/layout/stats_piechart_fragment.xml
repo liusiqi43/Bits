@@ -10,7 +10,46 @@
     <LinearLayout
         android:id="@+id/piechart_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" />
+        android:layout_height="0dp"
+        android:layout_weight="7"
+        android:background="@color/cloud"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="10dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/card_bg"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <CheckBox
+            android:id="@+id/active_task_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:checked="true"
+            android:text="@string/piechart_active_tasks" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="5dp"
+            android:background="@color/silver_transparent" />
+
+        <CheckBox
+            android:id="@+id/archived_task_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:checked="true"
+            android:text="@string/piechart_archived_tasks" />
+
+    </LinearLayout>
 
 </LinearLayout>

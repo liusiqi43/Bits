@@ -134,6 +134,19 @@ public class TaskManager {
         return tasks;
     }
 
+    public List<Task> getAllTasks(boolean active, boolean archive) {
+        List<Task> tasks = new ArrayList<Task>();
+
+        if (active && archive)
+            tasks = mTaskDao.queryBuilder().where(TaskDao.Properties.DeletedOn.isNull()).list();
+        else if (active && !archive)
+            tasks = mTaskDao.queryBuilder().where(TaskDao.Properties.DeletedOn.isNull(), TaskDao.Properties.Archieved_on.isNull()).list();
+        else if (!active && archive)
+            tasks = mTaskDao.queryBuilder().where(TaskDao.Properties.DeletedOn.isNull(), TaskDao.Properties.Archieved_on.isNotNull()).list();
+
+        return tasks;
+    }
+
     public List<Task> getAllSortedTasks() {
         List<Task> tasks = getAllTasks();
         Collections.sort(tasks, new Comparator<Task>() {
@@ -174,7 +187,7 @@ public class TaskManager {
         double sum = t.getDoneCount() + t.getSkipCount();
         double total = sum + t.getLateCount();
 
-        return ((int) (100 * sum/total));
+        return ((int) (100 * sum / total));
     }
 
     public int getDoneRateExcept(Task t) {
@@ -188,12 +201,12 @@ public class TaskManager {
                 long lateCount = e.getLateCount();
                 long skipCount = e.getSkipCount();
 
-                sum += doneCount+skipCount;
-                total += doneCount+skipCount+lateCount;
+                sum += doneCount + skipCount;
+                total += doneCount + skipCount + lateCount;
             }
         }
 
-        return ((int) (100 * sum/total));
+        return ((int) (100 * sum / total));
     }
 
     public long getActionCountForTaskSinceTimestamp(Task t) {
@@ -233,11 +246,12 @@ public class TaskManager {
         List<ActionRecord> records = qb.where(
                 qb.or(
                         ActionRecordDao.Properties.Action.eq(ACTION_TYPE_DONE),
-                        ActionRecordDao.Properties.Action.eq(ACTION_TYPE_SKIP)))
+                        ActionRecordDao.Properties.Action.eq(ACTION_TYPE_SKIP))
+        )
                 .orderDesc(ActionRecordDao.Properties.RecordOn).list();
 
         for (ActionRecord r : records) {
-            if (r.getTask().getDeletedOn() == null){
+            if (r.getTask().getDeletedOn() == null) {
                 return r;
             }
         }
@@ -260,15 +274,15 @@ public class TaskManager {
             t.setCurrentInterval(delta);
         }
 
-        Log.d("ScheduledTimeUpdate", "T:"+t.getDescription()+" freq:"+t.getFrequency() + " actionCount:"+actionCountSinceBeginOfInternval);
+        Log.d("ScheduledTimeUpdate", "T:" + t.getDescription() + " freq:" + t.getFrequency() + " actionCount:" + actionCountSinceBeginOfInternval);
         if (mScheduleService != null)
             mScheduleService.scheduleForTask(t);
     }
 
     public void setActionRecordForTask(Task t, int ACTION_TYPE) {
 
-        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-        View view = inflater.inflate( R.layout.toast_action_layout, null);
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.toast_action_layout, null);
         View layout = view.findViewById(R.id.toast_layout_root);
         TextView text = (TextView) layout.findViewById(R.id.text);
 
@@ -302,13 +316,13 @@ public class TaskManager {
     public void setActionRecordForTaskAtDate(Task t, int ACTION_TYPE, Date date) {
         switch (ACTION_TYPE) {
             case ACTION_TYPE_SKIP:
-                t.setSkipCount(t.getSkipCount()+1);
+                t.setSkipCount(t.getSkipCount() + 1);
                 break;
             case ACTION_TYPE_DONE:
-                t.setDoneCount(t.getDoneCount()+1);
+                t.setDoneCount(t.getDoneCount() + 1);
                 break;
             case ACTION_TYPE_LATE:
-                t.setLateCount(t.getLateCount()+1);
+                t.setLateCount(t.getLateCount() + 1);
         }
         t.update();
         ActionRecord record = new ActionRecord(null, ACTION_TYPE, date, t.getId());
@@ -318,6 +332,7 @@ public class TaskManager {
 
     /**
      * Called if task's progress is > 100, let's check if
+     *
      * @param t
      */
     public void updateActionRecordForTask(Task t) {
@@ -326,9 +341,10 @@ public class TaskManager {
         // get LateActions whose timestamps are later than nextScheduledTime()
         List<ActionRecord> records = qb.where(
                 ActionRecordDao.Properties.TaskId.eq(t.getId()),
-                        ActionRecordDao.Properties.Action.eq(ACTION_TYPE_LATE),
-                                qb.or(ActionRecordDao.Properties.RecordOn.gt(t.getNextScheduledTime()),
-                                        ActionRecordDao.Properties.RecordOn.eq(t.getNextScheduledTime())))
+                ActionRecordDao.Properties.Action.eq(ACTION_TYPE_LATE),
+                qb.or(ActionRecordDao.Properties.RecordOn.gt(t.getNextScheduledTime()),
+                        ActionRecordDao.Properties.RecordOn.eq(t.getNextScheduledTime()))
+        )
                 .orderDesc(ActionRecordDao.Properties.RecordOn).list();
 
         Long startTime = records.isEmpty() ? t.getNextScheduledTime() : records.get(0).getRecordOn().getTime() + t.getAvgInterval();
@@ -371,11 +387,10 @@ public class TaskManager {
     }
 
 
-
     public void removeActionRecordById(long id) {
         ActionRecord record = mActionRecordDao.load(id);
 
-        switch (record.getAction()){
+        switch (record.getAction()) {
             case ACTION_TYPE_DONE:
                 record.getTask().setDoneCount(record.getTask().getDoneCount() - 1);
                 break;
@@ -403,8 +418,8 @@ public class TaskManager {
         t.update();
     }
 
-    public HashMap<Long, Integer> getCategoryCountForTasks() {
-        List<Task> tasks = getAllTasks();
+    public HashMap<Long, Integer> getCategoryCountForTasks(boolean active, boolean archive) {
+        List<Task> tasks = getAllTasks(active, archive);
 
         HashMap<Long, Integer> catIdToCount = new HashMap<Long, Integer>();
 
@@ -413,7 +428,7 @@ public class TaskManager {
             if (i == null)
                 catIdToCount.put(t.getCategory().getId(), 1);
             else
-                catIdToCount.put(t.getCategory().getId(), i+1);
+                catIdToCount.put(t.getCategory().getId(), i + 1);
         }
 
         return catIdToCount;

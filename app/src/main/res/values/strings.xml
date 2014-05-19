@@ -51,10 +51,11 @@
 
     <string name="nav_header_bits">Bits</string>
     <string name="nav_header_misc">Misc.</string>
-    <string name="burndown_chart_title">Burndown</string>
-    <string name="task_category_chart_title">Task Category</string>
+    <string name="burndown_viewpagerstrip_title">Burndown</string>
+    <string name="task_category_viewpagerstrip_title">Task Category</string>
     <string name="burndown_chart_dateformat">\"dd/MM/yyyy\"</string>
-    <string name="chartTitle">Task Burndown Rate</string>
+    <string name="burndown_chart_title">Task Burndown Rate</string>
+    <string name="task_category_chart_title">Task Count by Category</string>
     <string name="burndown_chart_datetitle">Date</string>
     <string name="burndown_chart_counttitle">Burndown</string>
     <string name="spinner_text_days">days</string>
@@ -62,4 +63,7 @@
     <string name="spinner_text_show">Display</string>
     <string name="stats_linechart_maxrate">Max rate</string>
     <string name="stats_linechart_avgrate">Avg. rate</string>
+    <string name="piechart_archived_tasks">Archived Tasks</string>
+    <string name="piechart_active_tasks">Active Tasks</string>
+    <string name="task_in_this_category"> tasks in this category</string>
 </resources>

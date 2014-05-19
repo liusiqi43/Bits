@@ -72,9 +72,9 @@ public class StatsFragment extends Fragment {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return getString(R.string.burndown_chart_title);
+                    return getString(R.string.burndown_viewpagerstrip_title);
                 case 1:
-                    return getString(R.string.task_category_chart_title);
+                    return getString(R.string.task_category_viewpagerstrip_title);
                 default:
                     return null;
             }

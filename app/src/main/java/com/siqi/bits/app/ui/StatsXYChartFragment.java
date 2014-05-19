@@ -144,7 +144,7 @@ public class StatsXYChartFragment extends Fragment implements AdapterView.OnItem
         private static final String DATE_FORMAT = "dd/MM";
 
         public GraphicalView getView(Context context, List<ActionRecordManager.DateBurnratePair> results) {
-            String title = context.getString(R.string.chartTitle);
+            String title = context.getString(R.string.burndown_chart_title);
 
             int[] colors = new int[]{getResources().getColor(mActionToColor.get(mDisplayedAction)), getResources().getColor(R.color.PeterRiver)};
             PointStyle[] styles = new PointStyle[]{PointStyle.CIRCLE, PointStyle.POINT};
@@ -170,7 +170,7 @@ public class StatsXYChartFragment extends Fragment implements AdapterView.OnItem
                 mMaxRateTextView.setText(max.mBurnrate + "");
                 mAvgRateTextView.setText(avg + "");
 
-                setChartSettings(renderer, context.getString(R.string.chartTitle),
+                setChartSettings(renderer, context.getString(R.string.burndown_chart_title),
                         context.getString(R.string.burndown_chart_datetitle),
                         context.getString(R.string.burndown_chart_counttitle), results.get(0).mDate.getTime(), results.get(results.size() - 1)
                                 .mDate.getTime(), min.mBurnrate, max.mBurnrate, Color.LTGRAY, Color.BLACK
