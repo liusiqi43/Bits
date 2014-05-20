@@ -168,7 +168,7 @@ public class StatsXYChartFragment extends Fragment implements AdapterView.OnItem
 
                 avg = sum / results.size();
                 mMaxRateTextView.setText(max.mBurnrate + "");
-                mAvgRateTextView.setText(avg + "");
+                mAvgRateTextView.setText(Math.round(avg * 100.0) / 100.0 + "");
 
                 setChartSettings(renderer, context.getString(R.string.burndown_chart_title),
                         context.getString(R.string.burndown_chart_datetitle),

@@ -151,7 +151,7 @@ public class AchievementsFragment extends Fragment {
             int periodInDays = (int) (t.getPeriod() / TaskManager.DAY_IN_MILLIS);
             double periodCounts = Math.ceil((double) days / periodInDays);
 
-            Double freq = t.getDoneCount() / periodCounts;
+            Double freq = Math.round(t.getDoneCount() / periodCounts * 100.0) / 100.0;
 
             Log.d("Achievement", "days: " + days + " periodInDays" + periodInDays + " periodCounts" + periodCounts + " freq:" + freq);
 
