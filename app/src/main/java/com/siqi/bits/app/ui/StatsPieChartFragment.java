@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +24,9 @@ import org.achartengine.renderer.DefaultRenderer;
 import org.achartengine.renderer.SimpleSeriesRenderer;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 
 import model.CategoryManager;
 import model.TaskManager;
@@ -44,7 +45,7 @@ public class StatsPieChartFragment extends Fragment {
     private static int[] COLORS = new int[]{R.color.Turquoise, R.color.SeaGreen, R.color.Emerald, R.color.Nephritis, R.color.PeterRiver, R.color.BelizeHole, R.color.Amethyst, R.color.Wisteria, R.color.WetAsphalt, R.color.MidnightBlue, R.color.Sunflower, R.color.Orange, R.color.Carrot, R.color.Pumpkin, R.color.Alizarin, R.color.Pomegranate, R.color.silver, R.color.concrete, R.color.Asbestos};
     private TaskManager tm;
     private CategoryManager cm;
-    private HashMap<Long, Integer> mCatIdToCount;
+    private List<Pair<Long, Integer>> mCatIdToCount = new ArrayList<Pair<Long, Integer>>();
     /** The main series that will include all the data. */
     private CategorySeries mSeries = new CategorySeries("Task by category");
     /** The main renderer for the main dataset. */
@@ -119,12 +120,10 @@ public class StatsPieChartFragment extends Fragment {
 
     private void reloadData() {
         mSeries.clear();
-        mCatIdToCount = tm.getCategoryCountForTasks(mActiveTasks, mArchivedTasks);
-        Iterator it = mCatIdToCount.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pairs = (Map.Entry) it.next();
-            Long id = (Long) pairs.getKey();
-            Integer count = (Integer) pairs.getValue();
+        mCatIdToCount = tm.getCategoryWithCount(mActiveTasks, mArchivedTasks);
+        for (Pair p : mCatIdToCount) {
+            Long id = (Long) p.first;
+            Integer count = (Integer) p.second;
 
             mSeries.add(cm.getCategory(id).getName(), count);
             SimpleSeriesRenderer renderer = new SimpleSeriesRenderer();
@@ -169,10 +168,10 @@ public class StatsPieChartFragment extends Fragment {
                         ImageView categoryIcon = (ImageView) layout.findViewById(R.id.categoryIcon);
                         text.setText((int) seriesSelection.getValue() + " " + getString(R.string.task_in_this_category));
 
-                        Iterator it = mCatIdToCount.entrySet().iterator();
+                        Iterator<Pair<Long, Integer>> it = mCatIdToCount.iterator();
                         while (it.hasNext()) {
-                            Map.Entry pairs = (Map.Entry) it.next();
-                            Long id = (Long) pairs.getKey();
+                            Pair<Long, Integer> pairs = it.next();
+                            Long id = pairs.first;
                             Log.d("PieChart", cm.getCategory(id).getName() + " == " + mSeries.getCategory(seriesSelection.getPointIndex()) + "? ");
                             if (cm.getCategory(id).getName().equals(mSeries.getCategory(seriesSelection.getPointIndex()))) {
                                 try {

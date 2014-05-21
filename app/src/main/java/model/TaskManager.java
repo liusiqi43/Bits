@@ -1,9 +1,10 @@
 package model;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Handler;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,6 +60,8 @@ public class TaskManager {
     private ArrayList<String> mSkipSlogans = new ArrayList<String>();
     private Random mRandomiser;
     private ReminderScheduleService mScheduleService = null;
+
+    private Toast actionFinishedToast = null;
 
     private TaskManager(Context ctx) {
         /**
@@ -296,19 +299,13 @@ public class TaskManager {
             text.setText(mSkipSlogans.get(mRandomiser.nextInt(mSkipSlogans.size())));
         }
 
-        final Toast toast = new Toast(mContext.getApplicationContext());
-        toast.setView(layout);
-        toast.setDuration(Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.FILL, 0, 0);
-        toast.show();
-
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                toast.cancel();
-            }
-        }, 1500);
+        if (actionFinishedToast == null) {
+            actionFinishedToast = new Toast(mContext.getApplicationContext());
+        }
+        actionFinishedToast.setView(layout);
+        actionFinishedToast.setDuration(Toast.LENGTH_SHORT);
+        actionFinishedToast.setGravity(Gravity.FILL, 0, 0);
+        actionFinishedToast.show();
 
         setActionRecordForTaskAtDate(t, ACTION_TYPE, new Date());
     }
@@ -368,14 +365,17 @@ public class TaskManager {
     public String getTimesAgoDescriptionForTask(Task t) {
         List<ActionRecord> records = getLastActionForTask(t, ACTION_TYPE_DONE);
 
+        StringBuilder builder = new StringBuilder();
         if (records.size() > 0)
-            return new StringBuilder()
-                    .append(mContext.getResources().getString(R.string.done))
+            builder.append(mContext.getResources().getString(R.string.done))
                     .append(' ')
-                    .append(mPrettyTime.format(records.get(0).getRecordOn())).toString();
+                    .append(mPrettyTime.format(records.get(0).getRecordOn()));
         else {
-            return mContext.getResources().getString(R.string.added_recently);
+            builder.append(mContext.getResources().getString(R.string.added))
+                    .append(' ')
+                    .append(mPrettyTime.format(t.getCreatedOn()));
         }
+        return builder.toString();
     }
 
     public String getArchivedDescriptionForTask(Task t) {
@@ -432,6 +432,44 @@ public class TaskManager {
         }
 
         return catIdToCount;
+    }
+
+
+    public List<Pair<Long, Integer>> getCategoryWithCount(boolean archieved, boolean active) {
+        if (!archieved && !active)
+            return null;
+
+        List<Pair<Long, Integer>> pairs = new ArrayList<Pair<Long, Integer>>();
+
+        String cols[] = new String[2];
+        cols[0] = "CATEGORY_ID";
+        cols[1] = "count(*) as count";
+
+        String whereClause = null;
+
+        if (active && archieved)
+            whereClause = "deleted_on IS NULL";
+        else if (active && !archieved)
+            whereClause = "deleted_on IS NULL AND Archieved_on IS NULL";
+        else if (!active && archieved)
+            whereClause = "deleted_on IS NULL AND Archieved_on IS NOT NULL";
+
+        String groupBy = "CATEGORY_ID";
+
+        Cursor pairsCursor = mDB.query(mTaskDao.getTablename(), cols, whereClause, null, groupBy, null, null);
+
+        int countColIndex = pairsCursor.getColumnIndex("count");
+        int idColIndex = pairsCursor.getColumnIndex("CATEGORY_ID");
+
+        if (pairsCursor.moveToFirst() == true) {
+            do {
+                int count = pairsCursor.getInt(countColIndex);
+                long id = pairsCursor.getLong(idColIndex);
+                pairs.add(new Pair<Long, Integer>(id, count));
+            } while (pairsCursor.moveToNext());
+        }
+
+        return pairs;
     }
 
     public class DuplicatedTaskException extends Throwable {
