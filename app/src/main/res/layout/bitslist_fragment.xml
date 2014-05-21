@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp"
     tools:context="com.siqi.bits.app.MainActivity$PlaceholderFragment">
 
     <com.siqi.bits.swipelistview.SwipeListView xmlns:swipe="http://schemas.android.com/apk/res-auto"
@@ -11,6 +10,7 @@
         android:layout_height="fill_parent"
         android:divider="@android:color/transparent"
         android:longClickable="true"
+        android:padding="5dp"
         swipe:swipeActionLeft="choice"
         swipe:swipeActionRight="choice"
         swipe:swipeBackView="@+id/back"
