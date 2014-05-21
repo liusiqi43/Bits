@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -49,7 +50,6 @@ import com.siqi.bits.ActionRecord;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.MainActivity;
 import com.siqi.bits.app.R;
-import com.siqi.bits.swipelistview.BaseSwipeListViewListener;
 import com.siqi.bits.swipelistview.SwipeListView;
 
 import java.io.IOException;
@@ -144,82 +144,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
          */
         tm = TaskManager.getInstance(this.getActivity().getApplicationContext());
 
-        mAdapter = new BitListArrayAdapter(getActivity().getApplicationContext(), tm.getAllSortedTasks());
-        mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
+        new GetAllSortedTasksTask().execute();
 
-        // Swing from bottom anim & dismiss anim
-//        SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAnimateDismissAdapter);
-//        swingBottomInAnimationAdapter.setInitialDelayMillis(100);
-//        swingBottomInAnimationAdapter.setAnimationDurationMillis(300);
-
-        this.mBitsListView.setAdapter(mAnimateDismissAdapter);
-        mAnimateDismissAdapter.setAbsListView(mBitsListView);
-
-
-        this.mBitsListView.setSwipeListViewListener(new BaseSwipeListViewListener() {
-            @Override
-            public void onLeftChoiceAction(int position) {
-                if (mAdapter.isExpanded(position))
-                    mAdapter.toggle(position);
-                Task item = mAdapter.getItem(position);
-                tm.setSkipActionForTask(item);
-                saveState();
-                mAdapter.clear();
-                mAdapter.addAll(tm.getAllSortedTasks());
-                animateNewState();
-            }
-
-            @Override
-            public void onRightChoiceAction(int position) {
-                if (mAdapter.isExpanded(position))
-                    mAdapter.toggle(position);
-
-                Task item = mAdapter.getItem(position);
-                tm.setDoneActionForTask(item);
-                saveState();
-                mAdapter.clear();
-                mAdapter.addAll(tm.getAllSortedTasks());
-
-
-                animateNewState();
-            }
-
-        });
-
-
-        mBitsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, final View view, int position, long id) {
-
-                final ViewSwitcher viewSwitcher = (ViewSwitcher) view.findViewById(R.id.card_viewswitcher);
-                viewSwitcher.showNext();
-
-                new Handler().postDelayed(new Runnable() {
-                    public void run() {
-                        if (viewSwitcher.getDisplayedChild() == CARD_ACTION) {
-                            viewSwitcher.setDisplayedChild(CARD_INFO);
-                        }
-                    }
-                }, getResources().getInteger(R.integer.actionview_timeout));
-
-                return true;
-            }
-        });
-
-        mAdapter.setLimit(1);
-
-        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-        mSensorListener = new ShakeEventListener();
-
-        mSensorListener.setOnShakeListener(this);
-
-        mListReloader = new Runnable() {
-            @Override
-            public void run() {
-                refreshBitsList();
-                mListRefresherHandle.postDelayed(mListReloader, REFRESH_PERIOD);
-            }
-        };
 
         return rootView;
     }
@@ -241,9 +167,11 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     @Override
     public void onResume() {
         super.onResume();
-        mSensorManager.registerListener(mSensorListener,
-                mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_UI);
+        if (mSensorManager != null) {
+            mSensorManager.registerListener(mSensorListener,
+                    mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                    SensorManager.SENSOR_DELAY_UI);
+        }
         /**
          * Service binding
          */
@@ -252,7 +180,9 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         /**
          * UI refresher start
          */
-        startPeriodicRefresh();
+        if (mListReloader != null) {
+            startPeriodicRefresh();
+        }
     }
 
     private void refreshBitsList() {
@@ -438,6 +368,61 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         TextView othersDoneRate;
         GridView timeLine;
         LinearLayout globalLayout;
+    }
+
+    private class GetAllSortedTasksTask extends AsyncTask<Void, Integer, List<Task>> {
+        @Override
+        protected List<Task> doInBackground(Void... voids) {
+            return tm.getAllSortedTasks();
+        }
+
+        // This is called when doInBackground() is finished
+        protected void onPostExecute(List<Task> result) {
+            mAdapter = new BitListArrayAdapter(getActivity().getApplicationContext(), tm.getAllSortedTasks());
+            mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
+            mBitsListView.setAdapter(mAnimateDismissAdapter);
+            mAnimateDismissAdapter.setAbsListView(mBitsListView);
+            mAdapter.setLimit(1);
+
+
+            mBitsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> adapterView, final View view, int position, long id) {
+
+                    final ViewSwitcher viewSwitcher = (ViewSwitcher) view.findViewById(R.id.card_viewswitcher);
+                    viewSwitcher.showNext();
+
+                    new Handler().postDelayed(new Runnable() {
+                        public void run() {
+                            if (viewSwitcher.getDisplayedChild() == CARD_ACTION) {
+                                viewSwitcher.setDisplayedChild(CARD_INFO);
+                            }
+                        }
+                    }, getResources().getInteger(R.integer.actionview_timeout));
+
+                    return true;
+                }
+            });
+
+            mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+            mSensorListener = new ShakeEventListener();
+
+            mSensorListener.setOnShakeListener(BitsListFragment.this);
+
+            mListReloader = new Runnable() {
+                @Override
+                public void run() {
+                    refreshBitsList();
+                    mListRefresherHandle.postDelayed(mListReloader, REFRESH_PERIOD);
+                }
+            };
+
+            mSensorManager.registerListener(mSensorListener,
+                    mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                    SensorManager.SENSOR_DELAY_UI);
+
+            startPeriodicRefresh();
+        }
     }
 
     private class OnBitDismissCallback implements OnDismissCallback {

@@ -63,6 +63,8 @@ public class TaskManager {
 
     private Toast actionFinishedToast = null;
 
+    private List<Task> cachedSortedTasks = null;
+
     private TaskManager(Context ctx) {
         /**
          * DB init
@@ -151,12 +153,29 @@ public class TaskManager {
     }
 
     public List<Task> getAllSortedTasks() {
+        long start = System.nanoTime();
         List<Task> tasks = getAllTasks();
+        Log.d("TIMING", "SQL: " + (System.nanoTime() - start) / 1000000);
+
+        final HashMap<Task, Long> taskToCount = new HashMap<Task, Long>();
+
+        start = System.nanoTime();
         Collections.sort(tasks, new Comparator<Task>() {
             @Override
             public int compare(Task task, Task task2) {
-                long c1 = getActionCountForTaskSinceTimestamp(task);
-                long c2 = getActionCountForTaskSinceTimestamp(task2);
+                Long c1 = taskToCount.get(task);
+                Long c2 = taskToCount.get(task2);
+
+                if (c1 == null) {
+                    c1 = getActionCountForTaskSinceTimestamp(task);
+                    taskToCount.put(task, c1);
+                }
+
+                if (c2 == null) {
+                    c2 = getActionCountForTaskSinceTimestamp(task2);
+                    taskToCount.put(task2, c2);
+                }
+
                 if (task.getFrequency() <= c1) {
                     return 1;
                 } else if (task2.getFrequency() <= c2) {
@@ -173,6 +192,7 @@ public class TaskManager {
                 }
             }
         });
+        Log.d("TIMING", "Sort: " + (System.nanoTime() - start) / 1000000);
 
         return tasks;
     }
