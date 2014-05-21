@@ -50,6 +50,7 @@ import com.siqi.bits.ActionRecord;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.MainActivity;
 import com.siqi.bits.app.R;
+import com.siqi.bits.swipelistview.BaseSwipeListViewListener;
 import com.siqi.bits.swipelistview.SwipeListView;
 
 import java.io.IOException;
@@ -378,7 +379,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
         // This is called when doInBackground() is finished
         protected void onPostExecute(List<Task> result) {
-            mAdapter = new BitListArrayAdapter(getActivity().getApplicationContext(), tm.getAllSortedTasks());
+            mAdapter = new BitListArrayAdapter(getActivity().getApplicationContext(), result);
             mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
             mBitsListView.setAdapter(mAnimateDismissAdapter);
             mAnimateDismissAdapter.setAbsListView(mBitsListView);
@@ -402,6 +403,36 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
                     return true;
                 }
+            });
+
+            mBitsListView.setSwipeListViewListener(new BaseSwipeListViewListener() {
+                @Override
+                public void onLeftChoiceAction(int position) {
+                    if (mAdapter.isExpanded(position))
+                        mAdapter.toggle(position);
+                    Task item = mAdapter.getItem(position);
+                    tm.setSkipActionForTask(item);
+                    saveState();
+                    mAdapter.clear();
+                    mAdapter.addAll(tm.getAllSortedTasks());
+                    animateNewState();
+                }
+
+                @Override
+                public void onRightChoiceAction(int position) {
+                    if (mAdapter.isExpanded(position))
+                        mAdapter.toggle(position);
+
+                    Task item = mAdapter.getItem(position);
+                    tm.setDoneActionForTask(item);
+                    saveState();
+                    mAdapter.clear();
+                    mAdapter.addAll(tm.getAllSortedTasks());
+
+
+                    animateNewState();
+                }
+
             });
 
             mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
