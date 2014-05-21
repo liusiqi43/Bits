@@ -2,6 +2,7 @@ package com.siqi.bits.app.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -104,6 +105,7 @@ public class NewBitFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         View v = inflater.inflate(R.layout.new_bit_fragment, container, false);
         setHasOptionsMenu(true);
 
@@ -130,7 +132,7 @@ public class NewBitFragment extends Fragment {
                     mLastSelected.setBackgroundResource(android.R.color.transparent);
                 mLastSelected = v;
 
-                Log.d("BitListFrag", "Detected Click on View with tag: "+ ((Category) mLastSelected.getTag()).getName());
+                Log.d("BitListFrag", "Detected Click on View with tag: " + ((Category) mLastSelected.getTag()).getName());
             }
         };
 
@@ -199,7 +201,7 @@ public class NewBitFragment extends Fragment {
     private void hideSoftKeyBoard() {
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        if(imm.isAcceptingText()) { // verify if the soft keyboard is open
+        if (imm.isAcceptingText()) { // verify if the soft keyboard is open
             imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
         }
     }
@@ -280,7 +282,7 @@ public class NewBitFragment extends Fragment {
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p>
+     * <p/>
      * See the Android Training lesson <a href=
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
@@ -320,7 +322,7 @@ public class NewBitFragment extends Fragment {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                if(is!=null) {
+                if (is != null) {
                     try {
                         is.close();
                     } catch (IOException e) {
@@ -341,7 +343,7 @@ public class NewBitFragment extends Fragment {
 
         public int getPositionById(Category category) {
             for (int i = 0; i < mItems.size(); ++i) {
-                if (category.getId() == mItems.get(i).getId()){
+                if (category.getId() == mItems.get(i).getId()) {
                     return i;
                 }
             }

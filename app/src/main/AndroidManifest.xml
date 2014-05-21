@@ -5,13 +5,13 @@
 
     <application
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:hardwareAccelerated="true">
+        android:theme="@style/AppTheme">
         <activity
             android:name="com.siqi.bits.app.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -26,14 +26,18 @@
 
         <receiver android:name="service.ActionOnTaskReceiver">
             <intent-filter>
-                <action android:name="com.siqi.bits.intent.action.DONE_ACTION"/>
-                <action android:name="com.siqi.bits.intent.action.SKIP_ACTION"/>
+                <action android:name="com.siqi.bits.intent.action.DONE_ACTION" />
+                <action android:name="com.siqi.bits.intent.action.SKIP_ACTION" />
             </intent-filter>
         </receiver>
 
-        <receiver android:process=":remote" android:name="service.ReminderPublishReceiver"/>
+        <receiver
+            android:name="service.ReminderPublishReceiver"
+            android:process=":remote" />
 
-        <service android:enabled="true" android:name="service.ReminderScheduleService" />
+        <service
+            android:name="service.ReminderScheduleService"
+            android:enabled="true" />
     </application>
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />

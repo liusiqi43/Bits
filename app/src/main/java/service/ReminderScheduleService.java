@@ -30,24 +30,33 @@ public class ReminderScheduleService extends Service {
     private List<Task> mTasks;
 
     private void scheduleAllAlarms() {
-        reloadTasks();
-        for (Task t : mTasks) {
-            scheduleForTask(t);
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                reloadTasks();
+                for (Task t : mTasks) {
+                    scheduleForTask(t);
+                }
+            }
+        }).start();
     }
 
     private void cancelAllAlarms() {
-        reloadTasks();
-        for (Task t : mTasks) {
-            unScheduleForTask(t);
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                reloadTasks();
+                for (Task t : mTasks) {
+                    unScheduleForTask(t);
+                }
+            }
+        }).start();
     }
 
     public void scheduleForTask(Task t) {
         if (t.getNextScheduledTime() < System.currentTimeMillis())
             return;
 
-        // Display a notification about us starting.  We put an icon in the status bar.
         Intent displayTaskIntent = new Intent(this, ReminderPublishReceiver.class);
         displayTaskIntent.putExtra(TASK_ID, t.getId());
 

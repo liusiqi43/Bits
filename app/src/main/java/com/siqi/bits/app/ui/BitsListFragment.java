@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -17,7 +18,6 @@ import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.LruCache;
 import android.text.Html;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -54,6 +54,7 @@ import com.siqi.bits.swipelistview.BaseSwipeListViewListener;
 import com.siqi.bits.swipelistview.SwipeListView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,6 +63,7 @@ import java.util.List;
 import model.TaskManager;
 import service.ReminderScheduleService;
 import utils.ShakeEventListener;
+import utils.Utils;
 
 /**
  * Proudly powered by me on 4/8/14.
@@ -81,13 +83,13 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     // Reordering animation
     HashMap<Task, Integer> mSavedState = new HashMap<Task, Integer>();
     Interpolator mInterpolator = new AccelerateDecelerateInterpolator();
-    private TaskManager tm;
-    private SensorManager mSensorManager;
-    private ShakeEventListener mSensorListener;
-    private OnBitListInteractionListener mListener;
-    private boolean mUndoDialogDisplayed = false;
-    private ReminderScheduleService mScheduleService = null;
-    private ServiceConnection mConnection = new ServiceConnection() {
+    TaskManager tm;
+    SensorManager mSensorManager;
+    ShakeEventListener mSensorListener;
+    OnBitListInteractionListener mListener;
+    boolean mUndoDialogDisplayed = false;
+    ReminderScheduleService mScheduleService = null;
+    ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.d("ReminderScheduleService", "onServiceConnected");
             mScheduleService = ((ReminderScheduleService.LocalBinder) service).getService();
@@ -100,9 +102,9 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
             tm.setScheduleService(null);
         }
     };
-    private boolean mIsBound = false;
-    private Runnable mListReloader;
-    private Handler mListRefresherHandle = new Handler();
+    boolean mIsBound = false;
+    Runnable mListReloader;
+    Handler mListRefresherHandle = new Handler();
 
     public BitsListFragment() {
     }
@@ -134,21 +136,102 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         /**
          * View Binding
          */
         View rootView = inflater.inflate(R.layout.bitslist_fragment, container, false);
         mBitsListView = (SwipeListView) rootView.findViewById(R.id.bitslist);
 
+        new ReloadSortedTasks().execute();
+
+        mAdapter = new BitListArrayAdapter(getActivity(), new ArrayList<Task>());
+        mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
+        mBitsListView.setAdapter(mAnimateDismissAdapter);
+        mAnimateDismissAdapter.setAbsListView(mBitsListView);
+        mAdapter.setLimit(1);
+
+
+        mBitsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, final View view, int position, long id) {
+
+                final ViewSwitcher viewSwitcher = (ViewSwitcher) view.findViewById(R.id.card_viewswitcher);
+                viewSwitcher.showNext();
+
+                new Handler().postDelayed(new Runnable() {
+                    public void run() {
+                        if (viewSwitcher.getDisplayedChild() == CARD_ACTION) {
+                            viewSwitcher.setDisplayedChild(CARD_INFO);
+                        }
+                    }
+                }, getResources().getInteger(R.integer.actionview_timeout));
+
+                return true;
+            }
+        });
+
+        mBitsListView.setSwipeListViewListener(new BaseSwipeListViewListener() {
+            @Override
+            public void onLeftChoiceAction(int position) {
+                if (mAdapter.isExpanded(position))
+                    mAdapter.toggle(position);
+                Task item = mAdapter.getItem(position);
+                tm.setSkipActionForTask(item);
+                saveState();
+                mAdapter.clear();
+                mAdapter.addAll(tm.getAllSortedTasks());
+                animateNewState();
+            }
+
+            @Override
+            public void onRightChoiceAction(int position) {
+                if (mAdapter.isExpanded(position))
+                    mAdapter.toggle(position);
+
+                Task item = mAdapter.getItem(position);
+                tm.setDoneActionForTask(item);
+                saveState();
+                mAdapter.clear();
+                mAdapter.addAll(tm.getAllSortedTasks());
+
+
+                animateNewState();
+            }
+
+        });
+
+        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
+        mSensorListener = new ShakeEventListener();
+
+        mSensorListener.setOnShakeListener(BitsListFragment.this);
+
+        mListReloader = new Runnable() {
+            @Override
+            public void run() {
+                new ReloadSortedTasks().execute();
+                mListRefresherHandle.postDelayed(mListReloader, REFRESH_PERIOD);
+            }
+        };
+
+        mSensorManager.registerListener(mSensorListener,
+                mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_UI);
+
+        startPeriodicRefresh();
+
+        return rootView;
+    }
+
+    @Override
+    public void onCreate(Bundle bundle) {
+        super.onCreate(bundle);
         /**
          * Data Loading
          */
-        tm = TaskManager.getInstance(this.getActivity().getApplicationContext());
+        setRetainInstance(true);
+        tm = TaskManager.getInstance(this.getActivity());
 
-        new GetAllSortedTasksTask().execute();
-
-
-        return rootView;
     }
 
     @Override
@@ -186,14 +269,6 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         }
     }
 
-    private void refreshBitsList() {
-        Log.d("periodic", "Refresh now");
-        saveState();
-        mAdapter.clear();
-        mAdapter.addAll(tm.getAllSortedTasks());
-        animateNewState();
-    }
-
     private void startPeriodicRefresh() {
         mListReloader.run();
     }
@@ -206,7 +281,9 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     @Override
     public void onPause() {
         super.onPause();
-        mSensorManager.unregisterListener(mSensorListener);
+        if (mSensorManager != null) {
+            mSensorManager.unregisterListener(mSensorListener);
+        }
         /**
          * Service Unbinding
          */
@@ -241,12 +318,6 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         return super.onOptionsItemSelected(item);
     }
 
-    public int dpToPx(int dp) {
-        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
-        return px;
-    }
-
     @Override
     public void onShake() {
         if (mUndoDialogDisplayed)
@@ -269,7 +340,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                     .append("</b>");
 
             TextView tv = new TextView(getActivity());
-            int padInPx = dpToPx(15);
+            int padInPx = Utils.dpToPx(15, getActivity());
             tv.setPadding(padInPx, padInPx, padInPx, padInPx);
             tv.setTextAppearance(getActivity(), android.R.style.TextAppearance_Holo_Large);
             tv.setText(Html.fromHtml(msgBulder.toString()), TextView.BufferType.SPANNABLE);
@@ -371,7 +442,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         LinearLayout globalLayout;
     }
 
-    private class GetAllSortedTasksTask extends AsyncTask<Void, Integer, List<Task>> {
+    private class ReloadSortedTasks extends AsyncTask<Void, Integer, List<Task>> {
         @Override
         protected List<Task> doInBackground(Void... voids) {
             return tm.getAllSortedTasks();
@@ -379,80 +450,10 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
         // This is called when doInBackground() is finished
         protected void onPostExecute(List<Task> result) {
-            mAdapter = new BitListArrayAdapter(getActivity().getApplicationContext(), result);
-            mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
-            mBitsListView.setAdapter(mAnimateDismissAdapter);
-            mAnimateDismissAdapter.setAbsListView(mBitsListView);
-            mAdapter.setLimit(1);
-
-
-            mBitsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                @Override
-                public boolean onItemLongClick(AdapterView<?> adapterView, final View view, int position, long id) {
-
-                    final ViewSwitcher viewSwitcher = (ViewSwitcher) view.findViewById(R.id.card_viewswitcher);
-                    viewSwitcher.showNext();
-
-                    new Handler().postDelayed(new Runnable() {
-                        public void run() {
-                            if (viewSwitcher.getDisplayedChild() == CARD_ACTION) {
-                                viewSwitcher.setDisplayedChild(CARD_INFO);
-                            }
-                        }
-                    }, getResources().getInteger(R.integer.actionview_timeout));
-
-                    return true;
-                }
-            });
-
-            mBitsListView.setSwipeListViewListener(new BaseSwipeListViewListener() {
-                @Override
-                public void onLeftChoiceAction(int position) {
-                    if (mAdapter.isExpanded(position))
-                        mAdapter.toggle(position);
-                    Task item = mAdapter.getItem(position);
-                    tm.setSkipActionForTask(item);
-                    saveState();
-                    mAdapter.clear();
-                    mAdapter.addAll(tm.getAllSortedTasks());
-                    animateNewState();
-                }
-
-                @Override
-                public void onRightChoiceAction(int position) {
-                    if (mAdapter.isExpanded(position))
-                        mAdapter.toggle(position);
-
-                    Task item = mAdapter.getItem(position);
-                    tm.setDoneActionForTask(item);
-                    saveState();
-                    mAdapter.clear();
-                    mAdapter.addAll(tm.getAllSortedTasks());
-
-
-                    animateNewState();
-                }
-
-            });
-
-            mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
-            mSensorListener = new ShakeEventListener();
-
-            mSensorListener.setOnShakeListener(BitsListFragment.this);
-
-            mListReloader = new Runnable() {
-                @Override
-                public void run() {
-                    refreshBitsList();
-                    mListRefresherHandle.postDelayed(mListReloader, REFRESH_PERIOD);
-                }
-            };
-
-            mSensorManager.registerListener(mSensorListener,
-                    mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                    SensorManager.SENSOR_DELAY_UI);
-
-            startPeriodicRefresh();
+            saveState();
+            mAdapter.clear();
+            mAdapter.addAll(result);
+            animateNewState();
         }
     }
 
