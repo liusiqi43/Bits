@@ -30,6 +30,7 @@ import java.util.List;
 
 import model.CategoryManager;
 import model.TaskManager;
+import utils.Utils;
 
 /**
  * Proudly powered by me on 5/17/14.
@@ -194,9 +195,9 @@ public class StatsPieChartFragment extends Fragment {
             });
             mChartViewContainer.addView(mChartView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
-            mRenderer.setMargins(new int[]{30, 30, 0, 20});
-            mRenderer.setChartTitleTextSize(60);
-            mRenderer.setLabelsTextSize(35);
+            mRenderer.setMargins(new int[]{Utils.dpToPx(10, getActivity()), Utils.dpToPx(10, getActivity()), Utils.dpToPx(5, getActivity()), Utils.dpToPx(5, getActivity())});
+            mRenderer.setChartTitleTextSize(Utils.dpToPx(20, getActivity()));
+            mRenderer.setLabelsTextSize(Utils.dpToPx(12, getActivity()));
             mRenderer.setLabelsColor(getResources().getColor(R.color.black));
             mRenderer.setShowLegend(false);
         } else {
