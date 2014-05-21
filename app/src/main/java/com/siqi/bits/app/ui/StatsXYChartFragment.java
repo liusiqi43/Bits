@@ -240,16 +240,16 @@ public class StatsXYChartFragment extends Fragment implements AdapterView.OnItem
 
         protected void setRendererProperties(XYMultipleSeriesRenderer renderer, int[] colors,
                                              PointStyle[] styles, BasicStroke[] strokes) {
-            renderer.setChartTitleTextSize(Utils.dpToPx(20, getActivity()));
-            renderer.setLabelsTextSize(Utils.dpToPx(12, getActivity()));
-            renderer.setLegendTextSize(Utils.dpToPx(12, getActivity()));
-            renderer.setPointSize(Utils.dpToPx(5, getActivity()));
-            renderer.setMargins(new int[]{Utils.dpToPx(10, getActivity()), Utils.dpToPx(10, getActivity()), Utils.dpToPx(5, getActivity()), Utils.dpToPx(5, getActivity())});
+            renderer.setChartTitleTextSize(Utils.dpToPx(20));
+            renderer.setLabelsTextSize(Utils.dpToPx(12));
+            renderer.setLegendTextSize(Utils.dpToPx(12));
+            renderer.setPointSize(Utils.dpToPx(5));
+            renderer.setMargins(new int[]{Utils.dpToPx(10), Utils.dpToPx(10), Utils.dpToPx(5), Utils.dpToPx(5)});
             renderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00));
             int length = colors.length;
             for (int i = 0; i < length; i++) {
                 XYSeriesRenderer r = new XYSeriesRenderer();
-                r.setLineWidth(Utils.dpToPx(2, getActivity()));
+                r.setLineWidth(Utils.dpToPx(2));
                 r.setFillPoints(true);
                 r.setColor(colors[i]);
                 r.setPointStyle(styles[i]);

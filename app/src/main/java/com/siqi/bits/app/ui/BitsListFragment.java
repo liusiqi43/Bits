@@ -232,6 +232,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         setRetainInstance(true);
         tm = TaskManager.getInstance(this.getActivity());
 
+
     }
 
     @Override
@@ -340,7 +341,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                     .append("</b>");
 
             TextView tv = new TextView(getActivity());
-            int padInPx = Utils.dpToPx(15, getActivity());
+            int padInPx = Utils.dpToPx(15);
             tv.setPadding(padInPx, padInPx, padInPx, padInPx);
             tv.setTextAppearance(getActivity(), android.R.style.TextAppearance_Holo_Large);
             tv.setText(Html.fromHtml(msgBulder.toString()), TextView.BufferType.SPANNABLE);

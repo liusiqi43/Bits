@@ -17,6 +17,8 @@ import com.siqi.bits.app.ui.BitsListFragment;
 import com.siqi.bits.app.ui.NewBitFragment;
 import com.siqi.bits.app.ui.StatsFragment;
 
+import utils.Utils;
+
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         NewBitFragment.OnNewBitInteractionListener, BitsListFragment.OnBitListInteractionListener {
@@ -51,6 +53,9 @@ public class MainActivity extends ActionBarActivity
 //        }
 
         super.onCreate(savedInstanceState);
+
+        Utils.mDisplayMetrics = getResources().getDisplayMetrics();
+
         setContentView(R.layout.activity_main);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)

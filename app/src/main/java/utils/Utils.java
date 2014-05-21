@@ -1,7 +1,7 @@
 package utils;
 
-import android.content.Context;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 
 /**
  * Proudly powered by me on 5/21/14.
@@ -10,9 +10,10 @@ import android.util.DisplayMetrics;
  * its fullness!
  */
 public class Utils {
-    public static int dpToPx(int dp, Context c) {
-        DisplayMetrics displayMetrics = c.getResources().getDisplayMetrics();
-        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+    public static DisplayMetrics mDisplayMetrics;
+
+    public static int dpToPx(int dp) {
+        int px = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, mDisplayMetrics));
         return px;
     }
 }

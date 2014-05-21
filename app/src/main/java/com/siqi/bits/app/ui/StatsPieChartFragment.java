@@ -195,9 +195,9 @@ public class StatsPieChartFragment extends Fragment {
             });
             mChartViewContainer.addView(mChartView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
-            mRenderer.setMargins(new int[]{Utils.dpToPx(10, getActivity()), Utils.dpToPx(10, getActivity()), Utils.dpToPx(5, getActivity()), Utils.dpToPx(5, getActivity())});
-            mRenderer.setChartTitleTextSize(Utils.dpToPx(20, getActivity()));
-            mRenderer.setLabelsTextSize(Utils.dpToPx(12, getActivity()));
+            mRenderer.setMargins(new int[]{Utils.dpToPx(10), Utils.dpToPx(10), Utils.dpToPx(5), Utils.dpToPx(5)});
+            mRenderer.setChartTitleTextSize(Utils.dpToPx(20));
+            mRenderer.setLabelsTextSize(Utils.dpToPx(12));
             mRenderer.setLabelsColor(getResources().getColor(R.color.black));
             mRenderer.setShowLegend(false);
         } else {
