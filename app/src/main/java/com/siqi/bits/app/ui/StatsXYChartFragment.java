@@ -3,6 +3,7 @@ package com.siqi.bits.app.ui;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,6 +98,7 @@ public class StatsXYChartFragment extends BaseFragment implements AdapterView.On
     }
 
     private void reloadGraph() {
+        Log.d("Charting", "reloadGraph()");
         List<ActionRecordManager.DateBurnratePair> items = arm.getActionRateForLastDays(mDisplayedAction, mLastDaysCount);
         if (!items.isEmpty()) {
             BurndownChart chart = new BurndownChart();

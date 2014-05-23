@@ -1,5 +1,6 @@
 package com.siqi.bits.app.ui;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -27,15 +28,18 @@ public class BaseFragment extends Fragment {
                 getView().setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
                 animation.setAnimationListener(new Animation.AnimationListener() {
+                    @SuppressLint("NewApi")
                     @Override
                     public void onAnimationStart(Animation animation) {
                         getView().setLayerType(View.LAYER_TYPE_NONE, null);
                     }
 
+                    @SuppressLint("NewApi")
                     public void onAnimationEnd(Animation animation) {
                         getView().setLayerType(View.LAYER_TYPE_NONE, null);
                     }
 
+                    @SuppressLint("NewApi")
                     @Override
                     public void onAnimationRepeat(Animation animation) {
                         getView().setLayerType(View.LAYER_TYPE_NONE, null);

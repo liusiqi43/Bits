@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -54,24 +55,42 @@ public class ReminderScheduleService extends Service {
     }
 
     public void scheduleForTask(Task t) {
-        if (t.getNextScheduledTime() < System.currentTimeMillis())
-            return;
+        new AsyncTask<Task, Void, Void>() {
+            @Override
+            protected Void doInBackground(Task... tasks) {
+                Task t = tasks[0];
+                if (t.getNextScheduledTime() < System.currentTimeMillis())
+                    return null;
 
-        Intent displayTaskIntent = new Intent(this, ReminderPublishReceiver.class);
-        displayTaskIntent.putExtra(TASK_ID, t.getId());
+                Intent displayTaskIntent = new Intent(ReminderScheduleService.this, ReminderPublishReceiver.class);
+                displayTaskIntent.putExtra(TASK_ID, t.getId());
 
-        PendingIntent displayIntent = PendingIntent.getBroadcast(this, t.getId().intValue(), displayTaskIntent, 0);
-        mAlarmManager.set(AlarmManager.RTC_WAKEUP, t.getNextScheduledTime() - REMINDER_DURATION, displayIntent);
-        Log.d("ReminderScheduleService", "Scheduling task:" + t.getDescription() + " on " + new Date(t.getNextScheduledTime() - REMINDER_DURATION).toString());
+                PendingIntent displayIntent = PendingIntent.getBroadcast(ReminderScheduleService.this, t.getId().intValue(), displayTaskIntent, 0);
+                mAlarmManager.set(AlarmManager.RTC_WAKEUP, t.getNextScheduledTime() - REMINDER_DURATION, displayIntent);
+                Log.d("ReminderScheduleService", "Scheduling task:" + t.getDescription() + " on " + new Date(t.getNextScheduledTime() - REMINDER_DURATION).toString());
+                return null;
+            }
+        }.execute(t);
     }
 
     public void unScheduleForTask(Task t) {
-        Intent displayTaskIntent = new Intent(this, ReminderPublishReceiver.class);
-        displayTaskIntent.putExtra(TASK_ID, t.getId());
+        new AsyncTask<Task, Void, Void>() {
+            @Override
+            protected Void doInBackground(Task... tasks) {
+                Task t = tasks[0];
 
-        PendingIntent displayIntent = PendingIntent.getBroadcast(this, t.getId().intValue(), displayTaskIntent, 0);
-        mAlarmManager.cancel(displayIntent);
-        Log.d("ReminderScheduleService", "Unscheduling task:" + t.getDescription() + " on " + new Date(t.getNextScheduledTime() - REMINDER_DURATION).toString());
+                Intent displayTaskIntent = new Intent(ReminderScheduleService.this, ReminderPublishReceiver.class);
+                displayTaskIntent.putExtra(TASK_ID, t.getId());
+
+                if (t.getId() == null) {
+                    Log.d("Debugging", "t.getId() is null!");
+                }
+                PendingIntent displayIntent = PendingIntent.getBroadcast(ReminderScheduleService.this, t.getId().intValue(), displayTaskIntent, 0);
+                mAlarmManager.cancel(displayIntent);
+                Log.d("ReminderScheduleService", "Unscheduling task:" + t.getDescription() + " on " + new Date(t.getNextScheduledTime() - REMINDER_DURATION).toString());
+                return null;
+            }
+        }.execute(t);
     }
 
     /**
@@ -90,7 +109,6 @@ public class ReminderScheduleService extends Service {
     public void onCreate() {
         super.onCreate();
         mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-
         scheduleAllAlarms();
     }
 

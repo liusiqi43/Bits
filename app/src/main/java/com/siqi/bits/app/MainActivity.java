@@ -94,11 +94,7 @@ public class MainActivity extends ActionBarActivity
                 transaction.addToBackStack(AchievementsFragment.class.getName());
                 break;
             case StatsFragment.FRAGMENT_ID:
-                dest = fragmentManager.findFragmentByTag(StatsFragment.class.getName());
-                if (dest == null) {
-                    Log.d("TRANSACTION", "instanciating new fragment");
-                    dest = StatsFragment.newInstance();
-                }
+                dest = StatsFragment.newInstance();
                 transaction.replace(R.id.container, dest, StatsFragment.class.getName());
                 transaction.addToBackStack(StatsFragment.class.getName());
                 break;
@@ -138,6 +134,12 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onBackPressed() {
+        if (mCurrentSectionID == NewBitFragment.FRAGMENT_ID) {
+            onSectionAttached(BitsListFragment.FRAGMENT_ID);
+            super.onBackPressed();
+            return;
+        }
+
         if (doubleBackToExitPressedOnce) {
             finish();
             return;
@@ -156,8 +158,7 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()
-                && mCurrentSectionID != NewBitFragment.FRAGMENT_ID) {
+        if (!mNavigationDrawerFragment.isDrawerOpen()) {
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.

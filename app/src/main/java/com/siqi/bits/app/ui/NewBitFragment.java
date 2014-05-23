@@ -234,7 +234,7 @@ public class NewBitFragment extends BaseFragment {
                     tm.insertTask(mTask);
                 } catch (TaskManager.DuplicatedTaskException e) {
                     mBitTitleEditText.setError(getString(R.string.duplicated_title_error));
-                    e.printStackTrace();
+                    return true;
                 }
             }
 

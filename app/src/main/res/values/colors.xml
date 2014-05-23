@@ -32,7 +32,8 @@
     <color name="editColor">@color/BelizeHole</color>
     <color name="deleteColor">@color/Pomegranate</color>
 
-    <color name="achievement_stat_bg">#EAEAEA</color>
+    <color name="base_fragment_bg">#EAEAEA</color>
+    <color name="card_content_bg">@color/WetAsphalt</color>
 
     <color name="radiobutton_inactive">@android:color/transparent</color>
 

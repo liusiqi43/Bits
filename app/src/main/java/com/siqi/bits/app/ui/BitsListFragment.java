@@ -145,11 +145,10 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         View rootView = inflater.inflate(R.layout.bitslist_fragment, container, false);
         mBitsListView = (SwipeListView) rootView.findViewById(R.id.bitslist);
 
-        new ReloadSortedTasks().execute();
-
         mAdapter = new BitListArrayAdapter(getActivity(), mBits);
         mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
         SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAnimateDismissAdapter);
+
         mBitsListView.setAdapter(swingBottomInAnimationAdapter);
         swingBottomInAnimationAdapter.setAbsListView(mBitsListView);
         mAdapter.setLimit(1);
@@ -226,8 +225,6 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
          */
         setRetainInstance(true);
         tm = TaskManager.getInstance(this.getActivity());
-
-
     }
 
     @Override
@@ -444,10 +441,10 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
         // This is called when doInBackground() is finished
         protected void onPostExecute(List<Task> result) {
-//            saveState();
+            saveState();
             mAdapter.clear();
             mAdapter.addAll(result);
-//            animateNewState();
+            animateNewState();
         }
     }
 

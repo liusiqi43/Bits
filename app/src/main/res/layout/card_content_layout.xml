@@ -2,99 +2,100 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/WetAsphalt"
-    android:padding="5dp"
     android:id="@+id/card_content_global_layout"
-    android:layout_gravity="center">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="@color/card_content_bg"
+    android:orientation="vertical"
+    android:padding="5dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLargeInverse"
-        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="20dp"
         android:text="@string/done_on_time_rate"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="20dp" />
+        android:textAppearance="?android:attr/textAppearanceLargeInverse"
+        android:textStyle="bold" />
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_gravity="center"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal"
         android:padding="10dp">
 
         <TextView
             android:layout_width="0dp"
-            android:layout_weight="5"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLargeInverse"
-            android:text="For this activity"/>
+            android:layout_weight="5"
+            android:text="For this activity"
+            android:textAppearance="?android:attr/textAppearanceLargeInverse" />
 
         <TextView
+            android:id="@+id/bit_done_rate"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="2"
             android:gravity="right"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLargeInverse"
-            android:textSize="@dimen/large_text"
             android:text="85%"
-            android:id="@+id/bit_done_rate"
             android:textAlignment="gravity"
-            android:textColor="@color/Emerald"/>
+            android:textAppearance="?android:attr/textAppearanceLargeInverse"
+            android:textColor="@color/Emerald"
+            android:textSize="@dimen/large_text" />
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_gravity="center"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal"
         android:padding="10dp">
 
         <TextView
             android:layout_width="0dp"
-            android:layout_weight="5"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLargeInverse"
-            android:text="For everything else"/>
+            android:layout_weight="5"
+            android:text="For everything else"
+            android:textAppearance="?android:attr/textAppearanceLargeInverse" />
 
         <TextView
+            android:id="@+id/others_done_rate"
             android:layout_width="0dp"
-            android:layout_weight="2"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLargeInverse"
-            android:textSize="@dimen/large_text"
+            android:layout_weight="2"
             android:gravity="right"
             android:text="85%"
-            android:id="@+id/others_done_rate"
             android:textAlignment="gravity"
-            android:textColor="@color/Emerald"/>
+            android:textAppearance="?android:attr/textAppearanceLargeInverse"
+            android:textColor="@color/Emerald"
+            android:textSize="@dimen/large_text" />
     </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
         android:layout_gravity="center_horizontal"
+        android:layout_margin="15dp"
+        android:text="Timeline for this activity"
         android:textAppearance="?android:attr/textAppearanceLargeInverse"
-        android:textStyle="bold"
-        android:text="Timeline for this activity"/>
+        android:textStyle="bold" />
 
     <views.ExpandingGridView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/timeline_gridview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:columnWidth="15dp"
-        android:numColumns="auto_fit"
-        android:verticalSpacing="1dp"
-        android:paddingRight="20dp"
-        android:paddingLeft="20dp"
-        android:paddingBottom="20dp"
-        android:horizontalSpacing="1dp"
         android:gravity="center"
-        tools:listitem="@android:layout/simple_list_item_1"
+        android:horizontalSpacing="1dp"
+        android:numColumns="auto_fit"
+        android:paddingBottom="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:scrollingCache="true"
         android:stretchMode="spacingWidthUniform"
-        android:scrollingCache="true"/>
+        android:verticalSpacing="1dp"
+        tools:listitem="@android:layout/simple_list_item_1" />
 
 </LinearLayout>

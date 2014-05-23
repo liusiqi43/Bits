@@ -24,12 +24,18 @@ public class StatsFragment extends BaseFragment {
     ViewPager mViewPager;
 
     public StatsFragment() {
-        setRetainInstance(true);
     }
 
     public static StatsFragment newInstance() {
         StatsFragment fragment = new StatsFragment();
         return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstance) {
+        super.onCreate(savedInstance);
+
+        setRetainInstance(true);
     }
 
     @Override

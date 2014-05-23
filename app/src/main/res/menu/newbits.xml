@@ -3,13 +3,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.siqi.bits.app.MainActivity" >
-    <item android:id="@+id/action_save"
+    tools:context="com.siqi.bits.app.MainActivity">
+    <item
+        android:id="@+id/action_save"
         android:icon="@drawable/ic_action_done"
         android:title="@string/actionbar_save"
         app:showAsAction="withText|ifRoom" />
-    <item android:id="@+id/action_cancel"
+    <item
+        android:id="@+id/action_cancel"
         android:icon="@drawable/ic_action_cancel"
         android:title="@string/actionbar_cancel"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="withText|ifRoom" />
 </menu>
