@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -134,48 +135,10 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     }
 
     @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-
-        if (hidden) {
-            if (mSensorManager != null) {
-                mSensorManager.unregisterListener(mSensorListener);
-            }
-            /**
-             * Service Unbinding
-             */
-            doUnbindService();
-
-            /**
-             * UI refresher stops here
-             */
-            stopPeriodicRefresh();
-        } else {
-//            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
-            if (mSensorManager != null) {
-                mSensorManager.registerListener(mSensorListener,
-                        mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                        SensorManager.SENSOR_DELAY_UI);
-            }
-            /**
-             * Service binding
-             */
-            doBindService();
-
-            /**
-             * UI refresher start
-             */
-            if (mListReloader != null) {
-                startPeriodicRefresh();
-            }
-        }
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-//        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         /**
          * View Binding
          */

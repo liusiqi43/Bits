@@ -3,6 +3,7 @@ package com.siqi.bits.app;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -12,13 +13,12 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.siqi.bits.app.ui.AchievementsFragment;
 import com.siqi.bits.app.ui.BitsListFragment;
 import com.siqi.bits.app.ui.NewBitFragment;
 import com.siqi.bits.app.ui.StatsFragment;
-
-import java.util.HashMap;
 
 import utils.Utils;
 
@@ -37,16 +37,7 @@ public class MainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
     private int mCurrentSectionID = -1;
-    private HashMap<String, Fragment> mCachedFragments = new HashMap<String, Fragment>();
-    private Fragment mCurrentFragment = null;
-
-//    @Override
-//    protected void () {
-//        super.onDestroy();
-//        // update the main content by replacing fragments
-//
-//        Log.d("TRANSACTION", "Destroyed");
-//    }
+    private boolean doubleBackToExitPressedOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,19 +54,6 @@ public class MainActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
-
-//        if (savedInstanceState != null) {
-//            Log.d("TRANSACTION", "savedInstance!=null");
-//            // update the main content by replacing fragments
-//            FragmentManager fragmentManager = getSupportFragmentManager();
-//
-//            mCachedFragments.put(BitsListFragment.class.getName(), fragmentManager.getFragment(savedInstanceState, BitsListFragment.class.getName()));
-//            mCachedFragments.put(AchievementsFragment.class.getName(), fragmentManager.getFragment(savedInstanceState, AchievementsFragment.class.getName()));
-//            mCachedFragments.put(StatsFragment.class.getName(), fragmentManager.getFragment(savedInstanceState, StatsFragment.class.getName()));
-//
-//            mCurrentFragment = mCachedFragments.get(savedInstanceState.getString(CURRENT_FRAGMENT));
-//            mCurrentSectionID = savedInstanceState.getInt(CURRENT_FRAGMENT_ID);
-//        }
     }
 
     @Override
@@ -87,39 +65,6 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle bundle) {
-        super.onSaveInstanceState(bundle);
-//
-//        // update the main content by replacing fragments
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//
-//        fragmentManager.beginTransaction().remove(mCachedFragments.get(BitsListFragment.class.getName())).commit();
-//        fragmentManager.beginTransaction().remove(mCachedFragments.get(AchievementsFragment.class.getName())).commit();
-//        fragmentManager.beginTransaction().remove(mCachedFragments.get(StatsFragment.class.getName())).commit();
-//
-//
-//        if (mCachedFragments.get(BitsListFragment.class.getName()) != null)
-//            fragmentManager.putFragment(bundle, BitsListFragment.class.getName(), mCachedFragments.get(BitsListFragment.class.getName()));
-//        if (mCachedFragments.get(AchievementsFragment.class.getName()) != null)
-//            fragmentManager.putFragment(bundle, AchievementsFragment.class.getName(), mCachedFragments.get(AchievementsFragment.class.getName()));
-//        if (mCachedFragments.get(StatsFragment.class.getName()) != null)
-//            fragmentManager.putFragment(bundle, StatsFragment.class.getName(), mCachedFragments.get(StatsFragment.class.getName()));
-//
-//        if (mCurrentFragment != null)
-//            bundle.putString(CURRENT_FRAGMENT, mCurrentFragment.getClass().getName());
-//
-//        bundle.putInt(CURRENT_FRAGMENT_ID, mCurrentSectionID);
-
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        Fragment f = fragmentManager.findFragmentById(R.id.container);
-//        while (f != null) {
-//            Log.d("TRANSACTION", "remove " + f.getClass().getName());
-//            fragmentManager.beginTransaction().(f).commitAllowingStateLoss();
-//            f = fragmentManager.findFragmentById(R.id.container);
-//        }
-    }
-
-    @Override
     public void onNavigationDrawerItemSelected(int position) {
         if (position == mCurrentSectionID)
             return;
@@ -128,55 +73,39 @@ public class MainActivity extends ActionBarActivity
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
 
-        if (mCurrentFragment != null) {
-            Log.d("TRANSACTION", "putting fragment " + mCurrentFragment.getClass().getName());
-            mCachedFragments.put(mCurrentFragment.getClass().getName(), mCurrentFragment);
-            transaction.hide(mCurrentFragment);
-        }
-        Log.d("Nav", "selected: " + position);
-
-        Fragment dest = null;
+        Fragment dest;
         switch (position) {
             case BitsListFragment.FRAGMENT_ID:
-                dest = mCachedFragments.get(BitsListFragment.class.getName());
+                dest = fragmentManager.findFragmentByTag(BitsListFragment.class.getName());
                 if (dest == null) {
+                    Log.d("TRANSACTION", "instanciating new fragment");
                     dest = BitsListFragment.newInstance();
-                    transaction
-                            .add(R.id.container, dest);
-                } else {
-                    Log.d("TRANSACTION", "bitlist retrieved");
-                    transaction.show(dest);
                 }
-                onSectionAttached(BitsListFragment.FRAGMENT_ID);
+                transaction.replace(R.id.container, dest, BitsListFragment.class.getName());
+                transaction.addToBackStack(BitsListFragment.class.getName());
                 break;
             case AchievementsFragment.FRAGMENT_ID:
-                dest = mCachedFragments.get(AchievementsFragment.class.getName());
+                dest = fragmentManager.findFragmentByTag(AchievementsFragment.class.getName());
                 if (dest == null) {
+                    Log.d("TRANSACTION", "instanciating new fragment");
                     dest = AchievementsFragment.newInstance();
-                    transaction
-                            .add(R.id.container, dest);
-                } else {
-                    Log.d("TRANSACTION", "achievements retrieved");
-                    transaction.show(dest);
                 }
-                onSectionAttached(AchievementsFragment.FRAGMENT_ID);
+                transaction.replace(R.id.container, dest, AchievementsFragment.class.getName());
+                transaction.addToBackStack(AchievementsFragment.class.getName());
                 break;
             case StatsFragment.FRAGMENT_ID:
-                dest = mCachedFragments.get(StatsFragment.class.getName());
+                dest = fragmentManager.findFragmentByTag(StatsFragment.class.getName());
                 if (dest == null) {
+                    Log.d("TRANSACTION", "instanciating new fragment");
                     dest = StatsFragment.newInstance();
-                    transaction
-                            .add(R.id.container, dest);
-                } else {
-                    Log.d("TRANSACTION", "stats retrieved");
-                    transaction.show(dest);
                 }
-                onSectionAttached(StatsFragment.FRAGMENT_ID);
+                transaction.replace(R.id.container, dest, StatsFragment.class.getName());
+                transaction.addToBackStack(StatsFragment.class.getName());
                 break;
         }
 
-        mCurrentFragment = dest;
         transaction.commit();
+        onSectionAttached(position);
     }
 
     // set main activity title correctly
@@ -207,6 +136,23 @@ public class MainActivity extends ActionBarActivity
         actionBar.setTitle(mTitle);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            finish();
+            return;
+        }
+
+        doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Click BACK again to quit", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+            }
+        }, 2000);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
