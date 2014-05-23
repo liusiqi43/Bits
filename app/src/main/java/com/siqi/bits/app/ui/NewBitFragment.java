@@ -2,11 +2,9 @@ package com.siqi.bits.app.ui;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,7 +36,7 @@ import utils.BitmapProcessor;
 import views.ExpandingGridView;
 
 
-public class NewBitFragment extends Fragment {
+public class NewBitFragment extends BaseFragment {
     public static final int FRAGMENT_ID = 9;
     private static final String EDITING_BIT_ID = "bit_id";
 
@@ -105,7 +103,7 @@ public class NewBitFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+//        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         View v = inflater.inflate(R.layout.new_bit_fragment, container, false);
         setHasOptionsMenu(true);
 

@@ -1,6 +1,5 @@
 package com.siqi.bits.app.ui;
 
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,7 +17,7 @@ import com.siqi.bits.app.R;
  * A tool that helps you to architect your life to
  * its fullness!
  */
-public class StatsFragment extends Fragment {
+public class StatsFragment extends BaseFragment {
     public final static int FRAGMENT_ID = 2;
 
     ViewPager mViewPager;
@@ -33,8 +32,15 @@ public class StatsFragment extends Fragment {
     }
 
     @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+//        if (!hidden)
+//            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         View root = inflater.inflate(R.layout.stats_fragment_layout, container, false);
 

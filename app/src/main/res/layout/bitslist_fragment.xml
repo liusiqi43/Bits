@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:tag="bitslist_fragment"
     tools:context="com.siqi.bits.app.MainActivity$PlaceholderFragment">
 
     <com.siqi.bits.swipelistview.SwipeListView xmlns:swipe="http://schemas.android.com/apk/res-auto"

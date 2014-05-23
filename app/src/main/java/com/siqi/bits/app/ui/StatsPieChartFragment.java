@@ -2,7 +2,6 @@ package com.siqi.bits.app.ui;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -38,7 +37,7 @@ import utils.Utils;
  * A tool that helps you to architect your life to
  * its fullness!
  */
-public class StatsPieChartFragment extends Fragment {
+public class StatsPieChartFragment extends BaseFragment {
 
     /**
      * Colors to be used for the pie slices.

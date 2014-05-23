@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -15,7 +14,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.app.Fragment;
 import android.support.v4.util.LruCache;
 import android.text.Html;
 import android.util.Log;
@@ -46,6 +44,7 @@ import android.widget.ViewSwitcher;
 import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
+import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 import com.siqi.bits.ActionRecord;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.MainActivity;
@@ -71,7 +70,7 @@ import utils.Utils;
  * A tool that helps you to architect your life to
  * its fullness!
  */
-public class BitsListFragment extends Fragment implements ShakeEventListener.OnShakeListener {
+public class BitsListFragment extends BaseFragment implements ShakeEventListener.OnShakeListener {
     public static final int FRAGMENT_ID = 0;
 
     public static final int CARD_INFO = 0;
@@ -106,6 +105,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     Runnable mListReloader;
     Handler mListRefresherHandle = new Handler();
 
+    List<Task> mBits = new ArrayList<Task>();
+
     public BitsListFragment() {
     }
 
@@ -133,10 +134,48 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     }
 
     @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+
+        if (hidden) {
+            if (mSensorManager != null) {
+                mSensorManager.unregisterListener(mSensorListener);
+            }
+            /**
+             * Service Unbinding
+             */
+            doUnbindService();
+
+            /**
+             * UI refresher stops here
+             */
+            stopPeriodicRefresh();
+        } else {
+//            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+            if (mSensorManager != null) {
+                mSensorManager.registerListener(mSensorListener,
+                        mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                        SensorManager.SENSOR_DELAY_UI);
+            }
+            /**
+             * Service binding
+             */
+            doBindService();
+
+            /**
+             * UI refresher start
+             */
+            if (mListReloader != null) {
+                startPeriodicRefresh();
+            }
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+//        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         /**
          * View Binding
          */
@@ -145,10 +184,11 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
         new ReloadSortedTasks().execute();
 
-        mAdapter = new BitListArrayAdapter(getActivity(), new ArrayList<Task>());
+        mAdapter = new BitListArrayAdapter(getActivity(), mBits);
         mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
-        mBitsListView.setAdapter(mAnimateDismissAdapter);
-        mAnimateDismissAdapter.setAbsListView(mBitsListView);
+        SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAnimateDismissAdapter);
+        mBitsListView.setAdapter(swingBottomInAnimationAdapter);
+        swingBottomInAnimationAdapter.setAbsListView(mBitsListView);
         mAdapter.setLimit(1);
 
 
@@ -178,10 +218,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                     mAdapter.toggle(position);
                 Task item = mAdapter.getItem(position);
                 tm.setSkipActionForTask(item);
-                saveState();
-                mAdapter.clear();
-                mAdapter.addAll(tm.getAllSortedTasks());
-                animateNewState();
+                new ReloadSortedTasks().execute();
             }
 
             @Override
@@ -191,12 +228,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
                 Task item = mAdapter.getItem(position);
                 tm.setDoneActionForTask(item);
-                saveState();
-                mAdapter.clear();
-                mAdapter.addAll(tm.getAllSortedTasks());
-
-
-                animateNewState();
+                new ReloadSortedTasks().execute();
             }
 
         });
@@ -351,10 +383,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     tm.removeActionRecordById(record.getId());
-                    saveState();
-                    mAdapter.clear();
-                    mAdapter.addAll(tm.getAllSortedTasks());
-                    animateNewState();
+                    new ReloadSortedTasks().execute();
                     dialog.cancel();
                     mUndoDialogDisplayed = false;
                 }
@@ -446,15 +475,16 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     private class ReloadSortedTasks extends AsyncTask<Void, Integer, List<Task>> {
         @Override
         protected List<Task> doInBackground(Void... voids) {
-            return tm.getAllSortedTasks();
+            mBits = tm.getAllSortedTasks();
+            return mBits;
         }
 
         // This is called when doInBackground() is finished
         protected void onPostExecute(List<Task> result) {
-            saveState();
+//            saveState();
             mAdapter.clear();
             mAdapter.addAll(result);
-            animateNewState();
+//            animateNewState();
         }
     }
 
