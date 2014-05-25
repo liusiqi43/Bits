@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.siqi.bits.app.R;
+import com.viewpagerindicator.TabPageIndicator;
 
 /**
  * Proudly powered by me on 5/15/14.
@@ -48,8 +49,11 @@ public class StatsFragment extends BaseFragment {
          * UI binding
          */
         mViewPager = (ViewPager) root.findViewById(R.id.view_pager);
-        /** Important: Must use the child FragmentManager or you will see side effects. */
         mViewPager.setAdapter(new StatsViewPagerAdapter(getChildFragmentManager()));
+
+        //Bind the title indicator to the adapter
+        TabPageIndicator titleIndicator = (TabPageIndicator) root.findViewById(R.id.pager_indicator);
+        titleIndicator.setViewPager(mViewPager);
 
         return root;
     }

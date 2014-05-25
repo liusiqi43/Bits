@@ -6,20 +6,16 @@
     android:orientation="vertical"
     android:tag="stats_fragment">
 
+    <com.viewpagerindicator.TabPageIndicator
+        android:id="@+id/pager_indicator"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/MidnightBlue" />
+
     <android.support.v4.view.ViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <android.support.v4.view.PagerTabStrip
-            android:id="@+id/pagerTabStrip"
-            android:layout_width="fill_parent"
-            android:layout_height="40dp"
-            android:layout_gravity="top"
-            android:background="@color/MidnightBlue"
-            android:paddingBottom="4dp"
-            android:paddingTop="4dp"
-            android:textAppearance="@style/PagerTabStripText"></android.support.v4.view.PagerTabStrip>
-    </android.support.v4.view.ViewPager>
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
 </LinearLayout>
