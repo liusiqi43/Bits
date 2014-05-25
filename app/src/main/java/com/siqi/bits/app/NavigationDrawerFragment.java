@@ -134,7 +134,7 @@ public class NavigationDrawerFragment extends BaseFragment {
      * @param fragmentId   The android:id of this fragment in its activity's layout.
      * @param drawerLayout The DrawerLayout containing this fragment's UI.
      */
-    public void setUp(int fragmentId, DrawerLayout drawerLayout) {
+    public void setUp(int fragmentId, final DrawerLayout drawerLayout) {
         mFragmentContainerView = getActivity().findViewById(fragmentId);
         mDrawerLayout = drawerLayout;
 
@@ -182,6 +182,13 @@ public class NavigationDrawerFragment extends BaseFragment {
                 }
 
                 getActivity().supportInvalidateOptionsMenu(); // calls onPrepareOptionsMenu()
+            }
+
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                super.onDrawerSlide(drawerView, slideOffset);
+
+                mCallbacks.onDrawerSlide(drawerView, slideOffset);
             }
         };
 
@@ -293,6 +300,8 @@ public class NavigationDrawerFragment extends BaseFragment {
          * Called when an item in the navigation drawer is selected.
          */
         void onNavigationDrawerItemSelected(int position);
+
+        void onDrawerSlide(View drawerView, float slideOffset);
     }
 
 

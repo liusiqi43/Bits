@@ -24,9 +24,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.AbsListView;
@@ -54,11 +54,12 @@ import com.siqi.bits.swipelistview.BaseSwipeListViewListener;
 import com.siqi.bits.swipelistview.SwipeListView;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import model.TaskManager;
 import service.ReminderScheduleService;
@@ -80,9 +81,10 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     SwipeListView mBitsListView;
     BitListArrayAdapter mAdapter;
     AnimateDismissAdapter mAnimateDismissAdapter;
+    SwingBottomInAnimationAdapter mSwingBottomInAnimationAdapter;
     // Reordering animation
-    HashMap<Task, Integer> mSavedState = new HashMap<Task, Integer>();
-    Interpolator mInterpolator = new AccelerateDecelerateInterpolator();
+    HashMap<Long, Integer> mSavedState = new HashMap<Long, Integer>();
+    Interpolator mInterpolator = new DecelerateInterpolator();
     TaskManager tm;
     SensorManager mSensorManager;
     ShakeEventListener mSensorListener;
@@ -106,7 +108,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     Runnable mListReloader;
     Handler mListRefresherHandle = new Handler();
 
-    List<Task> mBits = new ArrayList<Task>();
+//    List<Task> mBits = new ArrayList<Task>();
 
     public BitsListFragment() {
     }
@@ -145,12 +147,8 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         View rootView = inflater.inflate(R.layout.bitslist_fragment, container, false);
         mBitsListView = (SwipeListView) rootView.findViewById(R.id.bitslist);
 
-        mAdapter = new BitListArrayAdapter(getActivity(), mBits);
-        mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
-        SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAnimateDismissAdapter);
-
-        mBitsListView.setAdapter(swingBottomInAnimationAdapter);
-        swingBottomInAnimationAdapter.setAbsListView(mBitsListView);
+        mBitsListView.setAdapter(mSwingBottomInAnimationAdapter);
+        mSwingBottomInAnimationAdapter.setAbsListView(mBitsListView);
         mAdapter.setLimit(1);
 
 
@@ -180,7 +178,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                     mAdapter.toggle(position);
                 Task item = mAdapter.getItem(position);
                 tm.setSkipActionForTask(item);
-                new ReloadSortedTasks().execute();
+                new RearrangeTasks().execute();
             }
 
             @Override
@@ -190,7 +188,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
                 Task item = mAdapter.getItem(position);
                 tm.setDoneActionForTask(item);
-                new ReloadSortedTasks().execute();
+                new RearrangeTasks().execute();
             }
 
         });
@@ -225,6 +223,10 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
          */
         setRetainInstance(true);
         tm = TaskManager.getInstance(this.getActivity());
+
+        mAdapter = new BitListArrayAdapter(getActivity(), null);
+        mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
+        mSwingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAnimateDismissAdapter);
     }
 
     @Override
@@ -343,7 +345,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     tm.removeActionRecordById(record.getId());
-                    new ReloadSortedTasks().execute();
+                    new RearrangeTasks().execute();
                     dialog.cancel();
                     mUndoDialogDisplayed = false;
                 }
@@ -363,23 +365,21 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
     private void saveState() {
         mSavedState.clear();
-
         int first = mBitsListView.getFirstVisiblePosition();
         int last = mBitsListView.getLastVisiblePosition();
         for (int i = 0; i < mAdapter.size(); i++) {
             if (i >= first && i <= last) {
                 View v = mBitsListView.getChildAt(i - first);
                 int top = v.getTop();
-                int dataIdx = i;
-                Task dataId = mAdapter.get(dataIdx);
+                long dataId = mAdapter.getItem(i).getId();
                 mSavedState.put(dataId, top);
             } else if (i < first) {
                 int top = mBitsListView.getTop() - mBitsListView.getHeight() / 2;
-                Task dataId = mAdapter.get(i);
+                long dataId = mAdapter.getItem(i).getId();
                 mSavedState.put(dataId, top);
             } else if (i > last) {
                 int top = mBitsListView.getBottom() + mBitsListView.getHeight() / 2;
-                Task dataId = mAdapter.get(i);
+                long dataId = mAdapter.getItem(i).getId();
                 mSavedState.put(dataId, top);
             }
         }
@@ -387,8 +387,14 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
             View v = mBitsListView.getChildAt(i);
             int top = v.getTop();
             int dataIdx = first + i;
-            Task dataId = mAdapter.get(dataIdx);
+            long dataId = mAdapter.getItem(dataIdx).getId();
             mSavedState.put(dataId, top);
+        }
+
+        Iterator it = mSavedState.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<Long, Integer> entry = (Map.Entry<Long, Integer>) it.next();
+            Log.d("ANIMATION", "saving : " + tm.getTask(entry.getKey()).getDescription() + ":" + entry.getValue());
         }
     }
 
@@ -397,15 +403,17 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         int last = mBitsListView.getLastVisiblePosition();
         for (int i = 0; i < mBitsListView.getChildCount(); i++) {
             int dataIdx = first + i;
-            Task dataId = mAdapter.get(dataIdx);
+            long dataId = mAdapter.getItem(dataIdx).getId();
             if (mSavedState.containsKey(dataId)) {
                 View v = mBitsListView.getChildAt(i);
                 int top = v.getTop();
+                Log.d("ANIMATION", "loading : " + tm.getTask(dataId).getDescription() + ":" + top);
                 int oldTop = mSavedState.get(dataId);
                 int hDiff = top - oldTop;
                 TranslateAnimation anim = new TranslateAnimation(0, 0, -hDiff, 0);
+                Log.d("ANIMATION", "moving : " + tm.getTask(dataId).getDescription() + ":" + (-hDiff));
                 anim.setInterpolator(mInterpolator);
-                anim.setDuration(330);
+                anim.setDuration(300);
                 v.startAnimation(anim);
             }
         }
@@ -432,18 +440,34 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         LinearLayout globalLayout;
     }
 
+    private class RearrangeTasks extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            saveState();
+            mAdapter.sort();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void v) {
+            mAdapter.notifyDataSetChanged();
+            animateNewState();
+        }
+    }
+
     private class ReloadSortedTasks extends AsyncTask<Void, Integer, List<Task>> {
         @Override
         protected List<Task> doInBackground(Void... voids) {
-            mBits = tm.getAllSortedTasks();
-            return mBits;
+            Log.d("ListView anim", "Reloading now");
+            saveState();
+            return tm.getAllSortedTasks();
         }
 
         // This is called when doInBackground() is finished
-        protected void onPostExecute(List<Task> result) {
-            saveState();
+        protected void onPostExecute(List<Task> l) {
             mAdapter.clear();
-            mAdapter.addAll(result);
+            mAdapter.addAll(l);
             animateNewState();
         }
     }
@@ -673,6 +697,11 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
             }
 
             return v;
+        }
+
+        public void sort() {
+            TaskManager.mBitsComparator.reset();
+            Collections.sort(mItems, TaskManager.mBitsComparator);
         }
 
     }

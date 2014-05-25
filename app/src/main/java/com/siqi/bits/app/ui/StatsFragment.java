@@ -44,6 +44,9 @@ public class StatsFragment extends BaseFragment {
 
         View root = inflater.inflate(R.layout.stats_fragment_layout, container, false);
 
+        /**
+         * UI binding
+         */
         mViewPager = (ViewPager) root.findViewById(R.id.view_pager);
         /** Important: Must use the child FragmentManager or you will see side effects. */
         mViewPager.setAdapter(new StatsViewPagerAdapter(getChildFragmentManager()));

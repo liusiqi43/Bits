@@ -13,8 +13,10 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
+import com.nineoldandroids.view.ViewHelper;
 import com.siqi.bits.app.ui.AchievementsFragment;
 import com.siqi.bits.app.ui.BitsListFragment;
 import com.siqi.bits.app.ui.NewBitFragment;
@@ -26,8 +28,6 @@ public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         NewBitFragment.OnNewBitInteractionListener, BitsListFragment.OnBitListInteractionListener {
 
-    private static final String CURRENT_FRAGMENT = "CURRENT_FRAGMENT";
-    private static final String CURRENT_FRAGMENT_ID = "CURRENT_FRAGMENT_ID";
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -39,12 +39,15 @@ public class MainActivity extends ActionBarActivity
     private int mCurrentSectionID = -1;
     private boolean doubleBackToExitPressedOnce = false;
 
+    private View mContainerView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Utils.mDisplayMetrics = getResources().getDisplayMetrics();
 
         setContentView(R.layout.activity_main);
+        mContainerView = findViewById(R.id.container);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -71,7 +74,7 @@ public class MainActivity extends ActionBarActivity
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+        transaction.setCustomAnimations(R.anim.zoom_out_fade_in, R.anim.zoom_in_fade_out);
 
         Fragment dest;
         switch (position) {
@@ -102,6 +105,12 @@ public class MainActivity extends ActionBarActivity
 
         transaction.commit();
         onSectionAttached(position);
+    }
+
+    @Override
+    public void onDrawerSlide(View drawerView, float slideOffset) {
+        ViewHelper.setScaleX(mContainerView, 1 - slideOffset / 20);
+        ViewHelper.setScaleY(mContainerView, 1 - slideOffset / 20);
     }
 
     // set main activity title correctly

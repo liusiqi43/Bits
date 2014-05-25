@@ -47,6 +47,7 @@ public class TaskManager {
     public static final int ACTION_TYPE_SKIP = 2;
     public static final int ACTION_TYPE_LATE = 3;
     public static final int ACTION_TYPE_ANY = 4;
+    public static CachedComparator mBitsComparator;
     private static TaskManager INSTANCE = null;
     private SQLiteDatabase mDB;
     private DaoMaster mDaoMaster;
@@ -55,15 +56,11 @@ public class TaskManager {
     private ActionRecordDao mActionRecordDao;
     private PrettyTime mPrettyTime;
     private Context mContext;
-
     private ArrayList<String> mDoneSlogans = new ArrayList<String>();
     private ArrayList<String> mSkipSlogans = new ArrayList<String>();
     private Random mRandomiser;
     private ReminderScheduleService mScheduleService = null;
-
     private Toast actionFinishedToast = null;
-
-    private List<Task> cachedSortedTasks = null;
 
     private TaskManager(Context ctx) {
         /**
@@ -104,6 +101,8 @@ public class TaskManager {
         mPrettyTime = new PrettyTime();
         mContext = ctx;
         mRandomiser = new Random();
+
+        mBitsComparator = new CachedComparator();
     }
 
     public static TaskManager getInstance(Context ctx) {
@@ -157,41 +156,9 @@ public class TaskManager {
         List<Task> tasks = getAllTasks();
         Log.d("TIMING", "SQL: " + (System.nanoTime() - start) / 1000000);
 
-        final HashMap<Task, Long> taskToCount = new HashMap<Task, Long>();
-
         start = System.nanoTime();
-        Collections.sort(tasks, new Comparator<Task>() {
-            @Override
-            public int compare(Task task, Task task2) {
-                Long c1 = taskToCount.get(task);
-                Long c2 = taskToCount.get(task2);
-
-                if (c1 == null) {
-                    c1 = getActionCountForTaskSinceTimestamp(task);
-                    taskToCount.put(task, c1);
-                }
-
-                if (c2 == null) {
-                    c2 = getActionCountForTaskSinceTimestamp(task2);
-                    taskToCount.put(task2, c2);
-                }
-
-                if (task.getFrequency() <= c1) {
-                    return 1;
-                } else if (task2.getFrequency() <= c2) {
-                    return -1;
-                }
-
-
-                if (task.getNextScheduledTime() < task2.getNextScheduledTime()) {
-                    return -1;
-                } else if (task2.getNextScheduledTime() < task.getNextScheduledTime()) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            }
-        });
+        mBitsComparator.reset();
+        Collections.sort(tasks, mBitsComparator);
         Log.d("TIMING", "Sort: " + (System.nanoTime() - start) / 1000000);
 
         return tasks;
@@ -274,7 +241,7 @@ public class TaskManager {
                 .orderDesc(ActionRecordDao.Properties.RecordOn).list();
 
         for (ActionRecord r : records) {
-            if (r.getTask().getDeletedOn() == null) {
+            if (r.getTask().getDeletedOn() == null && r.getTask().getArchieved_on() == null) {
                 return r;
             }
         }
@@ -406,7 +373,6 @@ public class TaskManager {
                 .toString();
     }
 
-
     public void removeActionRecordById(long id) {
         ActionRecord record = mActionRecordDao.load(id);
 
@@ -454,7 +420,6 @@ public class TaskManager {
         return catIdToCount;
     }
 
-
     public List<Pair<Long, Integer>> getCategoryWithCount(boolean archieved, boolean active) {
         if (!archieved && !active)
             return null;
@@ -490,6 +455,50 @@ public class TaskManager {
         }
 
         return pairs;
+    }
+
+    public class CachedComparator implements Comparator<Task> {
+        HashMap<Task, Long> taskToCount = new HashMap<Task, Long>();
+
+        public void reset() {
+            taskToCount.clear();
+        }
+
+        @Override
+        public int compare(Task task, Task task2) {
+            Long c1 = taskToCount.get(task);
+            Long c2 = taskToCount.get(task2);
+
+            if (c1 == null) {
+                c1 = getActionCountForTaskSinceTimestamp(task);
+                taskToCount.put(task, c1);
+            }
+
+            if (c2 == null) {
+                c2 = getActionCountForTaskSinceTimestamp(task2);
+                taskToCount.put(task2, c2);
+            }
+
+            if ((task).getFrequency() <= c1) {
+                return 1;
+            } else if ((task2).getFrequency() <= c2) {
+                return -1;
+            }
+
+
+            if (task.getNextScheduledTime() < task2.getNextScheduledTime()) {
+                return -1;
+            } else if (task2.getNextScheduledTime() < task.getNextScheduledTime()) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return false;
+        }
     }
 
     public class DuplicatedTaskException extends Throwable {
