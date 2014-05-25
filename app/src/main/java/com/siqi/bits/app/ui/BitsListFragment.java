@@ -54,6 +54,7 @@ import com.siqi.bits.swipelistview.BaseSwipeListViewListener;
 import com.siqi.bits.swipelistview.SwipeListView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -224,7 +225,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         setRetainInstance(true);
         tm = TaskManager.getInstance(this.getActivity());
 
-        mAdapter = new BitListArrayAdapter(getActivity(), null);
+        mAdapter = new BitListArrayAdapter(getActivity(), new ArrayList<Task>());
         mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
         mSwingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAnimateDismissAdapter);
     }
