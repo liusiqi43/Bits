@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.AsyncTask;
@@ -18,6 +20,7 @@ import android.os.IBinder;
 import android.support.v4.util.LruCache;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,6 +42,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
@@ -108,8 +112,8 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     boolean mIsBound = false;
     Runnable mListReloader;
     Handler mListRefresherHandle = new Handler();
-
-//    List<Task> mBits = new ArrayList<Task>();
+    Handler mBannerTextResetHandle = new Handler();
+    private TextSwitcher mBanner;
 
     public BitsListFragment() {
     }
@@ -141,12 +145,36 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
+
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         /**
          * View Binding
          */
         View rootView = inflater.inflate(R.layout.bitslist_fragment, container, false);
         mBitsListView = (SwipeListView) rootView.findViewById(R.id.bitslist);
+        mBanner = (TextSwitcher) rootView.findViewById(R.id.bitslist_banner);
+
+        // Set the ViewFactory of the TextSwitcher that will create TextView object when asked
+        mBanner.setFactory(new ViewSwitcher.ViewFactory() {
+
+            public View makeView() {
+                TextView bannerTextView = new TextView(getActivity());
+                bannerTextView.setGravity(Gravity.CENTER);
+                bannerTextView.setTextSize(20);
+                bannerTextView.setTypeface(null, Typeface.BOLD);
+                bannerTextView.setTextColor(Color.WHITE);
+                return bannerTextView;
+            }
+
+        });
+
+        mBanner.setText(getString(R.string.default_banner_text));
+
+        // Declare the in and out animations and initialize them
+        Animation in = AnimationUtils.loadAnimation(getActivity(), R.anim.card_flip_top_in);
+        Animation out = AnimationUtils.loadAnimation(getActivity(), R.anim.card_flip_bottom_out);
+        mBanner.setInAnimation(in);
+        mBanner.setOutAnimation(out);
 
         mBitsListView.setAdapter(mSwingBottomInAnimationAdapter);
         mSwingBottomInAnimationAdapter.setAbsListView(mBitsListView);
@@ -189,6 +217,16 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
                 Task item = mAdapter.getItem(position);
                 tm.setDoneActionForTask(item);
+                mBanner.setText(tm.getDoneSlogan());
+
+                mBannerTextResetHandle.removeCallbacksAndMessages(null);
+                mBannerTextResetHandle.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mBanner.setText(getString(R.string.default_banner_text));
+                    }
+                }, 3 * 1000);
+
                 new RearrangeTasks().execute();
             }
 
@@ -289,6 +327,11 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
          * UI refresher stops here
          */
         stopPeriodicRefresh();
+
+        /**
+         * Stop banner from resetting
+         */
+        mBannerTextResetHandle.removeCallbacksAndMessages(null);
     }
 
     @Override

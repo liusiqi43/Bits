@@ -2,8 +2,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:tag="bitslist_fragment"
     tools:context="com.siqi.bits.app.MainActivity$PlaceholderFragment">
+
+    <TextSwitcher
+        android:id="@+id/bitslist_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:background="@color/Turquoise"
+        android:gravity="center"
+        android:padding="7dp" />
 
     <com.siqi.bits.swipelistview.SwipeListView xmlns:swipe="http://schemas.android.com/apk/res-auto"
         android:id="@+id/bitslist"
