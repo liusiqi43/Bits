@@ -1,10 +1,10 @@
 package com.siqi.bits.app.ui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,9 +36,9 @@ import utils.BitmapProcessor;
 import views.ExpandingGridView;
 
 
-public class NewBitFragment extends BaseFragment {
+public class NewBitActivity extends ActionBarActivity {
     public static final int FRAGMENT_ID = 9;
-    private static final String EDITING_BIT_ID = "bit_id";
+    public static final String EDITING_BIT_ID = "bit_id";
 
 
     private Long mEditingBitID;
@@ -62,60 +62,35 @@ public class NewBitFragment extends BaseFragment {
     private AdapterView.OnItemClickListener mOnClickListener;
     private View mLastSelected = null;
 
-    public NewBitFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param id current ID of task
-     * @return A new instance of fragment NewBitFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static NewBitFragment newInstance(Long id) {
-        NewBitFragment fragment = new NewBitFragment();
-        if (id != null) {
-            Bundle args = new Bundle();
-            args.putLong(EDITING_BIT_ID, id);
-            fragment.setArguments(args);
-        }
-        return fragment;
-    }
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        tm = TaskManager.getInstance(this.getActivity().getApplicationContext());
-        cm = CategoryManager.getInstance(this.getActivity().getApplicationContext());
+        long id = getIntent().getLongExtra(EDITING_BIT_ID, -1);
+        mEditingBitID = id == -1 ? null : id;
 
-        if (getArguments() != null) {
-            mEditingBitID = getArguments().getLong(EDITING_BIT_ID);
+        tm = TaskManager.getInstance(this);
+        cm = CategoryManager.getInstance(this);
+
+        if (mEditingBitID != null) {
             mTask = tm.getTask(mEditingBitID);
         } else {
             mTask = tm.newTask();
         }
-    }
 
+        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.color.Turquoise));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
-//        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
-        View v = inflater.inflate(R.layout.new_bit_fragment, container, false);
-
-        mBitTitleEditText = (EditText) v.findViewById(R.id.bit_title_edittext);
-        mFrequencyRBtnGroup = (RadioGroup) v.findViewById(R.id.frequency_radio_group);
-        mPeriodRBtnGroup = (RadioGroup) v.findViewById(R.id.interval_radio_group);
-        mCategoryGridView = (ExpandingGridView) v.findViewById(R.id.category_gridview);
+        setContentView(R.layout.new_bit_fragment);
+        mBitTitleEditText = (EditText) findViewById(R.id.bit_title_edittext);
+        mFrequencyRBtnGroup = (RadioGroup) findViewById(R.id.frequency_radio_group);
+        mPeriodRBtnGroup = (RadioGroup) findViewById(R.id.interval_radio_group);
+        mCategoryGridView = (ExpandingGridView) findViewById(R.id.category_gridview);
 
         mBitTitleEditText.requestFocus();
 
         // Inflate the layout for this fragment
-        mAdapter = new CategoryAdapter(this.getActivity(), cm.getAllCategories());
+        mAdapter = new CategoryAdapter(this, cm.getAllCategories());
         SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAdapter);
 
         swingBottomInAnimationAdapter.setAbsListView(mCategoryGridView);
@@ -186,8 +161,6 @@ public class NewBitFragment extends BaseFragment {
             Log.d("BitListFrag", "Handling new bit");
             mTask.setCategory(cm.getDefaultCategory());
         }
-
-        return v;
     }
 
     @Override
@@ -197,25 +170,25 @@ public class NewBitFragment extends BaseFragment {
     }
 
     private void hideSoftKeyBoard() {
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
 
         if (imm.isAcceptingText()) { // verify if the soft keyboard is open
-            imm.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+            imm.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
         }
     }
 
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        this.getActivity().getMenuInflater().inflate(R.menu.newbits, menu);
-
-        super.onCreateOptionsMenu(menu, inflater);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.newbits, menu);
+        return true;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.action_cancel) {
-            this.mListener.onNewDisposeInteraction();
+            onBackPressed();
             return true;
         } else if (item.getItemId() == R.id.action_save) {
             if (mBitTitleEditText.getText().toString().trim().length() == 0) {
@@ -241,39 +214,21 @@ public class NewBitFragment extends BaseFragment {
             mTask.setCategory((Category) mLastSelected.getTag());
 
             Log.d("BitListFrag", mTask.getDescription() + " in " + ((Category) mLastSelected.getTag()).getName() + " Now ");
-            RadioButton rbFreq = (RadioButton) this.getView().findViewById(this.mFrequencyRBtnGroup.getCheckedRadioButtonId());
-            RadioButton rbPeriod = (RadioButton) this.getView().findViewById(this.mPeriodRBtnGroup.getCheckedRadioButtonId());
+            RadioButton rbFreq = (RadioButton) findViewById(this.mFrequencyRBtnGroup.getCheckedRadioButtonId());
+            RadioButton rbPeriod = (RadioButton) findViewById(this.mPeriodRBtnGroup.getCheckedRadioButtonId());
 
             mTask.setPeriod(TaskManager.PeriodStringToDays.get(rbPeriod.getText().toString()) * TaskManager.DAY_IN_MILLIS);
             mTask.setFrequency(Integer.parseInt(rbFreq.getText().toString()));
             tm.setNextScheduledTimeForTask(mTask);
 
             tm.updateTask(mTask);
-            mListener.onNewDisposeInteraction();
+            onBackPressed();
 
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnNewBitInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
 
     /**
      * This interface must be implemented by activities that contain this
@@ -303,7 +258,7 @@ public class NewBitFragment extends BaseFragment {
             View v = convertView;
 
             if (v == null) {
-                LayoutInflater li = getActivity().getLayoutInflater();
+                LayoutInflater li = getLayoutInflater();
                 v = li.inflate(R.layout.fragment_new_bit_category_gridview_item, parent, false);
             }
 
@@ -314,7 +269,7 @@ public class NewBitFragment extends BaseFragment {
 
             InputStream is = null;
             try {
-                is = getActivity().getAssets().open(c.getIconDrawableName());
+                is = getAssets().open(c.getIconDrawableName());
                 Bitmap bitmap = BitmapFactory.decodeStream(is);
                 icon.setImageBitmap(BitmapProcessor.invertImage(bitmap));
             } catch (IOException e) {
@@ -337,15 +292,6 @@ public class NewBitFragment extends BaseFragment {
 
             v.setTag(c);
             return v;
-        }
-
-        public int getPositionById(Category category) {
-            for (int i = 0; i < mItems.size(); ++i) {
-                if (category.getId() == mItems.get(i).getId()) {
-                    return i;
-                }
-            }
-            return -1;
         }
     }
 }

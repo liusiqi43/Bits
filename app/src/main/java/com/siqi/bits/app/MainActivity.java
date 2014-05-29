@@ -19,15 +19,15 @@ import android.widget.Toast;
 import com.nineoldandroids.view.ViewHelper;
 import com.siqi.bits.app.ui.AchievementsFragment;
 import com.siqi.bits.app.ui.BitsListFragment;
-import com.siqi.bits.app.ui.NewBitFragment;
+import com.siqi.bits.app.ui.NewBitActivity;
 import com.siqi.bits.app.ui.StatsFragment;
 
 import utils.Utils;
 
 public class MainActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks,
-        NewBitFragment.OnNewBitInteractionListener, BitsListFragment.OnBitListInteractionListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+    private static final String CURRENT_FRAGMENT_ID = "CURRENT_FRAGMENT_ID";
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -40,7 +40,24 @@ public class MainActivity extends ActionBarActivity
     private boolean doubleBackToExitPressedOnce = false;
 
     private View mContainerView;
-    private int mActionbarIcon;
+    private Integer mActionbarIcon;
+    private int mActionbarBackgroundColor;
+
+    @Override
+    protected void onSaveInstanceState(Bundle bundle) {
+        super.onSaveInstanceState(bundle);
+        bundle.putInt(CURRENT_FRAGMENT_ID, mCurrentSectionID);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle bundle) {
+        super.onRestoreInstanceState(bundle);
+
+        if (bundle != null) {
+            mCurrentSectionID = bundle.getInt(CURRENT_FRAGMENT_ID);
+            onSectionAttached(mCurrentSectionID);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +71,16 @@ public class MainActivity extends ActionBarActivity
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = "";
         mActionbarIcon = R.drawable.ic_banner;
+        mActionbarBackgroundColor = R.color.Turquoise;
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        if (mCurrentSectionID == NewBitActivity.FRAGMENT_ID) {
+
+        }
     }
 
     @Override
@@ -67,6 +89,8 @@ public class MainActivity extends ActionBarActivity
         // Clear all notification
         NotificationManager nMgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         nMgr.cancelAll();
+
+        restoreActionBar();
     }
 
     @Override
@@ -124,18 +148,17 @@ public class MainActivity extends ActionBarActivity
             case BitsListFragment.FRAGMENT_ID:
                 mTitle = "";
                 mActionbarIcon = R.drawable.ic_banner;
+                mActionbarBackgroundColor = R.color.Turquoise;
                 break;
             case AchievementsFragment.FRAGMENT_ID:
                 mTitle = getString(R.string.achievements);
-                mActionbarIcon = R.drawable.ic_launcher;
+                mActionbarIcon = android.R.color.transparent;
+                mActionbarBackgroundColor = R.color.Turquoise;
                 break;
             case StatsFragment.FRAGMENT_ID:
                 mTitle = getString(R.string.statistics);
-                mActionbarIcon = R.drawable.ic_launcher;
-                break;
-            case NewBitFragment.FRAGMENT_ID:
-                mTitle = getString(R.string.create_new_bit);
-                mActionbarIcon = R.drawable.ic_launcher;
+                mActionbarIcon = android.R.color.transparent;
+                mActionbarBackgroundColor = R.color.Turquoise;
                 break;
         }
     }
@@ -144,13 +167,14 @@ public class MainActivity extends ActionBarActivity
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setBackgroundDrawable(getResources().getDrawable(mActionbarBackgroundColor));
         actionBar.setTitle(mTitle);
         actionBar.setLogo(mActionbarIcon);
     }
 
     @Override
     public void onBackPressed() {
-        if (mCurrentSectionID == NewBitFragment.FRAGMENT_ID) {
+        if (mCurrentSectionID == NewBitActivity.FRAGMENT_ID) {
             onSectionAttached(BitsListFragment.FRAGMENT_ID);
             super.onBackPressed();
             return;
@@ -190,31 +214,5 @@ public class MainActivity extends ActionBarActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return super.onOptionsItemSelected(item);
-    }
-
-
-    @Override
-    public void onNewDisposeInteraction() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.popBackStack();
-        onSectionAttached(BitsListFragment.FRAGMENT_ID);
-    }
-
-
-    @Override
-    public void startEditBitFragment(Long id) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        NewBitFragment editFragment = NewBitFragment.newInstance(id);
-
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-
-        transaction.setCustomAnimations(R.anim.slide_in_top, R.anim.slide_out_bottom, R.anim.slide_in_bottom, R.anim.slide_out_top);
-        transaction.replace(R.id.container, editFragment);
-        transaction.addToBackStack("BitsListFragment");
-
-        onSectionAttached(NewBitFragment.FRAGMENT_ID);
-
-
-        transaction.commit();
     }
 }
