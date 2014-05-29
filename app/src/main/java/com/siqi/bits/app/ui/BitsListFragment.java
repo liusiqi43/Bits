@@ -93,7 +93,6 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     TaskManager tm;
     SensorManager mSensorManager;
     ShakeEventListener mSensorListener;
-    OnBitListInteractionListener mListener;
     boolean mUndoDialogDisplayed = false;
     ReminderScheduleService mScheduleService = null;
     ServiceConnection mConnection = new ServiceConnection() {
@@ -272,13 +271,6 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        try {
-            mListener = (OnBitListInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnBitListInteractionListener");
-        }
-
         ((MainActivity) activity).onSectionAttached(FRAGMENT_ID);
     }
 
@@ -334,12 +326,6 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         mBannerTextResetHandle.removeCallbacksAndMessages(null);
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         this.getActivity().getMenuInflater().inflate(R.menu.bitlist, menu);
 
@@ -350,7 +336,9 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.action_new) {
-            this.mListener.startEditBitFragment(null);
+            Intent intent = new Intent(getActivity(), NewBitActivity.class);
+            getActivity().overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_top);
+            startActivity(intent);
             return true;
         }
 
@@ -461,10 +449,6 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                 v.startAnimation(anim);
             }
         }
-    }
-
-    public interface OnBitListInteractionListener {
-        public void startEditBitFragment(Long id);
     }
 
     private static class BitTitleHolder {
@@ -627,7 +611,10 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
             holder.editButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mListener.startEditBitFragment(mAdapter.getItem(position).getId());
+                    Intent intent = new Intent(getActivity(), NewBitActivity.class);
+                    intent.putExtra(NewBitActivity.EDITING_BIT_ID, mAdapter.getItem(position).getId());
+                    getActivity().overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_top);
+                    startActivity(intent);
                 }
             });
 

@@ -6,12 +6,12 @@
     tools:context="com.siqi.bits.app.MainActivity">
     <item
         android:id="@+id/action_save"
-        android:icon="@drawable/ic_action_done"
+        android:icon="@drawable/ic_action_accept_light"
         android:title="@string/actionbar_save"
         app:showAsAction="withText|ifRoom" />
     <item
         android:id="@+id/action_cancel"
-        android:icon="@drawable/ic_action_cancel"
+        android:icon="@drawable/ic_action_cancel_light"
         android:title="@string/actionbar_cancel"
         app:showAsAction="withText|ifRoom" />
 </menu>

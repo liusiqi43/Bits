@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.siqi.bits.app.MainActivity" >
     <item android:id="@+id/action_new"
-        android:icon="@drawable/ic_action_new"
+        android:icon="@drawable/ic_action_new_light"
         android:title="@string/action_new"
         app:showAsAction="ifRoom" />
 </menu>
