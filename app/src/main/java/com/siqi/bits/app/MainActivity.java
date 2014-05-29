@@ -40,6 +40,7 @@ public class MainActivity extends ActionBarActivity
     private boolean doubleBackToExitPressedOnce = false;
 
     private View mContainerView;
+    private int mActionbarIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +52,8 @@ public class MainActivity extends ActionBarActivity
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
+        mTitle = "";
+        mActionbarIcon = R.drawable.ic_banner;
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
@@ -120,16 +122,20 @@ public class MainActivity extends ActionBarActivity
 
         switch (number) {
             case BitsListFragment.FRAGMENT_ID:
-                mTitle = getString(R.string.bits);
+                mTitle = "";
+                mActionbarIcon = R.drawable.ic_banner;
                 break;
             case AchievementsFragment.FRAGMENT_ID:
                 mTitle = getString(R.string.achievements);
+                mActionbarIcon = R.drawable.ic_launcher;
                 break;
             case StatsFragment.FRAGMENT_ID:
                 mTitle = getString(R.string.statistics);
+                mActionbarIcon = R.drawable.ic_launcher;
                 break;
             case NewBitFragment.FRAGMENT_ID:
                 mTitle = getString(R.string.create_new_bit);
+                mActionbarIcon = R.drawable.ic_launcher;
                 break;
         }
     }
@@ -139,6 +145,7 @@ public class MainActivity extends ActionBarActivity
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
+        actionBar.setLogo(mActionbarIcon);
     }
 
     @Override

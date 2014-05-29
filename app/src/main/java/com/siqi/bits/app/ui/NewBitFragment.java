@@ -103,9 +103,9 @@ public class NewBitFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
 //        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         View v = inflater.inflate(R.layout.new_bit_fragment, container, false);
-        setHasOptionsMenu(true);
 
         mBitTitleEditText = (EditText) v.findViewById(R.id.bit_title_edittext);
         mFrequencyRBtnGroup = (RadioGroup) v.findViewById(R.id.frequency_radio_group);
