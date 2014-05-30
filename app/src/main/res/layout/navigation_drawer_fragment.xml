@@ -18,6 +18,7 @@
         android:focusableInTouchMode="true" />
 
     <Button
+        android:id="@+id/share_bit_button"
         style="@style/AppTheme.actionbutton.medium.inverse.normal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

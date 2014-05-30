@@ -293,6 +293,8 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         if (mListReloader != null) {
             startPeriodicRefresh();
         }
+
+        mBanner.setText(getString(R.string.default_banner_text));
     }
 
     private void startPeriodicRefresh() {

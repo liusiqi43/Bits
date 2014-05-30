@@ -68,4 +68,6 @@
     <string name="task_in_this_category"> tasks in this category</string>
     <string name="added">added</string>
     <string name="default_banner_text">Get something done? </string>
+    <string name="share_bit_using_other_apps">Hey all, wish you were getting more out of your time? Check out Bits on Play store!</string>
+    <string name="sharing_use">Sharing use...</string>
 </resources>

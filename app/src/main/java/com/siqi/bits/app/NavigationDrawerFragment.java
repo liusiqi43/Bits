@@ -2,6 +2,7 @@ package com.siqi.bits.app;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -67,6 +69,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
+    private Button mShareButton;
 
     public NavigationDrawerFragment() {
     }
@@ -121,6 +124,27 @@ public class NavigationDrawerFragment extends BaseFragment {
 
         mDrawerListView.setAdapter(mAdapter);
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
+
+        mShareButton = (Button) drawerView.findViewById(R.id.share_bit_button);
+        mShareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mDrawerLayout != null) {
+                    mDrawerLayout.closeDrawer(mFragmentContainerView);
+                }
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent shareIntent = new Intent();
+                        shareIntent.setAction(Intent.ACTION_SEND);
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_bit_using_other_apps) + " (https://play.google.com/store/apps/details?id=com.siqi.bits.app)");
+                        shareIntent.setType("text/plain");
+                        startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.sharing_use)));
+                    }
+                }, 250);
+            }
+        });
         return drawerView;
     }
 
