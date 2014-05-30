@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import com.siqi.bits.app.R;
 import com.viewpagerindicator.TabPageIndicator;
 
+import utils.Utils;
+
 /**
  * Proudly powered by me on 5/15/14.
  * Part of android productivity application Bits
@@ -54,6 +56,8 @@ public class StatsFragment extends BaseFragment {
         //Bind the title indicator to the adapter
         TabPageIndicator titleIndicator = (TabPageIndicator) root.findViewById(R.id.pager_indicator);
         titleIndicator.setViewPager(mViewPager);
+
+        mViewPager.setPageMargin(Utils.dpToPx(16));
 
         return root;
     }
