@@ -3,15 +3,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/cloud"
+    android:background="@color/base_fragment_bg"
     android:orientation="vertical"
     android:tag="achievements_fragment">
 
     <ListView
-        android:id="@+id/achievement_listview"
+        android:id="@+id/achievement_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:divider="@android:color/transparent"
         android:listSelector="@android:color/transparent" />
-
 </LinearLayout>

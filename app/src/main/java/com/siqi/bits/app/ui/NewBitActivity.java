@@ -169,6 +169,12 @@ public class NewBitActivity extends ActionBarActivity {
         hideSoftKeyBoard();
     }
 
+    @Override
+    public boolean onNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
     private void hideSoftKeyBoard() {
         InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
 

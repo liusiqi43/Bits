@@ -70,4 +70,6 @@
     <string name="default_banner_text">Get something done? </string>
     <string name="share_bit_using_other_apps">Hey all, wish you were getting more out of your time? Check out Bits on Play store!</string>
     <string name="sharing_use">Sharing use...</string>
+    <string name="unarchive">unarchive</string>
+    <string name="achievements_empty_message">Haven\'t achieved anything yet! \nLong press on a bit to archive when finished</string>
 </resources>

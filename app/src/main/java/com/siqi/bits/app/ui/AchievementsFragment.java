@@ -1,17 +1,19 @@
 package com.siqi.bits.app.ui;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.util.LruCache;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,6 +24,8 @@ import com.siqi.bits.app.MainActivity;
 import com.siqi.bits.app.R;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import model.TaskManager;
@@ -57,14 +61,22 @@ public class AchievementsFragment extends BaseFragment {
          * View Binding
          */
         View rootView = inflater.inflate(R.layout.achievement_fragment, container, false);
-        mAchievementsListView = (ListView) rootView.findViewById(R.id.achievement_listview);
+        mAchievementsListView = (ListView) rootView.findViewById(R.id.achievement_list);
+
+        View emptyView = inflater.inflate(R.layout.placeholder_empty_view, null);
+        TextView tv = (TextView) emptyView.findViewById(R.id.message);
+        ImageView imageView = (ImageView) emptyView.findViewById(R.id.icon);
+        tv.setText(getString(R.string.achievements_empty_message));
+        imageView.setImageResource(R.drawable.trophy);
+        ((ViewGroup) mAchievementsListView.getParent()).addView(emptyView, mAchievementsListView.getLayoutParams());
+        mAchievementsListView.setEmptyView(emptyView);
 
         /**
          * Data Loading
          */
         tm = TaskManager.getInstance(this.getActivity().getApplicationContext());
-
-        mAdapter = new SectionedListAdapter(getActivity().getApplicationContext(), tm.getAllSortedArchivedTasks());
+        mAdapter = new SectionedListAdapter(new ArrayList<Task>());
+        reloadItems();
 
         // Swing from bottom anim & dismiss anim
         SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAdapter);
@@ -72,7 +84,46 @@ public class AchievementsFragment extends BaseFragment {
         this.mAchievementsListView.setAdapter(swingBottomInAnimationAdapter);
         swingBottomInAnimationAdapter.setAbsListView(mAchievementsListView);
 
+        /**
+         * Context Menu
+         */
+        registerForContextMenu(mAchievementsListView);
+
         return rootView;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId() == R.id.achievement_list) {
+            MenuInflater inflater = getActivity().getMenuInflater();
+            inflater.inflate(R.menu.achievement_listview_menu, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        Task t = mAdapter.getItem(info.position);
+        switch (item.getItemId()) {
+            case R.id.unarchive:
+                t.setArchieved_on(null);
+                t.update();
+                reloadItems();
+                return true;
+            case R.id.delete:
+                t.setDeletedOn(new Date());
+                t.update();
+                reloadItems();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
+    private void reloadItems() {
+        mAdapter.clear();
+        mAdapter.addAll(tm.getAllSortedArchivedTasks());
     }
 
     @Override
@@ -87,13 +138,13 @@ public class AchievementsFragment extends BaseFragment {
         View skipCountLayout, skipCountSeparator;
     }
 
-    public class SectionedListAdapter extends ArrayAdapter<Task> {
+    public class SectionedListAdapter extends com.nhaarman.listviewanimations.ArrayAdapter<Task> {
 
         private final LruCache<String, Bitmap> mMemoryCache;
         private List<Task> mItems;
 
-        public SectionedListAdapter(Context context, List<Task> tasks) {
-            super(context, R.layout.achievement_item, tasks);
+        public SectionedListAdapter(List<Task> tasks) {
+            super(tasks);
             final int cacheSize = (int) (Runtime.getRuntime().maxMemory() / 1024);
             mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
                 @Override

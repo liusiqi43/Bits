@@ -65,9 +65,9 @@ public class ReminderScheduleService extends Service {
                 Intent displayTaskIntent = new Intent(ReminderScheduleService.this, ReminderPublishReceiver.class);
                 displayTaskIntent.putExtra(TASK_ID, t.getId());
 
-                PendingIntent displayIntent = PendingIntent.getBroadcast(ReminderScheduleService.this, t.getId().intValue(), displayTaskIntent, 0);
+                PendingIntent displayIntent = PendingIntent.getBroadcast(ReminderScheduleService.this, t.getId().intValue(), displayTaskIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
                 mAlarmManager.set(AlarmManager.RTC_WAKEUP, t.getNextScheduledTime() - REMINDER_DURATION, displayIntent);
-                Log.d("ReminderScheduleService", "Scheduling task:" + t.getDescription() + " on " + new Date(t.getNextScheduledTime() - REMINDER_DURATION).toString());
+                Log.d("ReminderScheduleService", "Scheduling task:" + t.getId().intValue() + " on " + new Date(t.getNextScheduledTime() - REMINDER_DURATION).toString());
                 return null;
             }
         }.execute(t);
@@ -85,9 +85,10 @@ public class ReminderScheduleService extends Service {
                 if (t.getId() == null) {
                     Log.d("Debugging", "t.getId() is null!");
                 }
-                PendingIntent displayIntent = PendingIntent.getBroadcast(ReminderScheduleService.this, t.getId().intValue(), displayTaskIntent, 0);
+                PendingIntent displayIntent = PendingIntent.getBroadcast(ReminderScheduleService.this, t.getId().intValue(), displayTaskIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
                 mAlarmManager.cancel(displayIntent);
-                Log.d("ReminderScheduleService", "Unscheduling task:" + t.getDescription() + " on " + new Date(t.getNextScheduledTime() - REMINDER_DURATION).toString());
+                displayIntent.cancel();
+                Log.d("ReminderScheduleService", "Unscheduling task:" + t.getId().intValue() + " on " + new Date(t.getNextScheduledTime() - REMINDER_DURATION).toString());
                 return null;
             }
         }.execute(t);
