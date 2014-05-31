@@ -41,6 +41,7 @@
 
     <style name="AppTheme.EmptyView.messageStyle" parent="android:TextAppearance.Large">
         <item name="android:padding">10dp</item>
+        <item name="android:textColor">@color/Asbestos</item>
     </style>
 
     <style name="AppTheme.achievement_seperator">
