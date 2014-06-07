@@ -13,6 +13,8 @@ import com.siqi.bits.DaoSession;
 import java.util.Date;
 import java.util.List;
 
+import utils.Utils;
+
 /**
  * Created by me on 4/9/14.
  */
@@ -89,7 +91,7 @@ public class CategoryManager {
     }
 
     public Category newCategory() {
-        Category c = new Category(null, null, null, new Date(), new Date(), null);
+        Category c = new Category(null, null, null, new Date(Utils.currentTimeMillis()), new Date(Utils.currentTimeMillis()), null);
         return c;
     }
 

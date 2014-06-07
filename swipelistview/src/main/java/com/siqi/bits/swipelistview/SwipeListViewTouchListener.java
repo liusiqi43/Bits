@@ -23,6 +23,7 @@ package com.siqi.bits.swipelistview;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -58,6 +59,7 @@ import static com.nineoldandroids.view.ViewPropertyAnimator.animate;
 public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener {
 
     private static final int DISPLACE_CHOICE = 75;
+    private MediaPlayer mAudioFeedbackPlayer;
 
     private int swipeMode = SwipeListView.SWIPE_MODE_BOTH;
     private boolean swipeOpenOnLongPress = true;
@@ -113,7 +115,7 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
     private Vibrator hapticFeedbackVibrator;
 
     private LinkedList<Float> posXQueue = new LimitedLinkedList<Float>(3);
-    private boolean vibrated = false;
+    private boolean feedBackSent = false;
 
     /**
      * Constructor
@@ -133,6 +135,7 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
         animationTime = configShortAnimationTime;
         this.swipeListView = swipeListView;
         hapticFeedbackVibrator = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
+        mAudioFeedbackPlayer = MediaPlayer.create(swipeListView.getContext(), R.raw.facebook_pop);
     }
 
     /**
@@ -890,7 +893,7 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
                         deltaX += openedRight.get(downPosition) ? viewWidth - rightOffset : -viewWidth + leftOffset;
                     }
 
-                    if (posXQueue.size() > 2){
+                    if (posXQueue.size() > 2) {
                         float lastX = posXQueue.getLast();
                         float llastX = posXQueue.get(posXQueue.size() - 2);
 
@@ -959,10 +962,12 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
             float newPosX = Math.abs(p) < getDisplayChoiceInPx() ? p : sign * getDisplayChoiceInPx();
             if (Math.abs(posX) < getDisplayChoiceInPx() || Math.abs(newPosX) < getDisplayChoiceInPx()) {
                 setTranslationX(frontView, newPosX);
-                vibrated = false;
-            } else if (Math.abs(newPosX) == getDisplayChoiceInPx() && !vibrated) {
+                feedBackSent = false;
+            } else if (Math.abs(newPosX) == getDisplayChoiceInPx() && !feedBackSent) {
                 hapticFeedbackVibrator.vibrate(50);
-                vibrated = true;
+                mAudioFeedbackPlayer.start();
+
+                feedBackSent = true;
             }
         } else {
             setTranslationX(frontView, deltaX);

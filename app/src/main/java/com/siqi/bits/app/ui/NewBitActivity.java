@@ -33,6 +33,7 @@ import java.util.List;
 import model.CategoryManager;
 import model.TaskManager;
 import utils.BitmapProcessor;
+import utils.Utils;
 import views.ExpandingGridView;
 
 
@@ -206,9 +207,9 @@ public class NewBitActivity extends ActionBarActivity {
              * Save task model here
              */
             mTask.setDescription(mBitTitleEditText.getText().toString().trim());
-            mTask.setModifiedOn(new Date());
+            mTask.setModifiedOn(new Date(Utils.currentTimeMillis()));
             if (mEditingBitID == null) {
-                mTask.setCreatedOn(new Date());
+                mTask.setCreatedOn(new Date(Utils.currentTimeMillis()));
                 try {
                     tm.insertTask(mTask);
                 } catch (TaskManager.DuplicatedTaskException e) {

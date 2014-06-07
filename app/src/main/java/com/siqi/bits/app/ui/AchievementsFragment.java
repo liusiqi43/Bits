@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 import model.TaskManager;
+import utils.Utils;
 
 /**
  * Proudly powered by me on 5/6/14.
@@ -106,13 +107,8 @@ public class AchievementsFragment extends BaseFragment {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Task t = mAdapter.getItem(info.position);
         switch (item.getItemId()) {
-            case R.id.unarchive:
-                t.setArchieved_on(null);
-                t.update();
-                reloadItems();
-                return true;
             case R.id.delete:
-                t.setDeletedOn(new Date());
+                t.setDeletedOn(new Date(Utils.currentTimeMillis()));
                 t.update();
                 reloadItems();
                 return true;

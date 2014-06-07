@@ -352,7 +352,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         if (mUndoDialogDisplayed)
             return;
 
-        final ActionRecord record = tm.getLastActionForActiveTask();
+        final ActionRecord record = tm.getLastActiveActionForActiveTask();
 
         if (record != null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -581,7 +581,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                 public void onClick(View view) {
                     holder.viewSwitcher.setDisplayedChild(CARD_INFO);
                     Task item = mAdapter.getItem(position);
-                    item.setDeletedOn(new Date());
+                    item.setDeletedOn(new Date(Utils.currentTimeMillis()));
                     tm.updateTask(item);
                     if (mScheduleService != null)
                         mScheduleService.unScheduleForTask(item);
@@ -598,7 +598,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                 public void onClick(View view) {
                     holder.viewSwitcher.setDisplayedChild(CARD_INFO);
                     Task item = mAdapter.getItem(position);
-                    item.setArchieved_on(new Date());
+                    item.setArchieved_on(new Date(Utils.currentTimeMillis()));
                     tm.updateTask(item);
                     if (mScheduleService != null)
                         mScheduleService.unScheduleForTask(item);

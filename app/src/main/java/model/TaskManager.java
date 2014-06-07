@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import de.greenrobot.dao.query.QueryBuilder;
 import service.ReminderScheduleService;
+import utils.Utils;
 
 /**
  * Created by me on 4/9/14.
@@ -69,10 +70,35 @@ public class TaskManager {
         mTaskDao = mDaoSession.getTaskDao();
         mActionRecordDao = mDaoSession.getActionRecordDao();
 
-        PeriodStringToDays.put(ctx.getString(R.string.radio_day), 1);
-        PeriodStringToDays.put(ctx.getString(R.string.radio_week), 7);
-        PeriodStringToDays.put(ctx.getString(R.string.radio_month), 30);
-        PeriodStringToDays.put(ctx.getString(R.string.radio_year), 365);
+        mContext = ctx;
+
+        setUp();
+    }
+
+    public static TaskManager getInstance(Context ctx) {
+        if (INSTANCE == null)
+            INSTANCE = new TaskManager(ctx);
+        return INSTANCE;
+    }
+
+    public static TaskManager getTestInstance(Context ctx, SQLiteDatabase testDB) {
+        if (INSTANCE == null)
+            INSTANCE = new TaskManager(ctx);
+
+        INSTANCE.mDB = testDB;
+        INSTANCE.mDaoMaster = new DaoMaster(INSTANCE.mDB);
+        INSTANCE.mDaoSession = INSTANCE.mDaoMaster.newSession();
+        INSTANCE.mTaskDao = INSTANCE.mDaoSession.getTaskDao();
+        INSTANCE.mActionRecordDao = INSTANCE.mDaoSession.getActionRecordDao();
+
+        return INSTANCE;
+    }
+
+    private void setUp() {
+        PeriodStringToDays.put(mContext.getString(R.string.radio_day), 1);
+        PeriodStringToDays.put(mContext.getString(R.string.radio_week), 7);
+        PeriodStringToDays.put(mContext.getString(R.string.radio_month), 30);
+        PeriodStringToDays.put(mContext.getString(R.string.radio_year), 365);
 
         PeriodToDays.put((long) 1 * 24 * 60 * 60 * 1000, 1);
         PeriodToDays.put((long) 7 * 24 * 60 * 60 * 1000, 7);
@@ -87,16 +113,9 @@ public class TaskManager {
         mDoneSlogans.add("Bravo!");
 
         mPrettyTime = new PrettyTime();
-        mContext = ctx;
         mRandomiser = new Random();
 
         mBitsComparator = new CachedComparator();
-    }
-
-    public static TaskManager getInstance(Context ctx) {
-        if (INSTANCE == null)
-            INSTANCE = new TaskManager(ctx);
-        return INSTANCE;
     }
 
     public void setScheduleService(ReminderScheduleService mScheduleService) {
@@ -105,7 +124,7 @@ public class TaskManager {
 
     public void insertTask(Task t) throws DuplicatedTaskException {
         if (mTaskDao.queryBuilder()
-                .where(TaskDao.Properties.Description.eq(t.getDescription()), TaskDao.Properties.DeletedOn.isNull())
+                .where(TaskDao.Properties.Description.eq(t.getDescription()), TaskDao.Properties.DeletedOn.isNull(), TaskDao.Properties.Archieved_on.isNull())
                 .list().size() > 0)
             throw new DuplicatedTaskException();
         else
@@ -126,28 +145,15 @@ public class TaskManager {
         return tasks;
     }
 
-    public List<Task> getAllTasks(boolean active, boolean archive) {
-        List<Task> tasks = new ArrayList<Task>();
-
-        if (active && archive)
-            tasks = mTaskDao.queryBuilder().where(TaskDao.Properties.DeletedOn.isNull()).list();
-        else if (active && !archive)
-            tasks = mTaskDao.queryBuilder().where(TaskDao.Properties.DeletedOn.isNull(), TaskDao.Properties.Archieved_on.isNull()).list();
-        else if (!active && archive)
-            tasks = mTaskDao.queryBuilder().where(TaskDao.Properties.DeletedOn.isNull(), TaskDao.Properties.Archieved_on.isNotNull()).list();
-
-        return tasks;
-    }
-
     public List<Task> getAllSortedTasks() {
-        long start = System.nanoTime();
+//        long start = System.nanoTime();
         List<Task> tasks = getAllTasks();
-        Log.d("TIMING", "SQL: " + (System.nanoTime() - start) / 1000000);
+//        Log.d("TIMING", "SQL: " + (System.nanoTime() - start) / 1000000);
 
-        start = System.nanoTime();
+//        start = System.nanoTime();
         mBitsComparator.reset();
         Collections.sort(tasks, mBitsComparator);
-        Log.d("TIMING", "Sort: " + (System.nanoTime() - start) / 1000000);
+//        Log.d("TIMING", "Sort: " + (System.nanoTime() - start) / 1000000);
 
         return tasks;
     }
@@ -187,16 +193,16 @@ public class TaskManager {
         return ((int) (100 * sum / total));
     }
 
-    public long getActionCountForTaskSinceTimestamp(Task t) {
+    public long getActionCountForTaskSinceBeginningOfPeriod(Task t) {
         if (t.getId() == null)
             return 0;
 
-        long ts = System.currentTimeMillis() - t.getPastMillisOfCurrentPeriod();
-
+        long ts = Utils.currentTimeMillis() - t.getPastMillisOfCurrentPeriod();
         QueryBuilder qb = mActionRecordDao.queryBuilder();
 
         return qb.where(ActionRecordDao.Properties.TaskId.eq(t.getId()),
-                ActionRecordDao.Properties.RecordOn.gt(ts),
+                qb.or(ActionRecordDao.Properties.RecordOn.gt(ts),
+                        ActionRecordDao.Properties.RecordOn.eq(ts)),
                 qb.or(ActionRecordDao.Properties.Action.eq(ACTION_TYPE_DONE),
                         ActionRecordDao.Properties.Action.eq(ACTION_TYPE_SKIP))
         ).count();
@@ -218,7 +224,27 @@ public class TaskManager {
         }
     }
 
-    public ActionRecord getLastActionForActiveTask() {
+    public ActionRecord getLastActiveActionForTask(Task t) {
+        QueryBuilder qb = mActionRecordDao.queryBuilder();
+
+        List<ActionRecord> records = qb.where(
+                ActionRecordDao.Properties.TaskId.eq(t.getId()),
+                qb.or(
+                        ActionRecordDao.Properties.Action.eq(ACTION_TYPE_DONE),
+                        ActionRecordDao.Properties.Action.eq(ACTION_TYPE_SKIP))
+        )
+                .orderDesc(ActionRecordDao.Properties.RecordOn).list();
+
+        for (ActionRecord r : records) {
+            if (r.getTask().getDeletedOn() == null && r.getTask().getArchieved_on() == null) {
+                return r;
+            }
+        }
+
+        return null;
+    }
+
+    public ActionRecord getLastActiveActionForActiveTask() {
         QueryBuilder qb = mActionRecordDao.queryBuilder();
 
         List<ActionRecord> records = qb.where(
@@ -237,19 +263,41 @@ public class TaskManager {
         return null;
     }
 
-    public void setNextScheduledTimeForTask(Task t) {
-        Log.d("ReminderScheduleService", "setNextScheduledTimeForTask");
+    public void setNextScheduledTimeForTaskAfterRemove(Task t, long nextScheduledTime, long currentInterval) {
         if (mScheduleService != null)
             mScheduleService.unScheduleForTask(t);
         else {
             Log.d("ReminderScheduleService", "mScheduleService == null");
         }
 
-        long actionCountSinceBeginOfInternval = getActionCountForTaskSinceTimestamp(t);
+        t.setNextScheduledTime(nextScheduledTime);
+        t.setCurrentInterval(currentInterval);
+
+        if (mScheduleService != null)
+            mScheduleService.scheduleForTask(t);
+    }
+
+    public void setNextScheduledTimeForTask(Task t) {
+        if (mScheduleService != null)
+            mScheduleService.unScheduleForTask(t);
+        else {
+            Log.d("ReminderScheduleService", "mScheduleService == null");
+        }
+
+        long actionCountSinceBeginOfInternval = getActionCountForTaskSinceBeginningOfPeriod(t);
+
+
         if (t.getFrequency() - actionCountSinceBeginOfInternval > 0) {
-            long delta = (t.getPeriod() - t.getPastMillisOfCurrentPeriod()) / (t.getFrequency() - actionCountSinceBeginOfInternval);
-            t.setNextScheduledTime(System.currentTimeMillis() + delta);
+            long timeLeftInCurrentPeriod = t.getPeriod() - t.getPastMillisOfCurrentPeriod();
+            long delta = timeLeftInCurrentPeriod / (t.getFrequency() - actionCountSinceBeginOfInternval);
+            t.setNextScheduledTime(Utils.currentTimeMillis() + delta);
             t.setCurrentInterval(delta);
+        } else {
+            // already done enough for current period, postpone nextScheduledTime to next period
+            long beginningOfCurrentPeriod = Utils.currentTimeMillis() - t.getPastMillisOfCurrentPeriod();
+            long beginningOfNextPeriod = beginningOfCurrentPeriod + t.getPeriod();
+            t.setNextScheduledTime(beginningOfNextPeriod + t.getAvgInterval());
+            t.setCurrentInterval(t.getAvgInterval());
         }
 
         Log.d("ScheduledTimeUpdate", "T:" + t.getDescription() + " freq:" + t.getFrequency() + " actionCount:" + actionCountSinceBeginOfInternval);
@@ -258,10 +306,12 @@ public class TaskManager {
     }
 
     public void setActionRecordForTask(Task t, int ACTION_TYPE) {
-        setActionRecordForTaskAtDate(t, ACTION_TYPE, new Date());
+        setActionRecordForTaskAtDate(t, ACTION_TYPE, new Date(Utils.currentTimeMillis()));
+        setNextScheduledTimeForTask(t);
+        t.update();
     }
 
-    public void setActionRecordForTaskAtDate(Task t, int ACTION_TYPE, Date date) {
+    private void setActionRecordForTaskAtDate(Task t, int ACTION_TYPE, Date date) {
         switch (ACTION_TYPE) {
             case ACTION_TYPE_SKIP:
                 t.setSkipCount(t.getSkipCount() + 1);
@@ -273,7 +323,7 @@ public class TaskManager {
                 t.setLateCount(t.getLateCount() + 1);
         }
         t.update();
-        ActionRecord record = new ActionRecord(null, ACTION_TYPE, date, t.getId());
+        ActionRecord record = new ActionRecord(null, ACTION_TYPE, date, t.getCurrentInterval(), t.getNextScheduledTime(), t.getId());
         mActionRecordDao.insert(record);
         t.resetActionsRecords();
     }
@@ -285,7 +335,7 @@ public class TaskManager {
      */
     public void updateActionRecordForTask(Task t) {
         QueryBuilder qb = mActionRecordDao.queryBuilder();
-        long now = System.currentTimeMillis();
+        long now = Utils.currentTimeMillis();
         // get LateActions whose timestamps are later than nextScheduledTime()
         List<ActionRecord> records = qb.where(
                 ActionRecordDao.Properties.TaskId.eq(t.getId()),
@@ -304,7 +354,7 @@ public class TaskManager {
     }
 
     public int getProgressForTask(Task t) {
-        long actionCountSinceBeginOfInternval = getActionCountForTaskSinceTimestamp(t);
+        long actionCountSinceBeginOfInternval = getActionCountForTaskSinceBeginningOfPeriod(t);
         if (t.getFrequency() - actionCountSinceBeginOfInternval <= 0) {
             // Worked too many times on this task, return 0. No need to work anymore on this task
             return 0;
@@ -349,42 +399,24 @@ public class TaskManager {
                 break;
         }
 
-        setNextScheduledTimeForTask(record.getTask());
+        Task currentTask = record.getTask();
 
-        record.getTask().update();
         mActionRecordDao.delete(record);
-        record.getTask().resetActionsRecords();
+        currentTask.resetActionsRecords();
+        currentTask.update();
+
+        setNextScheduledTimeForTaskAfterRemove(currentTask, record.getPreviousNextScheduledTime(), record.getPreviousInterval());
     }
 
     public void setSkipActionForTask(Task t) {
         setActionRecordForTask(t, TaskManager.ACTION_TYPE_SKIP);
-        setNextScheduledTimeForTask(t);
-        t.update();
     }
 
     public void setDoneActionForTask(Task t) {
         setActionRecordForTask(t, TaskManager.ACTION_TYPE_DONE);
-        setNextScheduledTimeForTask(t);
-        t.update();
     }
 
-    public HashMap<Long, Integer> getCategoryCountForTasks(boolean active, boolean archive) {
-        List<Task> tasks = getAllTasks(active, archive);
-
-        HashMap<Long, Integer> catIdToCount = new HashMap<Long, Integer>();
-
-        for (Task t : tasks) {
-            Integer i = catIdToCount.get(t.getCategory().getId());
-            if (i == null)
-                catIdToCount.put(t.getCategory().getId(), 1);
-            else
-                catIdToCount.put(t.getCategory().getId(), i + 1);
-        }
-
-        return catIdToCount;
-    }
-
-    public List<Pair<Long, Integer>> getCategoryWithCount(boolean archieved, boolean active) {
+    public List<Pair<Long, Integer>> getCategoryWithCount(boolean active, boolean archieved) {
         if (!archieved && !active)
             return null;
 
@@ -438,12 +470,12 @@ public class TaskManager {
             Long c2 = taskToCount.get(task2);
 
             if (c1 == null) {
-                c1 = getActionCountForTaskSinceTimestamp(task);
+                c1 = getActionCountForTaskSinceBeginningOfPeriod(task);
                 taskToCount.put(task, c1);
             }
 
             if (c2 == null) {
-                c2 = getActionCountForTaskSinceTimestamp(task2);
+                c2 = getActionCountForTaskSinceBeginningOfPeriod(task2);
                 taskToCount.put(task2, c2);
             }
 
