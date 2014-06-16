@@ -23,6 +23,7 @@ package com.siqi.bits.swipelistview;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Rect;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Handler;
@@ -117,6 +118,8 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
     private LinkedList<Float> posXQueue = new LimitedLinkedList<Float>(3);
     private boolean feedBackSent = false;
 
+    private AudioManager mAudioManager;
+
     /**
      * Constructor
      *
@@ -136,6 +139,7 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
         this.swipeListView = swipeListView;
         hapticFeedbackVibrator = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
         mAudioFeedbackPlayer = MediaPlayer.create(swipeListView.getContext(), R.raw.facebook_pop);
+        mAudioManager = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
     }
 
     /**
@@ -964,8 +968,16 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
                 setTranslationX(frontView, newPosX);
                 feedBackSent = false;
             } else if (Math.abs(newPosX) == getDisplayChoiceInPx() && !feedBackSent) {
-                hapticFeedbackVibrator.vibrate(50);
-                mAudioFeedbackPlayer.start();
+                switch (mAudioManager.getRingerMode()) {
+                    case AudioManager.RINGER_MODE_VIBRATE:
+                        hapticFeedbackVibrator.vibrate(50);
+                        break;
+                    case AudioManager.RINGER_MODE_NORMAL:
+                        if (mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC) == 0)
+                            hapticFeedbackVibrator.vibrate(50);
+                        else mAudioFeedbackPlayer.start();
+                        break;
+                }
 
                 feedBackSent = true;
             }

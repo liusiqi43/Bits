@@ -2,6 +2,7 @@ package com.siqi.bits.app;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -78,9 +79,7 @@ public class MainActivity extends ActionBarActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
-        if (mCurrentSectionID == NewBitActivity.FRAGMENT_ID) {
-
-        }
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
     }
 
     @Override

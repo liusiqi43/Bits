@@ -15,20 +15,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.MainActivity;
 import com.siqi.bits.app.R;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import model.TaskManager;
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 import utils.Utils;
 
 /**
@@ -40,7 +42,7 @@ import utils.Utils;
 public class AchievementsFragment extends BaseFragment {
     public final static int FRAGMENT_ID = 1;
 
-    private ListView mAchievementsListView;
+    private StickyListHeadersListView mAchievementsListView;
     private SectionedListAdapter mAdapter;
     private TaskManager tm;
 
@@ -62,7 +64,7 @@ public class AchievementsFragment extends BaseFragment {
          * View Binding
          */
         View rootView = inflater.inflate(R.layout.achievement_fragment, container, false);
-        mAchievementsListView = (ListView) rootView.findViewById(R.id.achievement_list);
+        mAchievementsListView = (StickyListHeadersListView) rootView.findViewById(R.id.achievement_list);
 
         View emptyView = inflater.inflate(R.layout.placeholder_empty_view, null);
         TextView tv = (TextView) emptyView.findViewById(R.id.message);
@@ -80,10 +82,10 @@ public class AchievementsFragment extends BaseFragment {
         reloadItems();
 
         // Swing from bottom anim & dismiss anim
-        SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAdapter);
+//        SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAdapter);
 
-        this.mAchievementsListView.setAdapter(swingBottomInAnimationAdapter);
-        swingBottomInAnimationAdapter.setAbsListView(mAchievementsListView);
+        this.mAchievementsListView.setAdapter(mAdapter);
+//        swingBottomInAnimationAdapter.setAbsListView(mAchievementsListView);
 
         /**
          * Context Menu
@@ -129,12 +131,12 @@ public class AchievementsFragment extends BaseFragment {
     }
 
     private static class AchievementHolder {
-        TextView taskTitle, taskGoal, doneCount, skipCount, lateCount, daysCount, freq, interval, separator;
+        TextView taskTitle, taskGoal, doneCount, skipCount, lateCount, daysCount, freq, interval;
         ImageView taskIcon;
         View skipCountLayout, skipCountSeparator;
     }
 
-    public class SectionedListAdapter extends com.nhaarman.listviewanimations.ArrayAdapter<Task> {
+    public class SectionedListAdapter extends com.nhaarman.listviewanimations.ArrayAdapter<Task> implements StickyListHeadersAdapter {
 
         private final LruCache<String, Bitmap> mMemoryCache;
         private List<Task> mItems;
@@ -151,6 +153,33 @@ public class AchievementsFragment extends BaseFragment {
                 }
             };
             mItems = tasks;
+        }
+
+        @Override
+        public View getHeaderView(int position, View convertView, ViewGroup parent) {
+            HeaderViewHolder holder;
+            LayoutInflater li = getActivity().getLayoutInflater();
+
+            if (convertView == null) {
+                holder = new HeaderViewHolder();
+                convertView = li.inflate(R.layout.achievement_item_header, parent, false);
+                holder.text = (TextView) convertView.findViewById(R.id.text);
+                convertView.setTag(holder);
+            } else {
+                holder = (HeaderViewHolder) convertView.getTag();
+            }
+
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MMM");
+            holder.text.setText(format.format(mItems.get(position).getArchieved_on()));
+            return convertView;
+        }
+
+        @Override
+        public long getHeaderId(int position) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(mItems.get(position).getArchieved_on());
+
+            return 100 * cal.get(Calendar.YEAR) + cal.get(Calendar.MONTH);
         }
 
         @Override
@@ -172,7 +201,6 @@ public class AchievementsFragment extends BaseFragment {
                 holder.lateCount = (TextView) v.findViewById(R.id.achievement_late_count);
                 holder.taskGoal = (TextView) v.findViewById(R.id.taskSubtitle);
                 holder.taskTitle = (TextView) v.findViewById(R.id.taskTitle);
-                holder.separator = (TextView) v.findViewById(R.id.achievement_seperator);
                 holder.taskIcon = (ImageView) v.findViewById(R.id.taskIcon);
                 holder.skipCountLayout = v.findViewById(R.id.achievement_skip_count_layout);
                 holder.skipCountSeparator = v.findViewById(R.id.achievement_skip_count_separator);
@@ -212,7 +240,6 @@ public class AchievementsFragment extends BaseFragment {
             holder.lateCount.setText(Integer.toString(t.getLateCount()));
             holder.doneCount.setText(Integer.toString(t.getDoneCount()));
             holder.skipCount.setText(Integer.toString(t.getSkipCount()));
-            holder.separator.setText(tm.getArchivedDescriptionForTask(t));
 
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 holder.skipCountLayout.setVisibility(View.GONE);
@@ -224,6 +251,12 @@ public class AchievementsFragment extends BaseFragment {
 
             return v;
         }
+
+        class HeaderViewHolder {
+            TextView text;
+        }
+
+
 
     }
 
