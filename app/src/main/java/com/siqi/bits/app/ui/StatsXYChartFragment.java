@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -41,6 +42,7 @@ import utils.Utils;
  */
 public class StatsXYChartFragment extends BaseFragment implements AdapterView.OnItemSelectedListener {
 
+    private static final int TREND_DISPLAY_MIN_NUMBERS = 3;
     private ActionRecordManager arm;
     private Spinner mActionSpinner, mDaySpinner;
     private TextView mMaxRateTextView, mAvgRateTextView;
@@ -66,35 +68,50 @@ public class StatsXYChartFragment extends BaseFragment implements AdapterView.On
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstance) {
+        super.onCreate(savedInstance);
         arm = ActionRecordManager.getInstance(getActivity());
+    }
 
-        View root = inflater.inflate(R.layout.stats_linechart_fragment, container, false);
-        mChartViewContainer = (LinearLayout) root.findViewById(R.id.xychart_container);
-        mActionSpinner = (Spinner) root.findViewById(R.id.spinner_actions);
-        mDaySpinner = (Spinner) root.findViewById(R.id.spinner_days);
-        mMaxRateTextView = (TextView) root.findViewById(R.id.max_burnrate_tv);
-        mAvgRateTextView = (TextView) root.findViewById(R.id.avg_burnrate_tv);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (arm.getActionRateForLastDays(mDisplayedAction, mLastDaysCount).size() < TREND_DISPLAY_MIN_NUMBERS) {
+            View emptyView = inflater.inflate(R.layout.placeholder_empty_view, container, false);
+            TextView tv = (TextView) emptyView.findViewById(R.id.message);
+            ImageView imageView = (ImageView) emptyView.findViewById(R.id.icon);
+            tv.setText(getString(R.string.burndown_chart_emptymessage));
+            imageView.setImageResource(R.drawable.trend);
+            return emptyView;
+        } else {
 
-        ArrayAdapter<CharSequence> daysAdapter = ArrayAdapter.createFromResource(getActivity(),
-                R.array.stats_linechart_days_array, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        daysAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
-        mDaySpinner.setAdapter(daysAdapter);
-        mDaySpinner.setOnItemSelectedListener(this);
 
-        ArrayAdapter<CharSequence> actionsAdapter = ArrayAdapter.createFromResource(getActivity(),
-                R.array.stats_linechart_actions_array, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        actionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
-        mActionSpinner.setAdapter(actionsAdapter);
-        mActionSpinner.setOnItemSelectedListener(this);
+            View root = inflater.inflate(R.layout.stats_linechart_fragment, container, false);
+            mChartViewContainer = (LinearLayout) root.findViewById(R.id.xychart_container);
+            mActionSpinner = (Spinner) root.findViewById(R.id.spinner_actions);
+            mDaySpinner = (Spinner) root.findViewById(R.id.spinner_days);
+            mMaxRateTextView = (TextView) root.findViewById(R.id.max_burnrate_tv);
+            mAvgRateTextView = (TextView) root.findViewById(R.id.avg_burnrate_tv);
 
-        reloadGraph();
+            ArrayAdapter<CharSequence> daysAdapter = ArrayAdapter.createFromResource(getActivity(),
+                    R.array.stats_linechart_days_array, android.R.layout.simple_spinner_item);
+            // Specify the layout to use when the list of choices appears
+            daysAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            // Apply the adapter to the spinner
+            mDaySpinner.setAdapter(daysAdapter);
+            mDaySpinner.setOnItemSelectedListener(this);
 
-        return root;
+            ArrayAdapter<CharSequence> actionsAdapter = ArrayAdapter.createFromResource(getActivity(),
+                    R.array.stats_linechart_actions_array, android.R.layout.simple_spinner_item);
+            // Specify the layout to use when the list of choices appears
+            actionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            // Apply the adapter to the spinner
+            mActionSpinner.setAdapter(actionsAdapter);
+            mActionSpinner.setOnItemSelectedListener(this);
+
+            reloadGraph();
+
+            return root;
+        }
     }
 
     private void reloadGraph() {
@@ -107,6 +124,14 @@ public class StatsXYChartFragment extends BaseFragment implements AdapterView.On
         } else {
             Toast.makeText(getActivity(), "Not enough data", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (arm.getActionRateForLastDays(mDisplayedAction, mLastDaysCount).size() >= TREND_DISPLAY_MIN_NUMBERS)
+            reloadGraph();
     }
 
     @Override

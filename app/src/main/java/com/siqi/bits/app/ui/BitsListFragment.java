@@ -417,7 +417,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                 mSavedState.put(dataId, top);
             }
         }
-        for (int i = 0; i < mBitsListView.getChildCount(); i++) {
+        for (int i = 0; i < mBitsListView.getChildCount() - BitListArrayAdapter.EXTRA_ITEMS_COUNT; i++) {
             View v = mBitsListView.getChildAt(i);
             int top = v.getTop();
             int dataIdx = first + i;
@@ -435,7 +435,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     private void animateNewState() {
         int first = mBitsListView.getFirstVisiblePosition();
         int last = mBitsListView.getLastVisiblePosition();
-        for (int i = 0; i < mBitsListView.getChildCount(); i++) {
+        for (int i = 0; i < mBitsListView.getChildCount() - BitListArrayAdapter.EXTRA_ITEMS_COUNT; i++) {
             int dataIdx = first + i;
             long dataId = mAdapter.getItem(dataIdx).getId();
             if (mSavedState.containsKey(dataId)) {
@@ -514,6 +514,9 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
     private class BitListArrayAdapter extends ExpandableListItemAdapter<Task> {
 
+        private static final int EXTRA_ITEMS_COUNT = 1;
+        private static final int ITEM_TYPE_HELP = 1;
+        private static final int ITEM_TYPE_TASK = 0;
         private final LruCache<String, Bitmap> mMemoryCache;
         List<Task> mItems;
 
@@ -532,6 +535,21 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
             };
 
             mItems = t;
+        }
+
+        @Override
+        public int getCount() {
+            return mItems.size() + EXTRA_ITEMS_COUNT;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            return position >= mItems.size() ? ITEM_TYPE_HELP : ITEM_TYPE_TASK;
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return EXTRA_ITEMS_COUNT + 1;
         }
 
         @Override
@@ -669,12 +687,21 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Log.d("TEST", "getVlew:" + position);
-            View v = super.getView(position, convertView, parent);
-
-            ((SwipeListView) parent).recycle(v, position);
-
-            return v;
+            switch (getItemViewType(position)) {
+                case ITEM_TYPE_TASK:
+                    View v = super.getView(position, convertView, parent);
+                    ((SwipeListView) parent).recycle(v, position);
+                    return v;
+                case ITEM_TYPE_HELP:
+                    LayoutInflater li = getActivity().getLayoutInflater();
+                    if (mItems.size() == 0)
+                        v = li.inflate(R.layout.help_new, parent, false);
+                    else
+                        v = li.inflate(R.layout.help_details, parent, false);
+                    return v;
+            }
+            // Should not happen
+            return null;
         }
 
         @Override

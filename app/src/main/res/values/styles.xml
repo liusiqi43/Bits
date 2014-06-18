@@ -69,4 +69,9 @@
         <item name="android:typeface">monospace</item>
     </style>
 
+    <style name="AppTheme.help_text">
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
 </resources>

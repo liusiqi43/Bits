@@ -745,6 +745,8 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
                     child.getHitRect(rect);
 
                     int childPosition = swipeListView.getPositionForView(child);
+                    if (swipeListView.getAdapter().getItemViewType(childPosition) != 0)
+                        return true;
 
                     // dont allow swiping if this is on the header or footer or IGNORE_ITEM_VIEW_TYPE or enabled is false on the adapter
                     boolean allowSwipe = swipeListView.getAdapter().isEnabled(childPosition) && swipeListView.getAdapter().getItemViewType(childPosition) >= 0;
@@ -755,6 +757,7 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
 
                         downX = motionEvent.getRawX();
                         downPosition = childPosition;
+
 
                         frontView.setClickable(!opened.get(downPosition));
                         frontView.setLongClickable(!opened.get(downPosition));

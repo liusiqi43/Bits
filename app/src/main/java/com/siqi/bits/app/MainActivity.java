@@ -1,7 +1,9 @@
 package com.siqi.bits.app;
 
+import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +31,8 @@ public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     private static final String CURRENT_FRAGMENT_ID = "CURRENT_FRAGMENT_ID";
+    private static final int MISC_STARTING_INDEX = 3;
+    private static final int HELP_ITEM_INDEX = 4;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -39,7 +43,6 @@ public class MainActivity extends ActionBarActivity
     private CharSequence mTitle;
     private int mCurrentSectionID = -1;
     private boolean doubleBackToExitPressedOnce = false;
-
     private View mContainerView;
     private Integer mActionbarIcon;
     private int mActionbarBackgroundColor;
@@ -94,7 +97,7 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        if (position == mCurrentSectionID)
+        if (position < MISC_STARTING_INDEX && position == mCurrentSectionID)
             return;
 
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -103,6 +106,19 @@ public class MainActivity extends ActionBarActivity
 
         Fragment dest;
         switch (position) {
+            case HELP_ITEM_INDEX:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+                builder.setView(getLayoutInflater().inflate(R.layout.help_all, null, false));
+
+                builder.setPositiveButton(R.string.got_it, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+                break;
             case BitsListFragment.FRAGMENT_ID:
                 dest = fragmentManager.findFragmentByTag(BitsListFragment.class.getName());
                 if (dest == null) {

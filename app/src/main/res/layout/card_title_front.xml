@@ -22,7 +22,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <include layout="@layout/card_title_front_info"/>
-        <include layout="@layout/card_title_front_actions"/>
+        <include layout="@layout/card_title_front_info" />
+
+        <include layout="@layout/card_title_front_actions" />
     </ViewSwitcher>
 </LinearLayout>

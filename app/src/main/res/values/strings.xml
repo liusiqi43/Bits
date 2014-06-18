@@ -51,10 +51,10 @@
 
     <string name="nav_header_bits">Bits</string>
     <string name="nav_header_misc">Misc.</string>
-    <string name="burndown_viewpagerstrip_title">Burndown</string>
+    <string name="burndown_viewpagerstrip_title">Trend</string>
     <string name="task_category_viewpagerstrip_title">Task Category</string>
     <string name="burndown_chart_dateformat">\"dd/MM/yyyy\"</string>
-    <string name="burndown_chart_title">Task Burndown Rate</string>
+    <string name="burndown_chart_title">Progress Trend</string>
     <string name="task_category_chart_title">Task Count by Category</string>
     <string name="burndown_chart_datetitle">Date</string>
     <string name="burndown_chart_counttitle">Burndown</string>
@@ -72,4 +72,13 @@
     <string name="sharing_use">Sharing use...</string>
     <string name="unarchive">unarchive</string>
     <string name="achievements_empty_message">Nothing yet! \nLong press on bits to archive</string>
+    <string name="piechart_empty_message">Not enough data available! \nDiversify your life by creating tasks in different categories</string>
+    <string name="burndown_chart_emptymessage">Not enough data now! \nCome back in a few days!</string>
+    <string name="Instructions">Instructions</string>
+    <string name="help_add">Add a new bit</string>
+    <string name="to_get_started">to get started...</string>
+    <string name="top_right_to_add">Top-right button to add</string>
+    <string name="change_the_first">change the first</string>
+    <string name="in_your_life">in your life!</string>
+    <string name="got_it">OK, got it!</string>
 </resources>
