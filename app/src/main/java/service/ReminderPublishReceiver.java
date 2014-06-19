@@ -21,7 +21,7 @@ import model.TaskManager;
  * Created by me on 4/30/14.
  */
 public class ReminderPublishReceiver extends BroadcastReceiver {
-    private int NOTIFICATION_ID = R.string.task_reminder_publisher;
+    public final static String NOTIFICATION_ID = "TaskReminderPublisher";
     private NotificationManager mNM;
 
     /**
@@ -59,7 +59,7 @@ public class ReminderPublishReceiver extends BroadcastReceiver {
             Notification notification = notificationBuilder.build();
 
             // Send the notification.
-            mNM.notify(t.getId().intValue(), notification);
+            mNM.notify(NOTIFICATION_ID, t.getId().hashCode(), notification);
         } catch (IOException e) {
             e.printStackTrace();
         }

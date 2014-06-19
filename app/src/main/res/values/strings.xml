@@ -43,7 +43,6 @@
     <string name="on_task"> on task </string>
     <string name="ok">Yes, Please</string>
     <string name="cancel">Cancel</string>
-    <string name="task_reminder_publisher">TaskReminderPublisher</string>
     <string name="finish">Finish</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>

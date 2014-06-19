@@ -43,6 +43,6 @@ public class ActionOnTaskReceiver extends BroadcastReceiver {
             }
         }
 
-        mNM.cancel(id.intValue());
+        mNM.cancel(ReminderPublishReceiver.NOTIFICATION_ID, id.hashCode());
     }
 }
