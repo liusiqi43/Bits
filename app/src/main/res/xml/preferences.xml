@@ -10,6 +10,27 @@
             android:title="Auto-rotate Screen" />
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:key="pref_notifications_settings"
+        android:title="@string/pref_notifications_settings">
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="IS_NOTIFICATIONS_ON"
+            android:summary="@string/show_notifications_text"
+            android:title="@string/show_notifications_title" />
+
+        <ListPreference
+            android:defaultValue="30"
+            android:dependency="IS_NOTIFICATIONS_ON"
+            android:dialogTitle="@string/show_notifications_delay_diaglogtitle"
+            android:entries="@array/notification_time_options"
+            android:entryValues="@array/notification_time_values"
+            android:key="NOTIFY_MINUTES_COUNT_BEFORE_LATE"
+            android:summary="@string/show_notifications_delay_text"
+            android:title="@string/show_notifications_delay_title" />
+
+    </PreferenceCategory>
 
     <PreferenceCategory
         android:key="pref_bits_settings"
@@ -33,5 +54,6 @@
             android:title="@string/enable_shake_title" />
 
     </PreferenceCategory>
+
 
 </PreferenceScreen>

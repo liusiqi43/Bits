@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -28,6 +29,9 @@ public class ReminderPublishReceiver extends BroadcastReceiver {
      * Show a notification while this service is running.
      */
     private void publishNotificationForTask(Context ctx, Task t) {
+        if (!PreferenceManager.getDefaultSharedPreferences(ctx).getBoolean("IS_NOTIFICATIONS_ON", true))
+            return;
+
         try {
             // The PendingIntent to launch our activity if the user selects this notification
             PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0,

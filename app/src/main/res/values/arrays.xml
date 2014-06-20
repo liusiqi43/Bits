@@ -12,4 +12,28 @@
         <item>Skip</item>
         <item>Late</item>
     </string-array>
+
+    <array name="notification_time_options">
+        <item>5 minutes before late</item>
+        <item>10 minutes before late</item>
+        <item>20 minutes before late</item>
+        <item>30 minutes before late</item>
+        <item>40 minutes before late</item>
+        <item>50 minutes before late</item>
+        <item>60 minutes before late</item>
+        <item>90 minutes before late</item>
+        <item>120 minutes before late</item>
+    </array>
+
+    <string-array name="notification_time_values">
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+        <item>30</item>
+        <item>40</item>
+        <item>50</item>
+        <item>60</item>
+        <item>90</item>
+        <item>120</item>
+    </string-array>
 </resources>

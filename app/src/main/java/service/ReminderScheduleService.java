@@ -4,9 +4,11 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.siqi.bits.Task;
@@ -23,11 +25,13 @@ public class ReminderScheduleService extends Service {
     public static final String DONE_ACTION = "com.siqi.bits.intent.action.DONE_ACTION";
     public static final String SKIP_ACTION = "com.siqi.bits.intent.action.SKIP_ACTION";
     public static final String TASK_ID = "TASK_ID";
-    public static final int REMINDER_DURATION = 5 * 60 * 1000;
+    public static final int MINUTE = 60 * 1000;
+
     // This is the object that receives interactions from clients.  See
     // RemoteService for a more complete example.
     private final IBinder mBinder = new LocalBinder();
     AlarmManager mAlarmManager;
+    private SharedPreferences mPreferences;
     private List<Task> mTasks;
 
     private void scheduleAllAlarms() {
@@ -66,8 +70,8 @@ public class ReminderScheduleService extends Service {
                 displayTaskIntent.putExtra(TASK_ID, t.getId());
 
                 PendingIntent displayIntent = PendingIntent.getBroadcast(ReminderScheduleService.this, t.getId().intValue(), displayTaskIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
-                mAlarmManager.set(AlarmManager.RTC_WAKEUP, t.getNextScheduledTime() - REMINDER_DURATION, displayIntent);
-                Log.d("ReminderScheduleService", "Scheduling task:" + t.getId().intValue() + " on " + new Date(t.getNextScheduledTime() - REMINDER_DURATION).toString());
+                mAlarmManager.set(AlarmManager.RTC_WAKEUP, t.getNextScheduledTime() - Integer.parseInt(mPreferences.getString("NOTIFY_MINUTES_COUNT_BEFORE_LATE", "30")) * MINUTE, displayIntent);
+                Log.d("ReminderScheduleService", "Scheduling task:" + t.getId().intValue() + " on " + new Date(t.getNextScheduledTime() - Integer.parseInt(mPreferences.getString("NOTIFY_MINUTES_COUNT_BEFORE_LATE", "30")) * MINUTE).toString());
                 return null;
             }
         }.execute(t);
@@ -88,7 +92,7 @@ public class ReminderScheduleService extends Service {
                 PendingIntent displayIntent = PendingIntent.getBroadcast(ReminderScheduleService.this, t.getId().intValue(), displayTaskIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
                 mAlarmManager.cancel(displayIntent);
                 displayIntent.cancel();
-                Log.d("ReminderScheduleService", "Unscheduling task:" + t.getId().intValue() + " on " + new Date(t.getNextScheduledTime() - REMINDER_DURATION).toString());
+                Log.d("ReminderScheduleService", "Unscheduling task:" + t.getId().intValue() + " on " + new Date(t.getNextScheduledTime() - Integer.parseInt(mPreferences.getString("NOTIFY_MINUTES_COUNT_BEFORE_LATE", "30")) * MINUTE).toString());
                 return null;
             }
         }.execute(t);
@@ -110,6 +114,7 @@ public class ReminderScheduleService extends Service {
     public void onCreate() {
         super.onCreate();
         mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         scheduleAllAlarms();
     }
 

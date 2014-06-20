@@ -24,9 +24,6 @@ public class SettingsActivity extends PreferenceActivity {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
 
-        getActionBar().setBackgroundDrawable(getResources().getDrawable(R.color.Turquoise));
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-
         addPreferencesFromResource(R.xml.preferences);
     }
 }

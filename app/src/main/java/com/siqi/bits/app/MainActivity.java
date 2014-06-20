@@ -57,7 +57,6 @@ public class MainActivity extends ActionBarActivity
     private boolean doubleBackToExitPressedOnce = false;
     private View mContainerView;
     private Integer mActionbarIcon;
-    private int mActionbarBackgroundColor;
 
     @Override
     protected void onSaveInstanceState(Bundle bundle) {
@@ -87,7 +86,6 @@ public class MainActivity extends ActionBarActivity
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = "";
         mActionbarIcon = R.drawable.ic_banner;
-        mActionbarBackgroundColor = R.color.Turquoise;
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
@@ -222,17 +220,14 @@ public class MainActivity extends ActionBarActivity
             case BitsListFragment.FRAGMENT_ID:
                 mTitle = "";
                 mActionbarIcon = R.drawable.ic_banner;
-                mActionbarBackgroundColor = R.color.Turquoise;
                 break;
             case AchievementsFragment.FRAGMENT_ID:
                 mTitle = getString(R.string.achievements);
                 mActionbarIcon = android.R.color.transparent;
-                mActionbarBackgroundColor = R.color.Turquoise;
                 break;
             case StatsFragment.FRAGMENT_ID:
                 mTitle = getString(R.string.statistics);
                 mActionbarIcon = android.R.color.transparent;
-                mActionbarBackgroundColor = R.color.Turquoise;
                 break;
         }
     }
@@ -241,7 +236,6 @@ public class MainActivity extends ActionBarActivity
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setBackgroundDrawable(getResources().getDrawable(mActionbarBackgroundColor));
         actionBar.setTitle(mTitle);
         actionBar.setLogo(mActionbarIcon);
     }

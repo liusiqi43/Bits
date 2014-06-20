@@ -91,9 +91,6 @@ public class NewBitActivity extends ActionBarActivity {
             mTask = tm.newTask();
         }
 
-        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.color.Turquoise));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         setContentView(R.layout.new_bit_fragment);
         mBitTitleEditText = (EditText) findViewById(R.id.bit_title_edittext);
         mFrequencyRBtnGroup = (RadioGroup) findViewById(R.id.frequency_radio_group);
