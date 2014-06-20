@@ -6,7 +6,6 @@
     <string name="bits">Tasks</string>
     <string name="achievements">Achievements</string>
     <string name="statistics">Statistics</string>
-    <string name="settings">Settings</string>
     <string name="rewards">Rewards</string>
     <string name="feedback">Send feedback</string>
     <string name="help">Help</string>
@@ -29,6 +28,7 @@
     <string name="times_a">times a</string>
     <string name="put_in_category">select an icon for the Bit</string>
     <string name="create_new_bit">Create New Bit</string>
+    <string name="settings">Settings</string>
     <string name="whats_on_your_mind">What\'s on your mind? </string>
     <string name="duplicated_title_error">A bit with same title already exists, make that a habit first!</string>
     <string name="empty_title_error">Bit needs a title to get started!</string>
@@ -78,6 +78,26 @@
     <string name="to_get_started">to get started...</string>
     <string name="top_right_to_add">Top-right button to add</string>
     <string name="change_the_first">change the first</string>
-    <string name="in_your_life">in your life!</string>
+    <string name="of_your_life">of your life!</string>
     <string name="got_it">OK, got it!</string>
+    <string name="hey_you_found_it">Hey you found it!</string>
+    <string name="tap_to_modify">edit current task</string>
+    <string name="swipe_left_for_done">Swipe left for done</string>
+    <string name="swipe_right_to_skip">Swipe right to skip</string>
+    <string name="long_press_for_actions">Long press for actions</string>
+    <string name="tap_to_view_history">Tap to view history</string>
+    <string name="tap_to_remove">remove currenttask</string>
+    <string name="tap_to_achieve">archive finished task</string>
+    <string name="no_email_client_installed">There are no email clients installed.</string>
+    <string name="send_email">Send mail...</string>
+    <string name="feedback_for_bits_app">Feedback for Bits app </string>
+    <string name="feedback_email_addr">android.bitsapp@gmail.com</string>
+    <string name="show_instructions_title">Show instructions</string>
+    <string name="show_instructions_text">Show instructions below list of tasks</string>
+    <string name="enable_shake_text">Shake to undo last done or skip action in Tasks section</string>
+    <string name="enable_shake_title">Enable shake to undo</string>
+    <string name="enable_swipe_feedback_title">Enable feedback when swipe</string>
+    <string name="enable_swipe_feedback_text">Enable haptic/audio feedback when swipe to the right and left and it\'s good to release</string>
+    <string name="pref_general_settings">General</string>
+    <string name="pref_bits_settings">Bits</string>
 </resources>

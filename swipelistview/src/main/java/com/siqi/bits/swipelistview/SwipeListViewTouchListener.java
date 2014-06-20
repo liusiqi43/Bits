@@ -21,6 +21,7 @@
 package com.siqi.bits.swipelistview;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.media.AudioManager;
@@ -28,6 +29,7 @@ import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.v4.view.MotionEventCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -60,6 +62,7 @@ import static com.nineoldandroids.view.ViewPropertyAnimator.animate;
 public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener {
 
     private static final int DISPLACE_CHOICE = 75;
+    private final SharedPreferences mPreferences;
     private MediaPlayer mAudioFeedbackPlayer;
 
     private int swipeMode = SwipeListView.SWIPE_MODE_BOTH;
@@ -140,6 +143,7 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
         hapticFeedbackVibrator = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
         mAudioFeedbackPlayer = MediaPlayer.create(swipeListView.getContext(), R.raw.facebook_pop);
         mAudioManager = (AudioManager) ctx.getSystemService(Context.AUDIO_SERVICE);
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(ctx);
     }
 
     /**
@@ -970,7 +974,7 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
             if (Math.abs(posX) < getDisplayChoiceInPx() || Math.abs(newPosX) < getDisplayChoiceInPx()) {
                 setTranslationX(frontView, newPosX);
                 feedBackSent = false;
-            } else if (Math.abs(newPosX) == getDisplayChoiceInPx() && !feedBackSent) {
+            } else if (mPreferences.getBoolean("IS_SWIPE_FEEDBACK_ON", true) && Math.abs(newPosX) == getDisplayChoiceInPx() && !feedBackSent) {
                 switch (mAudioManager.getRingerMode()) {
                     case AudioManager.RINGER_MODE_VIBRATE:
                         hapticFeedbackVibrator.vibrate(50);
@@ -981,7 +985,6 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
                         else mAudioFeedbackPlayer.start();
                         break;
                 }
-
                 feedBackSent = true;
             }
         } else {

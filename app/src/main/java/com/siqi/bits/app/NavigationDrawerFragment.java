@@ -309,8 +309,6 @@ public class NavigationDrawerFragment extends BaseFragment {
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-//        actionBar.setTitle("");
-//        actionBar.setLogo(R.drawable.ic_banner);
     }
 
     private ActionBar getActionBar() {

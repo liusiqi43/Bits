@@ -11,8 +11,9 @@
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="15dp"
         android:gravity="center"
-        android:text="@string/Instructions"
+        android:text="@string/hey_you_found_it"
         android:textSize="30sp" />
 
     <LinearLayout
@@ -33,8 +34,10 @@
                 android:layout_width="50dp"
                 android:layout_height="fill_parent"
                 android:layout_gravity="center"
+                android:background="@color/editColor"
+                android:padding="5dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/help_add" />
+                android:src="@drawable/ic_action_edit" />
 
 
             <TextView
@@ -42,7 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-light"
-                android:text="@string/top_right_to_add" />
+                android:text="@string/tap_to_modify" />
 
         </LinearLayout>
 
@@ -58,15 +61,17 @@
                 android:layout_width="50dp"
                 android:layout_height="fill_parent"
                 android:layout_gravity="center"
+                android:background="@color/achieveColor"
+                android:padding="5dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/help_swipe_left" />
+                android:src="@drawable/ic_action_read" />
 
             <TextView
                 style="@style/AppTheme.help_text_compact"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-light"
-                android:text="@string/swipe_left_for_done" />
+                android:text="@string/tap_to_achieve" />
 
         </LinearLayout>
 
@@ -82,8 +87,10 @@
                 android:layout_width="50dp"
                 android:layout_height="fill_parent"
                 android:layout_gravity="center"
+                android:background="@color/deleteColor"
+                android:padding="5dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/help_swipe_right" />
+                android:src="@drawable/ic_action_delete" />
 
 
             <TextView
@@ -91,58 +98,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-light"
-                android:text="@string/swipe_right_to_skip" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="1dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp">
-
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="fill_parent"
-                android:layout_gravity="center"
-                android:scaleType="fitCenter"
-                android:src="@drawable/help_long_press" />
-
-
-            <TextView
-                style="@style/AppTheme.help_text_compact"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-light"
-                android:text="@string/long_press_for_actions" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/view_history"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="1dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp">
-
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="fill_parent"
-                android:layout_gravity="center"
-                android:scaleType="fitCenter"
-                android:src="@drawable/help_tap" />
-
-
-            <TextView
-                style="@style/AppTheme.help_text_compact"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-light"
-                android:text="@string/tap_to_view_history" />
+                android:text="@string/tap_to_remove" />
 
         </LinearLayout>
     </LinearLayout>

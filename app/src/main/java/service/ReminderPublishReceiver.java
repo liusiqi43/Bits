@@ -59,7 +59,7 @@ public class ReminderPublishReceiver extends BroadcastReceiver {
             Notification notification = notificationBuilder.build();
 
             // Send the notification.
-            mNM.notify(NOTIFICATION_ID, t.getId().hashCode(), notification);
+            mNM.notify(NOTIFICATION_ID, t.getId().intValue(), notification);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -67,12 +67,12 @@ public class ReminderPublishReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        mNM = (NotificationManager)context.getSystemService(context.NOTIFICATION_SERVICE);
+        mNM = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
         long id = intent.getLongExtra(ReminderScheduleService.TASK_ID, -1);
 
         Log.d("ReminderScheduleService", "Publish Intent received");
         if (id != -1) {
-            Log.d("ReminderScheduleService", "id="+id);
+            Log.d("ReminderScheduleService", "id=" + id);
             publishNotificationForTask(context, TaskManager.getInstance(context).getTask(id));
         }
     }

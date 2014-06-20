@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -17,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.util.LruCache;
 import android.text.Html;
 import android.util.Log;
@@ -82,6 +84,9 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
     public static final int CARD_INFO = 0;
     public static final int CARD_ACTION = 1;
+    public static final String IS_BITSLIST_HELP_ON = "IS_BITSLIST_HELP_ON";
+    public static final String IS_BITSLIST_SHAKE_ON = "IS_BITSLIST_SHAKE_ON";
+    public static final String IS_BITSLIST_LONGPRESS_HELP_ON = "IS_BITSLIST_LONGPRESS_HELP_ON";
     private static final int REFRESH_PERIOD = 60 * 1000;
     SwipeListView mBitsListView;
     BitListArrayAdapter mAdapter;
@@ -113,6 +118,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     Handler mListRefresherHandle = new Handler();
     Handler mBannerTextResetHandle = new Handler();
     private TextSwitcher mBanner;
+    private SharedPreferences mPreferences;
 
     public BitsListFragment() {
     }
@@ -145,7 +151,12 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
 
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        if (mPreferences.getBoolean("IS_AUTO_ROTATE_ENABLED", false)) {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        } else {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+
         /**
          * View Binding
          */
@@ -194,6 +205,21 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                         }
                     }
                 }, getResources().getInteger(R.integer.actionview_timeout));
+
+                if (mPreferences.getBoolean(IS_BITSLIST_LONGPRESS_HELP_ON, true)) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+                    builder.setView(getActivity().getLayoutInflater().inflate(R.layout.help_longclick, null, false));
+
+                    builder.setPositiveButton(R.string.got_it, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.show();
+                    mPreferences.edit().putBoolean(IS_BITSLIST_LONGPRESS_HELP_ON, false).commit();
+                }
 
                 return true;
             }
@@ -265,6 +291,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         mAdapter = new BitListArrayAdapter(getActivity(), new ArrayList<Task>());
         mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
         mSwingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAnimateDismissAdapter);
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
     }
 
     @Override
@@ -349,6 +376,9 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
     @Override
     public void onShake() {
+        if (!mPreferences.getBoolean(IS_BITSLIST_SHAKE_ON, true))
+            return;
+
         if (mUndoDialogDisplayed)
             return;
 
@@ -698,6 +728,10 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                         v = li.inflate(R.layout.help_new, parent, false);
                     else
                         v = li.inflate(R.layout.help_details, parent, false);
+
+                    if (!mPreferences.getBoolean(IS_BITSLIST_HELP_ON, true))
+                        v.setVisibility(View.GONE);
+
                     return v;
             }
             // Should not happen

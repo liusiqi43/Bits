@@ -4,9 +4,15 @@ import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -23,7 +29,11 @@ import com.nineoldandroids.view.ViewHelper;
 import com.siqi.bits.app.ui.AchievementsFragment;
 import com.siqi.bits.app.ui.BitsListFragment;
 import com.siqi.bits.app.ui.NewBitActivity;
+import com.siqi.bits.app.ui.SettingsActivity;
 import com.siqi.bits.app.ui.StatsFragment;
+
+import java.util.List;
+import java.util.Stack;
 
 import utils.Utils;
 
@@ -32,7 +42,9 @@ public class MainActivity extends ActionBarActivity
 
     private static final String CURRENT_FRAGMENT_ID = "CURRENT_FRAGMENT_ID";
     private static final int MISC_STARTING_INDEX = 3;
+    private static final int SETTING_ITEM_INDEX = 3;
     private static final int HELP_ITEM_INDEX = 4;
+    private static final int FEEDBACK_ITEM_INDEX = 5;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -83,6 +95,7 @@ public class MainActivity extends ActionBarActivity
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
     }
 
     @Override
@@ -93,6 +106,32 @@ public class MainActivity extends ActionBarActivity
         nMgr.cancelAll();
 
         restoreActionBar();
+    }
+
+    private Intent createEmailOnlyChooserIntent(Intent source,
+                                                CharSequence chooserTitle) {
+        Stack<Intent> intents = new Stack<Intent>();
+        Intent i = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto",
+                "info@domain.com", null));
+        List<ResolveInfo> activities = getPackageManager()
+                .queryIntentActivities(i, 0);
+
+        for (ResolveInfo ri : activities) {
+            Intent target = new Intent(source);
+            target.setPackage(ri.activityInfo.packageName);
+            intents.add(target);
+        }
+
+        if (!intents.isEmpty()) {
+            Intent chooserIntent = Intent.createChooser(intents.remove(0),
+                    chooserTitle);
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,
+                    intents.toArray(new Parcelable[intents.size()]));
+
+            return chooserIntent;
+        } else {
+            return Intent.createChooser(source, chooserTitle);
+        }
     }
 
     @Override
@@ -106,6 +145,10 @@ public class MainActivity extends ActionBarActivity
 
         Fragment dest;
         switch (position) {
+            case SETTING_ITEM_INDEX:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                break;
             case HELP_ITEM_INDEX:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -118,6 +161,22 @@ public class MainActivity extends ActionBarActivity
                 });
 
                 builder.show();
+                break;
+            case FEEDBACK_ITEM_INDEX:
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("message/rfc822");
+                i.putExtra(Intent.EXTRA_EMAIL, new String[]{getString(R.string.feedback_email_addr)});
+                try {
+                    i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback_for_bits_app) + " " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+                } catch (PackageManager.NameNotFoundException e) {
+                    i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback_for_bits_app));
+                }
+
+                try {
+                    startActivity(createEmailOnlyChooserIntent(i, getString(R.string.send_email)));
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Toast.makeText(this, getString(R.string.no_email_client_installed), Toast.LENGTH_SHORT).show();
+                }
                 break;
             case BitsListFragment.FRAGMENT_ID:
                 dest = fragmentManager.findFragmentByTag(BitsListFragment.class.getName());

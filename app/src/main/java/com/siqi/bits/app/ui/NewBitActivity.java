@@ -1,9 +1,12 @@
 package com.siqi.bits.app.ui;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -62,10 +65,19 @@ public class NewBitActivity extends ActionBarActivity {
 
     private AdapterView.OnItemClickListener mOnClickListener;
     private View mLastSelected = null;
+    private SharedPreferences mPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if (mPreferences.getBoolean("IS_AUTO_ROTATE_ENABLED", false)) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
 
         long id = getIntent().getLongExtra(EDITING_BIT_ID, -1);
         mEditingBitID = id == -1 ? null : id;

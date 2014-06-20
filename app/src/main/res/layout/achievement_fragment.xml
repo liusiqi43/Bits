@@ -8,9 +8,10 @@
     android:tag="achievements_fragment">
 
     <se.emilsjolander.stickylistheaders.StickyListHeadersListView
-        android:id="@+id/achievement_list"
+        android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:divider="@android:color/transparent"
         android:listSelector="@android:color/transparent" />
+
 </LinearLayout>

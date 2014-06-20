@@ -33,6 +33,19 @@
             >
         </activity>
 
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:label="@string/action_settings"
+            android:logo="@android:color/transparent"
+            android:parentActivityName="com.siqi.bits.app.MainActivity"
+            android:screenOrientation="fullSensor">
+            <!-- Parent activity meta-data to support API level 7+ -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.siqi.bits.app.MainActivity" />
+            >
+        </activity>
+
         <receiver android:name="service.ReminderServiceStartReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

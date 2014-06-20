@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/in_your_life"
+            android:text="@string/of_your_life"
             android:textColor="@color/grey_font"
             android:textSize="28sp" />
 

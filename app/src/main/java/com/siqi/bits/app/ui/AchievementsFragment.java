@@ -1,10 +1,12 @@
 package com.siqi.bits.app.ui;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -45,6 +47,7 @@ public class AchievementsFragment extends BaseFragment {
     private StickyListHeadersListView mAchievementsListView;
     private SectionedListAdapter mAdapter;
     private TaskManager tm;
+    private SharedPreferences mPreferences;
 
     public AchievementsFragment() {
     }
@@ -58,21 +61,20 @@ public class AchievementsFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
         setHasOptionsMenu(true);
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        if (mPreferences.getBoolean("IS_AUTO_ROTATE_ENABLED", false)) {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        } else {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+
         /**
          * View Binding
          */
         View rootView = inflater.inflate(R.layout.achievement_fragment, container, false);
-        mAchievementsListView = (StickyListHeadersListView) rootView.findViewById(R.id.achievement_list);
-
-        View emptyView = inflater.inflate(R.layout.placeholder_empty_view, null);
-        TextView tv = (TextView) emptyView.findViewById(R.id.message);
-        ImageView imageView = (ImageView) emptyView.findViewById(R.id.icon);
-        tv.setText(getString(R.string.achievements_empty_message));
-        imageView.setImageResource(R.drawable.trophy);
-        ((ViewGroup) mAchievementsListView.getParent()).addView(emptyView, mAchievementsListView.getLayoutParams());
-        mAchievementsListView.setEmptyView(emptyView);
+        mAchievementsListView = (StickyListHeadersListView) rootView.findViewById(R.id.list);
 
         /**
          * Data Loading
@@ -80,12 +82,16 @@ public class AchievementsFragment extends BaseFragment {
         tm = TaskManager.getInstance(this.getActivity().getApplicationContext());
         mAdapter = new SectionedListAdapter(new ArrayList<Task>());
         reloadItems();
+        mAchievementsListView.setAdapter(mAdapter);
 
-        // Swing from bottom anim & dismiss anim
-//        SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAdapter);
 
-        this.mAchievementsListView.setAdapter(mAdapter);
-//        swingBottomInAnimationAdapter.setAbsListView(mAchievementsListView);
+        View emptyView = inflater.inflate(R.layout.placeholder_empty_view, null);
+        TextView tv = (TextView) emptyView.findViewById(R.id.message);
+        ImageView imageView = (ImageView) emptyView.findViewById(R.id.icon);
+        tv.setText(getString(R.string.achievements_empty_message));
+        imageView.setImageResource(R.drawable.trophy);
+        ((ViewGroup) mAchievementsListView.getParent()).addView(emptyView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mAchievementsListView.setEmptyView(emptyView);
 
         /**
          * Context Menu
@@ -98,10 +104,9 @@ public class AchievementsFragment extends BaseFragment {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        if (v.getId() == R.id.achievement_list) {
-            MenuInflater inflater = getActivity().getMenuInflater();
-            inflater.inflate(R.menu.achievement_listview_menu, menu);
-        }
+//        Log.d("Achievement", "Creating ContextMenu1");
+        MenuInflater inflater = getActivity().getMenuInflater();
+        inflater.inflate(R.menu.achievement_listview_menu, menu);
     }
 
     @Override
@@ -122,6 +127,9 @@ public class AchievementsFragment extends BaseFragment {
     private void reloadItems() {
         mAdapter.clear();
         mAdapter.addAll(tm.getAllSortedArchivedTasks());
+
+        if (mAdapter.isEmpty())
+            Log.d("Adapter Empty", "Empty");
     }
 
     @Override

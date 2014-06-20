@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="pref_general_settings"
+        android:title="@string/pref_general_settings">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="IS_AUTO_ROTATE_ENABLED"
+            android:title="Auto-rotate Screen" />
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:key="pref_bits_settings"
+        android:title="@string/pref_bits_settings">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="IS_SWIPE_FEEDBACK_ON"
+            android:summary="@string/enable_swipe_feedback_text"
+            android:title="@string/enable_swipe_feedback_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="IS_BITSLIST_HELP_ON"
+            android:summary="@string/show_instructions_text"
+            android:title="@string/show_instructions_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="IS_BITSLIST_SHAKE_ON"
+            android:summary="@string/enable_shake_text"
+            android:title="@string/enable_shake_title" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
