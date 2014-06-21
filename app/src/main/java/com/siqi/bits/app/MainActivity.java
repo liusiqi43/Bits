@@ -150,7 +150,11 @@ public class MainActivity extends ActionBarActivity
             case HELP_ITEM_INDEX:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-                builder.setView(getLayoutInflater().inflate(R.layout.help_all, null, false));
+                View v = getLayoutInflater().inflate(R.layout.help_all, null, false);
+                if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(BitsListFragment.REWARD_HISTORY_ON_TAP_ENABLED, false)) {
+                    v.findViewById(R.id.view_history).setVisibility(View.VISIBLE);
+                }
+                builder.setView(v);
 
                 builder.setPositiveButton(R.string.got_it, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {

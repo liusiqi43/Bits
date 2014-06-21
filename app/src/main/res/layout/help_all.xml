@@ -127,7 +127,8 @@
             android:orientation="horizontal"
             android:padding="1dp"
             android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            android:paddingRight="10dp"
+            android:visibility="gone">
 
             <ImageView
                 android:layout_width="50dp"

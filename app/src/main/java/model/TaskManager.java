@@ -1,8 +1,10 @@
 package model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.Pair;
 
@@ -43,6 +45,10 @@ public class TaskManager {
     public static final int ACTION_TYPE_SKIP = 2;
     public static final int ACTION_TYPE_LATE = 3;
     public static final int ACTION_TYPE_ANY = 4;
+    public static final String TOTAL_SKIP_COUNT = "TOTAL_SKIP_COUNT";
+    public static final String TOTAL_DONE_COUNT = "TOTAL_DONE_COUNT";
+    public static final String TOTAL_LATE_COUNT = "TOTAL_LATE_COUNT";
+    public static final String TOTAL_TASK_ADDED = "TOTAL_TASK_ADDED";
     public static CachedComparator mBitsComparator;
     private static TaskManager INSTANCE = null;
     private SQLiteDatabase mDB;
@@ -55,6 +61,7 @@ public class TaskManager {
     private ArrayList<String> mDoneSlogans = new ArrayList<String>();
     private Random mRandomiser;
     private ReminderScheduleService mScheduleService = null;
+    private SharedPreferences mPreferences;
 
     private TaskManager(Context ctx) {
         /**
@@ -72,6 +79,7 @@ public class TaskManager {
 
         mContext = ctx;
 
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(ctx);
         setUp();
     }
 
@@ -111,6 +119,15 @@ public class TaskManager {
         mDoneSlogans.add("Incredible!");
         mDoneSlogans.add("Impressive!");
         mDoneSlogans.add("Bravo!");
+        mDoneSlogans.add("Champion!");
+        mDoneSlogans.add("Go you!");
+        mDoneSlogans.add("Smashing!");
+        mDoneSlogans.add("Well done!");
+        mDoneSlogans.add("Nice one!");
+        mDoneSlogans.add("Hero!");
+        mDoneSlogans.add("Winner!");
+        mDoneSlogans.add("Good going!");
+        mDoneSlogans.add("Kudos!");
 
         mPrettyTime = new PrettyTime();
         mRandomiser = new Random();
@@ -127,8 +144,10 @@ public class TaskManager {
                 .where(TaskDao.Properties.Description.eq(t.getDescription()), TaskDao.Properties.DeletedOn.isNull(), TaskDao.Properties.Archieved_on.isNull())
                 .list().size() > 0)
             throw new DuplicatedTaskException();
-        else
+        else {
             mTaskDao.insert(t);
+            mPreferences.edit().putInt(TOTAL_TASK_ADDED, mPreferences.getInt(TOTAL_TASK_ADDED, 0) + 1).commit();
+        }
     }
 
     public Task newTask() {
@@ -146,14 +165,9 @@ public class TaskManager {
     }
 
     public List<Task> getAllSortedTasks() {
-//        long start = System.nanoTime();
         List<Task> tasks = getAllTasks();
-//        Log.d("TIMING", "SQL: " + (System.nanoTime() - start) / 1000000);
-
-//        start = System.nanoTime();
         mBitsComparator.reset();
         Collections.sort(tasks, mBitsComparator);
-//        Log.d("TIMING", "Sort: " + (System.nanoTime() - start) / 1000000);
 
         return tasks;
     }
@@ -315,12 +329,15 @@ public class TaskManager {
         switch (ACTION_TYPE) {
             case ACTION_TYPE_SKIP:
                 t.setSkipCount(t.getSkipCount() + 1);
+                mPreferences.edit().putInt(TOTAL_SKIP_COUNT, mPreferences.getInt(TOTAL_SKIP_COUNT, 0) + 1).commit();
                 break;
             case ACTION_TYPE_DONE:
                 t.setDoneCount(t.getDoneCount() + 1);
+                mPreferences.edit().putInt(TOTAL_DONE_COUNT, mPreferences.getInt(TOTAL_DONE_COUNT, 0) + 1).commit();
                 break;
             case ACTION_TYPE_LATE:
                 t.setLateCount(t.getLateCount() + 1);
+                mPreferences.edit().putInt(TOTAL_LATE_COUNT, mPreferences.getInt(TOTAL_LATE_COUNT, 0) + 1).commit();
         }
         t.update();
         ActionRecord record = new ActionRecord(null, ACTION_TYPE, date, t.getCurrentInterval(), t.getNextScheduledTime(), t.getId());
@@ -393,9 +410,11 @@ public class TaskManager {
         switch (record.getAction()) {
             case ACTION_TYPE_DONE:
                 record.getTask().setDoneCount(record.getTask().getDoneCount() - 1);
+                mPreferences.edit().putInt(TOTAL_DONE_COUNT, Math.max(mPreferences.getInt(TOTAL_DONE_COUNT, 0) - 1, 0)).commit();
                 break;
             case ACTION_TYPE_SKIP:
                 record.getTask().setSkipCount(record.getTask().getSkipCount() - 1);
+                mPreferences.edit().putInt(TOTAL_SKIP_COUNT, Math.max(mPreferences.getInt(TOTAL_SKIP_COUNT, 0) - 1, 0)).commit();
                 break;
         }
 

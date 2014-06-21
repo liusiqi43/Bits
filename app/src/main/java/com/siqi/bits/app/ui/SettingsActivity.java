@@ -1,8 +1,11 @@
 package com.siqi.bits.app.ui;
 
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
 
 import com.siqi.bits.app.R;
@@ -24,6 +27,15 @@ public class SettingsActivity extends PreferenceActivity {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         addPreferencesFromResource(R.xml.preferences);
+
+        if (!prefs.getBoolean(BitsListFragment.REWARD_UNDO_ON_SHAKE_ENABLED, false)) {
+            PreferenceCategory category = (PreferenceCategory) findPreference("pref_bits_settings");
+            CheckBoxPreference shakeCheckbox = (CheckBoxPreference) findPreference("IS_BITSLIST_SHAKE_ON");
+            category.removePreference(shakeCheckbox);
+        }
+
     }
 }

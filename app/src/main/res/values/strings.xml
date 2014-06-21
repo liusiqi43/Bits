@@ -79,7 +79,7 @@
     <string name="top_right_to_add">Top-right button to add</string>
     <string name="change_the_first">change the first</string>
     <string name="of_your_life">of your life!</string>
-    <string name="got_it">OK, got it!</string>
+    <string name="got_it">Got it, thanks!</string>
     <string name="hey_you_found_it">Hey you found it!</string>
     <string name="tap_to_modify">edit current task</string>
     <string name="swipe_left_for_done">Swipe left for done</string>
@@ -106,4 +106,25 @@
     <string name="show_notifications_delay_title">Notification time</string>
     <string name="show_notifications_delay_text">how long should I notify you before the task is late?</string>
     <string name="show_notifications_delay_diaglogtitle">Notification time before tasks get late</string>
+    <string name="first_done">First Task Done!</string>
+    <string name="first_new_task_title">New Task!</string>
+    <string name="first_new_task_summary">Well done! You have just created your first task!</string>
+    <string name="first_new_task_details">Tasks are arranged by their next due time, the more often you want to do it, the more often it will be on top of the list.</string>
+    <string name="first_done_summary">Marking your first done!</string>
+    <string name="first_done_details">Tasks will be rearranged into the right order, it will go to the bottom as you do it as planned.</string>
+    <string name="first_skip">Skipping</string>
+    <string name="first_skip_summary">Run out of time? You can skip it!</string>
+    <string name="first_skip_details">Skipping is useful when you can\'t finish a task on time and have to skip it for this time.</string>
+    <string name="first_late">First late :\'/</string>
+    <string name="first_late_summary">Task will be marked as late if you haven\'t done it on time. Try to get things done when the progress bar is red.</string>
+    <string name="first_late_details">Just a friendly reminder though, chin up! :D</string>
+    <string name="reward_history_on_tap">Timeline Unlocked!</string>
+    <string name="reward_history_on_tap_summary">That\'s 5 tasks done! You deserve a reward!</string>
+    <string name="reward_history_on_tap_details">You can now tap on an item to see its history!</string>
+    <string name="reward_bitslist_help_off">That\'s 10 done!</string>
+    <string name="reward_bitslist_help_off_summary">You\'re clearly getting the hang of things!</string>
+    <string name="reward_bitslist_help_off_details">I\'ve disabled the help for you to save some space. \nYou can enable it from the settings.</string>
+    <string name="reward_undo_on_shake">That\'s 30 done!</string>
+    <string name="reward_undo_on_shake_summary">You deserve a reward!</string>
+    <string name="reward_undo_on_shake_details">From now on you can shake to undo last skip/done on tasks! \nYou can disable that in the settings.</string>
 </resources>
