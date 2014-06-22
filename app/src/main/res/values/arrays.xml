@@ -36,4 +36,22 @@
         <item>90</item>
         <item>120</item>
     </string-array>
+
+    <string-array name="done_slogans">
+        <item>Good Job!</item>
+        <item>You Rock!</item>
+        <item>Awesome!</item>
+        <item>Incredible!</item>
+        <item>Impressive!</item>
+        <item>Bravo!</item>
+        <item>Champion!</item>
+        <item>Go you!</item>
+        <item>Smashing!</item>
+        <item>Well done!</item>
+        <item>Nice one!</item>
+        <item>Hero!</item>
+        <item>Winner!</item>
+        <item>Good going!</item>
+        <item>Kudos!</item>
+    </string-array>
 </resources>

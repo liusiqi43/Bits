@@ -58,7 +58,7 @@ public class TaskManager {
     private ActionRecordDao mActionRecordDao;
     private PrettyTime mPrettyTime;
     private Context mContext;
-    private ArrayList<String> mDoneSlogans = new ArrayList<String>();
+    private String[] mDoneSlogans;
     private Random mRandomiser;
     private ReminderScheduleService mScheduleService = null;
     private SharedPreferences mPreferences;
@@ -113,21 +113,7 @@ public class TaskManager {
         PeriodToDays.put((long) 30 * 24 * 60 * 60 * 1000, 30);
         PeriodToDays.put((long) 365 * 24 * 60 * 60 * 1000, 365);
 
-        mDoneSlogans.add("Good Job!");
-        mDoneSlogans.add("You Rock!");
-        mDoneSlogans.add("Awesome!");
-        mDoneSlogans.add("Incredible!");
-        mDoneSlogans.add("Impressive!");
-        mDoneSlogans.add("Bravo!");
-        mDoneSlogans.add("Champion!");
-        mDoneSlogans.add("Go you!");
-        mDoneSlogans.add("Smashing!");
-        mDoneSlogans.add("Well done!");
-        mDoneSlogans.add("Nice one!");
-        mDoneSlogans.add("Hero!");
-        mDoneSlogans.add("Winner!");
-        mDoneSlogans.add("Good going!");
-        mDoneSlogans.add("Kudos!");
+        mDoneSlogans = mContext.getResources().getStringArray(R.array.done_slogans);
 
         mPrettyTime = new PrettyTime();
         mRandomiser = new Random();
@@ -473,7 +459,7 @@ public class TaskManager {
     }
 
     public CharSequence getDoneSlogan() {
-        return mDoneSlogans.get(mRandomiser.nextInt(mDoneSlogans.size()));
+        return mDoneSlogans[mRandomiser.nextInt(mDoneSlogans.length)];
     }
 
     public class CachedComparator implements Comparator<Task> {

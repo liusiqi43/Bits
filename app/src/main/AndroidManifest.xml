@@ -12,9 +12,10 @@
         <activity
             android:name="com.siqi.bits.app.MainActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:logo="@drawable/ic_banner"
             android:screenOrientation="fullSensor">
-        <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
