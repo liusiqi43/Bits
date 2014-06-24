@@ -35,7 +35,7 @@ public class ReminderPublishReceiver extends BroadcastReceiver {
         try {
             // The PendingIntent to launch our activity if the user selects this notification
             PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0,
-                    new Intent(ctx, MainActivity.class), 0);
+                    new Intent(ctx, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP), 0);
 
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(ctx)
                     .setContentTitle("Bits reminder")

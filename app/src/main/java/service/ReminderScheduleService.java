@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 import model.TaskManager;
+import utils.Utils;
 
 /**
  * Created by me on 4/30/14.
@@ -40,7 +41,8 @@ public class ReminderScheduleService extends Service {
             public void run() {
                 reloadTasks();
                 for (Task t : mTasks) {
-                    scheduleForTask(t);
+                    if (t.getNextScheduledTime() > Utils.currentTimeMillis())
+                        scheduleForTask(t);
                 }
             }
         }).start();

@@ -263,7 +263,7 @@ public class TaskManager {
         return null;
     }
 
-    public void setNextScheduledTimeForTaskAfterRemove(Task t, long nextScheduledTime, long currentInterval) {
+    public void setNextScheduledTimeForTaskAfterUndo(Task t, long nextScheduledTime, long currentInterval) {
         if (mScheduleService != null)
             mScheduleService.unScheduleForTask(t);
         else {
@@ -410,7 +410,7 @@ public class TaskManager {
         currentTask.resetActionsRecords();
         currentTask.update();
 
-        setNextScheduledTimeForTaskAfterRemove(currentTask, record.getPreviousNextScheduledTime(), record.getPreviousInterval());
+        setNextScheduledTimeForTaskAfterUndo(currentTask, record.getPreviousNextScheduledTime(), record.getPreviousInterval());
     }
 
     public void setSkipActionForTask(Task t) {

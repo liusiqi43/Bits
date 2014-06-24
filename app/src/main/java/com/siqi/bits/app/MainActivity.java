@@ -258,7 +258,7 @@ public class MainActivity extends ActionBarActivity
         }
 
         doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Click BACK again to quit", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.click_back_twice_to_quit), Toast.LENGTH_SHORT).show();
 
         new Handler().postDelayed(new Runnable() {
             @Override

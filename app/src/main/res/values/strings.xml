@@ -127,4 +127,5 @@
     <string name="reward_undo_on_shake">That\'s 30 done!</string>
     <string name="reward_undo_on_shake_summary">You deserve a reward!</string>
     <string name="reward_undo_on_shake_details">From now on you can shake to undo last skip/done on tasks! \nYou can disable that in the settings.</string>
+    <string name="click_back_twice_to_quit">Click BACK again to quit</string>
 </resources>
