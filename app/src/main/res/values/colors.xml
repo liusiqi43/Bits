@@ -53,4 +53,6 @@
     <color name="danger_progress_color">@color/Pomegranate</color>
     <color name="achieveColor">@color/doneColor</color>
     <color name="black">#444444</color>
+
+    <color name="transparent">#00000000</color>
 </resources>

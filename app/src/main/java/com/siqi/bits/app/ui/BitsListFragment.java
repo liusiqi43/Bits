@@ -93,9 +93,9 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     public static final String IS_FIRST_SKIP = "IS_FIRST_SKIP";
     public static final String IS_FIRST_LATE = "IS_FIRST_LATE";
     public static final String IS_FIRST_TASK_ADDED = "IS_FIRST_TASK_ADDED";
+    public static final String TASKS_COUNT_LIMIT_UNLOCKED = "TASKS_COUNT_LIMIT_UNLOCKED";
     private static final int REFRESH_PERIOD = 60 * 1000;
     private static final int FREEMIUM_TASK_COUNT_LIMIT = 5;
-
     SwipeListView mBitsListView;
     BitListArrayAdapter mAdapter;
     AnimateDismissAdapter mAnimateDismissAdapter;
@@ -373,13 +373,14 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.action_new) {
-            if (mAdapter.getItemCount() < FREEMIUM_TASK_COUNT_LIMIT) {
+            if (mAdapter.getItemCount() < FREEMIUM_TASK_COUNT_LIMIT || mPreferences.getBoolean(TASKS_COUNT_LIMIT_UNLOCKED, false)) {
                 Intent intent = new Intent(getActivity(), NewBitActivity.class);
                 getActivity().overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_top);
                 startActivity(intent);
                 return true;
             } else {
-
+                Intent intent = new Intent(getActivity(), InAppPurchaseActivity.class);
+                startActivity(intent);
             }
         }
 

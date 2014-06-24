@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">Bits</string>
-
     <string name="bits">Tasks</string>
     <string name="achievements">Achievements</string>
     <string name="statistics">Statistics</string>
@@ -10,7 +9,6 @@
     <string name="feedback">Send feedback</string>
     <string name="help">Help</string>
     <string name="share">Share Bits</string>
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_new">New</string>
@@ -18,8 +16,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="actionbar_cancel">Cancel</string>
     <string name="actionbar_save">Save</string>
-
-
     <string name="radio_day">day</string>
     <string name="radio_week">week</string>
     <string name="radio_month">month</string>
@@ -37,7 +33,6 @@
     <string name="done">Done</string>
     <string name="skip">Skip</string>
     <string name="actionview_tag">ACTION</string>
-
     <string name="last_record_seems_to_be">Your last action seems to be a </string>
     <string name="do_you_want_to_undo_it">\nDo you want to undo it?</string>
     <string name="on_task"> on task </string>
@@ -47,7 +42,6 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="achieved">Archived</string>
-
     <string name="nav_header_bits">Bits</string>
     <string name="nav_header_misc">Misc.</string>
     <string name="burndown_viewpagerstrip_title">Trend</string>
@@ -128,4 +122,17 @@
     <string name="reward_undo_on_shake_summary">You deserve a reward!</string>
     <string name="reward_undo_on_shake_details">From now on you can shake to undo last skip/done on tasks! \nYou can disable that in the settings.</string>
     <string name="click_back_twice_to_quit">Click BACK again to quit</string>
+    <string name="title_activity_in_app_purchase">Upgrade</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="want_more_than_5_tasks">Want more than 5 tasks?</string>
+    <string name="upgrade_to_add_unlimited">Upgrade to add unlimited tasks and get more control over your time!</string>
+    <string name="all_for_just">All for just $</string>
+    <string name="upgrade_now">Upgrade Now!</string>
+    <string name="failed_to_connect_to_play_store">Failed to Google Play Store for now.</string><string name="make_sure_your_device_is_connected">Please make sure that your device is online and try again later.
+Sorry about this.</string>
+    <string name="oops">Oops</string>
+    <string name="thank_you_for_your_purchase">Purchase completed!</string>
+    <string name="thanks_to_people_like_you">Thanks to people like you, Bits can continue its development and bring better experience to you! \nNow go back and add new tasks as you like!</string>
+    <string name="success">Success!</string>
+
 </resources>
