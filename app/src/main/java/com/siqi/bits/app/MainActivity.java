@@ -109,7 +109,7 @@ public class MainActivity extends ActionBarActivity
                     // Oh noes, there was a problem.
                     Log.d("In-App Purchase", "Problem setting up In-app Billing: " + result);
                 }
-                // Hooray, IAB is fully set up!
+                Log.d("In-App Purchase", "Set-up: Success");
             }
         });
     }
