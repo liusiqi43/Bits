@@ -20,9 +20,11 @@
         <item>30 minutes before late</item>
         <item>40 minutes before late</item>
         <item>50 minutes before late</item>
-        <item>60 minutes before late</item>
-        <item>90 minutes before late</item>
-        <item>120 minutes before late</item>
+        <item>1 hour before late</item>
+        <item>2 hours before late</item>
+        <item>3 hours before late</item>
+        <item>4 hours before late</item>
+        <item>5 hours before late</item>
     </array>
 
     <string-array name="notification_time_values">
@@ -35,6 +37,9 @@
         <item>60</item>
         <item>90</item>
         <item>120</item>
+        <item>180</item>
+        <item>240</item>
+        <item>300</item>
     </string-array>
 
     <string-array name="done_slogans">

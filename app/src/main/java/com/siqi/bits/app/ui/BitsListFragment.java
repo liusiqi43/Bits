@@ -94,6 +94,8 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     public static final String IS_FIRST_LATE = "IS_FIRST_LATE";
     public static final String IS_FIRST_TASK_ADDED = "IS_FIRST_TASK_ADDED";
     private static final int REFRESH_PERIOD = 60 * 1000;
+    private static final int FREEMIUM_TASK_COUNT_LIMIT = 5;
+
     SwipeListView mBitsListView;
     BitListArrayAdapter mAdapter;
     AnimateDismissAdapter mAnimateDismissAdapter;
@@ -371,10 +373,14 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.action_new) {
-            Intent intent = new Intent(getActivity(), NewBitActivity.class);
-            getActivity().overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_top);
-            startActivity(intent);
-            return true;
+            if (mAdapter.getItemCount() < FREEMIUM_TASK_COUNT_LIMIT) {
+                Intent intent = new Intent(getActivity(), NewBitActivity.class);
+                getActivity().overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_top);
+                startActivity(intent);
+                return true;
+            } else {
+
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -645,6 +651,10 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
             };
 
             mItems = t;
+        }
+
+        public int getItemCount() {
+            return mItems.size();
         }
 
         @Override

@@ -233,17 +233,13 @@ public class AchievementsFragment extends BaseFragment {
 
             Integer days = (int) Math.ceil((double) (t.getArchieved_on().getTime() - t.getCreatedOn().getTime()) / TaskManager.DAY_IN_MILLIS);
             int periodInDays = (int) (t.getPeriod() / TaskManager.DAY_IN_MILLIS);
-            double periodCounts = Math.ceil((double) days / periodInDays);
-
-            Double freq = Math.round(t.getDoneCount() / periodCounts * 100.0) / 100.0;
-
-            Log.d("Achievement", "days: " + days + " periodInDays" + periodInDays + " periodCounts" + periodCounts + " freq:" + freq);
+            Double actualDoneFrequency = Math.round(periodInDays * (t.getDoneCount() / days) * 100.0) / 100.0;
 
             holder.taskIcon.setImageBitmap(bitmap);
             holder.taskTitle.setText(t.getDescription());
             holder.taskGoal.setText(t.getFrequency() + " times/" + TaskManager.PeriodStringToDays.inverse().get(periodInDays));
             holder.interval.setText("t/" + TaskManager.PeriodStringToDays.inverse().get(periodInDays));
-            holder.freq.setText(freq.toString());
+            holder.freq.setText(actualDoneFrequency.toString());
             holder.daysCount.setText(days.toString());
             holder.lateCount.setText(Integer.toString(t.getLateCount()));
             holder.doneCount.setText(Integer.toString(t.getDoneCount()));
