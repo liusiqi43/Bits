@@ -35,6 +35,8 @@ import com.siqi.bits.app.ui.StatsFragment;
 import java.util.List;
 import java.util.Stack;
 
+import utils.IabHelper;
+import utils.IabResult;
 import utils.Utils;
 
 public class MainActivity extends ActionBarActivity
@@ -57,6 +59,7 @@ public class MainActivity extends ActionBarActivity
     private boolean doubleBackToExitPressedOnce = false;
     private View mContainerView;
     private Integer mActionbarIcon;
+    private IabHelper mBillingHelper;
 
     @Override
     protected void onSaveInstanceState(Bundle bundle) {
@@ -94,6 +97,21 @@ public class MainActivity extends ActionBarActivity
 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
+        /**
+         * In-app billing
+         */
+        String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn1vS35/bnUlJ+TmB29ZkXcMTLHQmjxhG6rCl5iqRkbhFFk7QnCEyYTPVEQN5nRizs5pi9eyrXXe3Cm2e8Xh/xyH9upCMf9ICPF4TXRPqwmmmh0ghg9b/cnz3w8rrgzBZOCDiDl0agpeo0weiQ11UTdrLGXc7iS4tUx8LN7H9SMux62z6gkaMOOkJOdPTzH+cogE5HqBFGzg1AvR3lnGM+pDGm7L6rJ6omQcmeM2FonnDwzY1Ww+5OVutY4D4IQuwUPmGsOJMJwAY4JKbUiNMwkG1PsfQG/QSJc6dJ8oLq12dXKftB8bCQB3CDt50Nlp8AGp6g3deiC6TCHjqrx/NUwIDAQAB";
+        mBillingHelper = new IabHelper(this, base64EncodedPublicKey);
+        mBillingHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+            public void onIabSetupFinished(IabResult result) {
+                if (!result.isSuccess()) {
+                    // Oh noes, there was a problem.
+                    Log.d("In-App Purchase", "Problem setting up In-app Billing: " + result);
+                }
+                // Hooray, IAB is fully set up!
+            }
+        });
     }
 
     @Override
@@ -286,5 +304,12 @@ public class MainActivity extends ActionBarActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mBillingHelper != null) mBillingHelper.dispose();
+        mBillingHelper = null;
     }
 }
