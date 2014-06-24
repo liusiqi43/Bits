@@ -41,8 +41,7 @@ public class ReminderScheduleService extends Service {
             public void run() {
                 reloadTasks();
                 for (Task t : mTasks) {
-                    if (t.getNextScheduledTime() > Utils.currentTimeMillis())
-                        scheduleForTask(t);
+                    scheduleForTask(t);
                 }
             }
         }).start();
@@ -61,6 +60,9 @@ public class ReminderScheduleService extends Service {
     }
 
     public void scheduleForTask(Task t) {
+        if (t.getNextScheduledTime() <= Utils.currentTimeMillis())
+            return;
+
         new AsyncTask<Task, Void, Void>() {
             @Override
             protected Void doInBackground(Task... tasks) {
