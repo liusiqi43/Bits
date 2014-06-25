@@ -31,10 +31,12 @@ public class Utils {
                 if (!result.isSuccess()) {
                     // Oh noes, there was a problem.
                     Log.d("In-App Purchase", "Problem setting up In-app Billing: " + result);
+                    if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                 }
                 Log.d("In-App Purchase", "Set-up: Success");
 
                 checkIfPremiumPurchased(ctx);
+                if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
             }
         });
     }
@@ -46,9 +48,11 @@ public class Utils {
                                                  Inventory inventory) {
                 if (result.isFailure()) {
                     Log.d("In-App Purchase", "query purchased item failed");
+                    if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                 } else {
                     PreferenceManager.getDefaultSharedPreferences(ctx).edit().putBoolean(BitsListFragment.TASKS_COUNT_LIMIT_UNLOCKED, inventory.hasPurchase(InAppPurchaseActivity.SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK));
                     Log.d("In-App Purchase", "purchased item restored");
+                    if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                 }
             }
         };

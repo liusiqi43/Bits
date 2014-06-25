@@ -52,12 +52,14 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                 if (result.isFailure()) {
                     mProgressDialog.cancel();
                     buildFailureDialog();
+                    if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                     return;
                 }
 
                 if (inventory == null || inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) == null) {
                     mProgressDialog.cancel();
                     buildFailureDialog();
+                    if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                     return;
                 }
 
@@ -67,6 +69,7 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                 TextView priceTextView = (TextView) findViewById(R.id.price_tag);
                 priceTextView.setText(getString(R.string.all_for_just) + " " + UnlockPrice);
                 mProgressDialog.cancel();
+                if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
             }
         });
 
@@ -89,14 +92,17 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                     public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
                         if (result.isFailure()) {
                             buildFailureDialog();
+                            if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                             return;
                         } else if (purchase.getSku().equals(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK)) {
                             mPreferences.edit().putBoolean(BitsListFragment.TASKS_COUNT_LIMIT_UNLOCKED, true).commit();
                             buildThankyouDialog();
+                            if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                             return;
                         }
                     }
                 }, deviceId);
+                if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
             }
         });
     }
