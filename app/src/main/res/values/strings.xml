@@ -126,7 +126,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="want_more_than_5_tasks">Want more than 5 tasks?</string>
     <string name="upgrade_to_add_unlimited">Upgrade to add unlimited tasks and get more control over your time!</string>
-    <string name="all_for_just">All for just $</string>
+    <string name="all_for_just">All for just</string>
     <string name="upgrade_now">Upgrade Now!</string>
     <string name="failed_to_connect_to_play_store">Failed to Google Play Store for now.</string><string name="make_sure_your_device_is_connected">Please make sure that your device is online and try again later.
 Sorry about this.</string>

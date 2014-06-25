@@ -84,7 +84,7 @@
         <item name="android:alertDialogStyle">@style/AppTheme.busyspinner.alert</item>
         <item name="android:windowBackground">@color/transparent</item>
         <item name="android:textColorPrimary">#FFFFFF</item>
-        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:backgroundDimEnabled">true</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">12sp</item>

@@ -667,7 +667,7 @@ public class IabHelper {
     }
 
     /**
-     * Same as {@link consumeAsync}, but for multiple items at once.
+     * Same as consumeAsync, but for multiple items at once.
      *
      * @param purchases The list of PurchaseInfo objects representing the purchases to consume.
      * @param listener  The listener to notify when the consumption operation finishes.
@@ -724,7 +724,7 @@ public class IabHelper {
         logDebug("Starting async operation: " + operation);
     }
 
-    void flagEndAsync() {
+    public void flagEndAsync() {
         logDebug("Ending async operation: " + mAsyncOperation);
         mAsyncOperation = "";
         mAsyncInProgress = false;

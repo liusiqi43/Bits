@@ -65,8 +65,11 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                         inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK).getPrice();
 
                 TextView priceTextView = (TextView) findViewById(R.id.price_tag);
-                priceTextView.setText(getString(R.string.all_for_just) + UnlockPrice);
+                priceTextView.setText(getString(R.string.all_for_just) + " " + UnlockPrice);
                 mProgressDialog.cancel();
+
+                if (Utils.mIabHelper != null)
+                    Utils.mIabHelper.flagEndAsync();
             }
         });
 
@@ -86,15 +89,18 @@ public class InAppPurchaseActivity extends ActionBarActivity {
 
                 Utils.mIabHelper.launchPurchaseFlow(InAppPurchaseActivity.this, SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK, 647, new IabHelper.OnIabPurchaseFinishedListener() {
                     @Override
-                    public void onIabPurchaseFinished(IabResult result, Purchase info) {
+                    public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
                         if (result.isFailure()) {
                             buildFailureDialog();
                             return;
-                        } else if (info.getSku().equals(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK)) {
+                        } else if (purchase.getSku().equals(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK)) {
                             mPreferences.edit().putBoolean(BitsListFragment.TASKS_COUNT_LIMIT_UNLOCKED, true).commit();
                             buildThankyouDialog();
                             return;
                         }
+
+                        if (Utils.mIabHelper != null)
+                            Utils.mIabHelper.flagEndAsync();
                     }
                 }, deviceId);
             }

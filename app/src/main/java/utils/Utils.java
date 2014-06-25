@@ -44,13 +44,15 @@ public class Utils {
                 = new IabHelper.QueryInventoryFinishedListener() {
             public void onQueryInventoryFinished(IabResult result,
                                                  Inventory inventory) {
-
                 if (result.isFailure()) {
                     Log.d("In-App Purchase", "query purchased item failed");
                 } else {
                     PreferenceManager.getDefaultSharedPreferences(ctx).edit().putBoolean(BitsListFragment.TASKS_COUNT_LIMIT_UNLOCKED, inventory.hasPurchase(InAppPurchaseActivity.SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK));
                     Log.d("In-App Purchase", "purchased item restored");
                 }
+
+                if (Utils.mIabHelper != null)
+                    Utils.mIabHelper.flagEndAsync();
             }
         };
 
