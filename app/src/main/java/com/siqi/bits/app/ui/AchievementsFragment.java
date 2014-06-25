@@ -177,7 +177,7 @@ public class AchievementsFragment extends BaseFragment {
                 holder = (HeaderViewHolder) convertView.getTag();
             }
 
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MMM");
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MMM", getResources().getConfiguration().locale);
             holder.text.setText(format.format(mItems.get(position).getArchieved_on()));
             return convertView;
         }
