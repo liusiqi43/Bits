@@ -67,9 +67,6 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                 TextView priceTextView = (TextView) findViewById(R.id.price_tag);
                 priceTextView.setText(getString(R.string.all_for_just) + " " + UnlockPrice);
                 mProgressDialog.cancel();
-
-                if (Utils.mIabHelper != null)
-                    Utils.mIabHelper.flagEndAsync();
             }
         });
 
@@ -98,9 +95,6 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                             buildThankyouDialog();
                             return;
                         }
-
-                        if (Utils.mIabHelper != null)
-                            Utils.mIabHelper.flagEndAsync();
                     }
                 }, deviceId);
             }
