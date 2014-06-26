@@ -114,18 +114,20 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                 Utils.mIabHelper.launchPurchaseFlow(InAppPurchaseActivity.this, SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK, 647, new IabHelper.OnIabPurchaseFinishedListener() {
                     @Override
                     public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
+                        if (GOD_MODE_ON) {
+                            Log.d("In-App Purchase", "purchase done");
+                            mPreferences.edit().putBoolean(BitsListFragment.TASKS_COUNT_LIMIT_UNLOCKED, true).commit();
+                            buildThankyouDialog();
+                            if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                            return;
+                        }
+
                         if (result.isFailure()) {
                             buildFailureDialog();
                             Log.d("In-App Purchase", "purchase failed:" + result);
                             if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                             return;
                         } else if (purchase.getSku().equals(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK)) {
-                            Log.d("In-App Purchase", "purchase done");
-                            mPreferences.edit().putBoolean(BitsListFragment.TASKS_COUNT_LIMIT_UNLOCKED, true).commit();
-                            buildThankyouDialog();
-                            if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
-                            return;
-                        } else if (GOD_MODE_ON) {
                             Log.d("In-App Purchase", "purchase done");
                             mPreferences.edit().putBoolean(BitsListFragment.TASKS_COUNT_LIMIT_UNLOCKED, true).commit();
                             buildThankyouDialog();
