@@ -39,7 +39,6 @@ public class InAppPurchaseActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_in_app_purchase);
 
-
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         List additionalSkuList = new ArrayList();

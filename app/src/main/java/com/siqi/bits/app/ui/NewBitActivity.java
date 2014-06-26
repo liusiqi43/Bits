@@ -35,7 +35,6 @@ import java.util.List;
 
 import model.CategoryManager;
 import model.TaskManager;
-import utils.BitmapProcessor;
 import utils.Utils;
 import views.ExpandingGridView;
 
@@ -287,7 +286,7 @@ public class NewBitActivity extends ActionBarActivity {
             try {
                 is = getAssets().open(c.getIconDrawableName());
                 Bitmap bitmap = BitmapFactory.decodeStream(is);
-                icon.setImageBitmap(BitmapProcessor.invertImage(bitmap));
+                icon.setImageBitmap(bitmap);
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
