@@ -16,7 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
-            android:hint="@string/whats_on_your_mind" />
+            android:hint="@string/whats_on_your_mind"
+            android:inputType="text" />
 
         <TextView
             android:layout_width="wrap_content"
