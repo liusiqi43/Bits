@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -36,70 +35,42 @@ public class ReminderScheduleService extends Service {
     private List<Task> mTasks;
 
     private void scheduleAllAlarms() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                reloadTasks();
-                for (Task t : mTasks) {
-                    scheduleForTask(t);
-                }
-            }
-        }).start();
+        reloadTasks();
+        for (Task t : mTasks) {
+            scheduleForTask(t);
+        }
     }
 
     private void cancelAllAlarms() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                reloadTasks();
-                for (Task t : mTasks) {
-                    unScheduleForTask(t);
-                }
-            }
-        }).start();
+        reloadTasks();
+        for (Task t : mTasks) {
+            unScheduleForTask(t);
+        }
     }
 
     public void scheduleForTask(Task t) {
-        if (t.getNextScheduledTime() <= Utils.currentTimeMillis())
+        if (t.getNextScheduledTime() - Integer.parseInt(mPreferences.getString("NOTIFY_MINUTES_COUNT_BEFORE_LATE", "30")) * MINUTE <= Utils.currentTimeMillis())
             return;
 
-        new AsyncTask<Task, Void, Void>() {
-            @Override
-            protected Void doInBackground(Task... tasks) {
-                Task t = tasks[0];
-                if (t.getNextScheduledTime() < System.currentTimeMillis())
-                    return null;
+        Intent displayTaskIntent = new Intent(ReminderScheduleService.this, ReminderPublishReceiver.class);
+        displayTaskIntent.putExtra(TASK_ID, t.getId());
 
-                Intent displayTaskIntent = new Intent(ReminderScheduleService.this, ReminderPublishReceiver.class);
-                displayTaskIntent.putExtra(TASK_ID, t.getId());
-
-                PendingIntent displayIntent = PendingIntent.getBroadcast(ReminderScheduleService.this, t.getId().intValue(), displayTaskIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
-                mAlarmManager.set(AlarmManager.RTC_WAKEUP, t.getNextScheduledTime() - Integer.parseInt(mPreferences.getString("NOTIFY_MINUTES_COUNT_BEFORE_LATE", "30")) * MINUTE, displayIntent);
-                Log.d("ReminderScheduleService", "Scheduling task:" + t.getId().intValue() + " on " + new Date(t.getNextScheduledTime() - Integer.parseInt(mPreferences.getString("NOTIFY_MINUTES_COUNT_BEFORE_LATE", "30")) * MINUTE).toString());
-                return null;
-            }
-        }.execute(t);
+        PendingIntent displayIntent = PendingIntent.getBroadcast(ReminderScheduleService.this, t.getId().intValue(), displayTaskIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
+        mAlarmManager.set(AlarmManager.RTC_WAKEUP, t.getNextScheduledTime() - Integer.parseInt(mPreferences.getString("NOTIFY_MINUTES_COUNT_BEFORE_LATE", "30")) * MINUTE, displayIntent);
+        Log.d("ReminderScheduleService", "Scheduling task:" + t.getId().intValue() + " on " + new Date(t.getNextScheduledTime() - Integer.parseInt(mPreferences.getString("NOTIFY_MINUTES_COUNT_BEFORE_LATE", "30")) * MINUTE).toString());
     }
 
     public void unScheduleForTask(Task t) {
-        new AsyncTask<Task, Void, Void>() {
-            @Override
-            protected Void doInBackground(Task... tasks) {
-                Task t = tasks[0];
+        Intent displayTaskIntent = new Intent(ReminderScheduleService.this, ReminderPublishReceiver.class);
+        displayTaskIntent.putExtra(TASK_ID, t.getId());
 
-                Intent displayTaskIntent = new Intent(ReminderScheduleService.this, ReminderPublishReceiver.class);
-                displayTaskIntent.putExtra(TASK_ID, t.getId());
-
-                if (t.getId() == null) {
-                    Log.d("Debugging", "t.getId() is null!");
-                }
-                PendingIntent displayIntent = PendingIntent.getBroadcast(ReminderScheduleService.this, t.getId().intValue(), displayTaskIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
-                mAlarmManager.cancel(displayIntent);
-                displayIntent.cancel();
-                Log.d("ReminderScheduleService", "Unscheduling task:" + t.getId().intValue() + " on " + new Date(t.getNextScheduledTime() - Integer.parseInt(mPreferences.getString("NOTIFY_MINUTES_COUNT_BEFORE_LATE", "30")) * MINUTE).toString());
-                return null;
-            }
-        }.execute(t);
+        if (t.getId() == null) {
+            Log.d("Debugging", "t.getId() is null!");
+        }
+        PendingIntent displayIntent = PendingIntent.getBroadcast(ReminderScheduleService.this, t.getId().intValue(), displayTaskIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
+        mAlarmManager.cancel(displayIntent);
+        displayIntent.cancel();
+        Log.d("ReminderScheduleService", "Unscheduling task:" + t.getId().intValue() + " on " + new Date(t.getNextScheduledTime() - Integer.parseInt(mPreferences.getString("NOTIFY_MINUTES_COUNT_BEFORE_LATE", "30")) * MINUTE).toString());
     }
 
     /**

@@ -134,5 +134,8 @@
     <string name="thank_you_for_your_purchase">Purchase completed!</string>
     <string name="thanks_to_people_like_you">Thanks to people like you, Bits can continue its development and bring better experience to you! \nNow go back and add new tasks as you like!</string>
     <string name="success">Success!</string>
+    <string name="bits_reminder_title">Bits reminder</string>
+    <string name="reminder_you_may_want_to">You may want to \"</string>
+    <string name="reminder_questionmark">\"?</string>
 
 </resources>

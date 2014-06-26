@@ -26,23 +26,24 @@ public class ActionOnTaskReceiver extends BroadcastReceiver {
 
         String action = intent.getAction();
 
-        Log.d("ActionOnTaskReceiver", "Intent received with action = " + action);
+        Log.d("ReminderScheduleService", "ActionOnTaskReceiver: Intent received with action = " + action);
 
         Long id = intent.getLongExtra(ReminderScheduleService.TASK_ID, -1);
         if (ReminderScheduleService.DONE_ACTION.equals(action)) {
-            Log.d("ActionOnTaskReceiver", "Done id = " + id);
+            Log.d("ReminderScheduleService", "ActionOnTaskReceiver: Done id = " + id);
             if (id != -1) {
                 Task t = tm.getTask(id);
                 tm.setDoneActionForTask(t);
             }
         } else if (ReminderScheduleService.SKIP_ACTION.equals(action)) {
-            Log.d("ActionOnTaskReceiver", "Skip id = " + id);
+            Log.d("ReminderScheduleService", "ActionOnTaskReceiver: Skip id = " + id);
             if (id != -1) {
                 Task t = tm.getTask(id);
                 tm.setSkipActionForTask(t);
             }
         }
 
-        mNM.cancel(ReminderPublishReceiver.NOTIFICATION_ID, id.intValue());
+        Log.d("ReminderScheduleService", "ActionOnTaskReceiver: Cancel notification for tag = " + context.getPackageName() + " id = " + id.intValue());
+        mNM.cancel(context.getPackageName(), id.intValue());
     }
 }

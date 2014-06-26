@@ -22,7 +22,6 @@ import model.TaskManager;
  * Created by me on 4/30/14.
  */
 public class ReminderPublishReceiver extends BroadcastReceiver {
-    public final static String NOTIFICATION_ID = "TaskReminderPublisher";
     private NotificationManager mNM;
 
     /**
@@ -38,8 +37,8 @@ public class ReminderPublishReceiver extends BroadcastReceiver {
                     new Intent(ctx, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP), 0);
 
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(ctx)
-                    .setContentTitle("Bits reminder")
-                    .setContentText("You may want to do \"" + t.getDescription() + "\"?")
+                    .setContentTitle(ctx.getString(R.string.bits_reminder_title))
+                    .setContentText(ctx.getString(R.string.reminder_you_may_want_to) + t.getDescription() + ctx.getString(R.string.reminder_questionmark))
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setAutoCancel(true)
                     .setLargeIcon(t.getCategory().getIconBitmap(ctx))
@@ -49,21 +48,22 @@ public class ReminderPublishReceiver extends BroadcastReceiver {
             Intent doneReceive = new Intent();
             doneReceive.setAction(ReminderScheduleService.DONE_ACTION);
             doneReceive.putExtra(ReminderScheduleService.TASK_ID, t.getId());
-            PendingIntent pendingIntentDone = PendingIntent.getBroadcast(ctx, 0, doneReceive, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntentDone = PendingIntent.getBroadcast(ctx, t.getId().intValue(), doneReceive, PendingIntent.FLAG_UPDATE_CURRENT);
             notificationBuilder.addAction(R.drawable.ic_action_accept, ctx.getString(R.string.done), pendingIntentDone);
 
             //Skip intent
             Intent skipReceive = new Intent();
             skipReceive.setAction(ReminderScheduleService.SKIP_ACTION);
             skipReceive.putExtra(ReminderScheduleService.TASK_ID, t.getId());
-            PendingIntent pendingIntentSkip = PendingIntent.getBroadcast(ctx, 0, skipReceive, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntentSkip = PendingIntent.getBroadcast(ctx, t.getId().intValue(), skipReceive, PendingIntent.FLAG_UPDATE_CURRENT);
             notificationBuilder.addAction(R.drawable.ic_action_forward, ctx.getString(R.string.skip), pendingIntentSkip);
 
 
             Notification notification = notificationBuilder.build();
 
             // Send the notification.
-            mNM.notify(NOTIFICATION_ID, t.getId().intValue(), notification);
+            Log.d("ReminderScheduleService", "publishNotificationForTask: for " + ctx.getPackageName() + " id=" + t.getId().intValue());
+            mNM.notify(ctx.getPackageName(), t.getId().intValue(), notification);
         } catch (IOException e) {
             e.printStackTrace();
         }

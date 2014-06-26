@@ -21,7 +21,7 @@
             android:title="@string/show_notifications_title" />
 
         <ListPreference
-            android:defaultValue="30"
+            android:defaultValue="60"
             android:dependency="IS_NOTIFICATIONS_ON"
             android:dialogTitle="@string/show_notifications_delay_diaglogtitle"
             android:entries="@array/notification_time_options"
