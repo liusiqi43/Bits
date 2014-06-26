@@ -31,6 +31,7 @@ import utils.Utils;
 public class InAppPurchaseActivity extends ActionBarActivity {
 
     public static final String SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK = "active_tasks_count_limit_unlock";
+    private static boolean GOD_MODE_ON = false;
     //    public static final String SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK = "android.test.purchased";
     private SharedPreferences mPreferences;
     private ProgressDialog mProgressDialog;
@@ -119,6 +120,12 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                             if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                             return;
                         } else if (purchase.getSku().equals(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK)) {
+                            Log.d("In-App Purchase", "purchase done");
+                            mPreferences.edit().putBoolean(BitsListFragment.TASKS_COUNT_LIMIT_UNLOCKED, true).commit();
+                            buildThankyouDialog();
+                            if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                            return;
+                        } else if (GOD_MODE_ON) {
                             Log.d("In-App Purchase", "purchase done");
                             mPreferences.edit().putBoolean(BitsListFragment.TASKS_COUNT_LIMIT_UNLOCKED, true).commit();
                             buildThankyouDialog();
