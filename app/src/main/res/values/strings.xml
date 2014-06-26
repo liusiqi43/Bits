@@ -128,9 +128,9 @@
     <string name="upgrade_to_add_unlimited">Upgrade to add unlimited tasks and get more control over your time!</string>
     <string name="all_for_just">All for just</string>
     <string name="upgrade_now">Upgrade Now!</string>
-    <string name="failed_to_connect_to_play_store">Failed to Google Play Store for now.</string><string name="make_sure_your_device_is_connected">Please make sure that your device is online and try again later.
-Sorry about this.</string>
-    <string name="oops">Oops</string>
+    <string name="failed_to_connect_to_play_store">Failed to Google Play Store for now.</string>
+    <string name="make_sure_your_device_is_connected">Please make sure that you have never purchased this item and the device is online and try again later. \nSorry about this.</string>
+    <string name="oops">Something went wrong :\'/</string>
     <string name="thank_you_for_your_purchase">Purchase completed!</string>
     <string name="thanks_to_people_like_you">Thanks to people like you, Bits can continue its development and bring better experience to you! \nNow go back and add new tasks as you like!</string>
     <string name="success">Success!</string>

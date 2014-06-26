@@ -4,11 +4,13 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -28,6 +30,7 @@ import utils.Utils;
 public class InAppPurchaseActivity extends ActionBarActivity {
 
     public static final String SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK = "active_tasks_count_limit_unlock";
+    //    public static final String SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK = "android.test.purchased";
     private SharedPreferences mPreferences;
     private ProgressDialog mProgressDialog;
 
@@ -50,6 +53,7 @@ public class InAppPurchaseActivity extends ActionBarActivity {
         Utils.mIabHelper.queryInventoryAsync(true, additionalSkuList, new IabHelper.QueryInventoryFinishedListener() {
             public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
                 if (result.isFailure()) {
+                    Log.d("In-App Purchase", "query failed");
                     mProgressDialog.cancel();
                     buildFailureDialog();
                     if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
@@ -57,6 +61,7 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                 }
 
                 if (inventory == null || inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) == null) {
+                    Log.d("In-App Purchase", "inventory == null || inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) == null");
                     mProgressDialog.cancel();
                     buildFailureDialog();
                     if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
@@ -70,6 +75,22 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                 priceTextView.setText(getString(R.string.all_for_just) + " " + UnlockPrice);
                 mProgressDialog.cancel();
                 if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+
+//                IabHelper.OnConsumeFinishedListener mConsumeFinishedListener =
+//                        new IabHelper.OnConsumeFinishedListener() {
+//                            public void onConsumeFinished(Purchase purchase, IabResult result) {
+//                                if (result.isSuccess()) {
+//                                    Log.d("In-App Purchase", "item consumed");
+//                                }
+//                                else {
+//                                    Log.d("In-App Purchase", "item consumption failed");
+//                                }
+//                            }
+//                        };
+
+//                Log.d("In-App Purchase", "inventory.hasPurchase(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) = " + inventory.hasPurchase(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK));
+//                Utils.mIabHelper.consumeAsync(inventory.getPurchase(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK),
+//                        mConsumeFinishedListener);
             }
         });
 
@@ -87,24 +108,43 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                 UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
                 String deviceId = deviceUuid.toString();
 
+
                 Utils.mIabHelper.launchPurchaseFlow(InAppPurchaseActivity.this, SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK, 647, new IabHelper.OnIabPurchaseFinishedListener() {
                     @Override
                     public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
                         if (result.isFailure()) {
                             buildFailureDialog();
+                            Log.d("In-App Purchase", "purchase failed:" + result);
                             if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                             return;
                         } else if (purchase.getSku().equals(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK)) {
+                            Log.d("In-App Purchase", "purchase done");
                             mPreferences.edit().putBoolean(BitsListFragment.TASKS_COUNT_LIMIT_UNLOCKED, true).commit();
                             buildThankyouDialog();
                             if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                             return;
                         }
+                        Log.d("In-App Purchase", "purchase.getSku() = " + purchase.getSku());
                     }
                 }, deviceId);
                 if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d("In-App Purchase", "onActivityResult(" + requestCode + "," + resultCode + ","
+                + data);
+
+        // Pass on the activity result to the helper for handling
+        if (!Utils.mIabHelper.handleActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
+        } else {
+            Log.d("In-App Purchase", "onActivityResult handled by IABUtil.");
+        }
     }
 
     private void buildFailureDialog() {

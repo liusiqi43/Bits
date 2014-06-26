@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@color/Turquoise" android:state_selected="true"></item>
-    <item android:drawable="@color/Turquoise" android:state_pressed="true"></item>
-    <item android:drawable="@color/SeaGreen"></item>
+    <item android:drawable="@color/SeaGreen" android:state_selected="true"></item>
+    <item android:drawable="@color/SeaGreen" android:state_pressed="true"></item>
+    <item android:drawable="@color/Turquoise"></item>
 </selector>

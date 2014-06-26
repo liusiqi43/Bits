@@ -47,7 +47,7 @@ public class Utils {
             public void onQueryInventoryFinished(IabResult result,
                                                  Inventory inventory) {
                 if (result.isFailure()) {
-                    Log.d("In-App Purchase", "query purchased item failed");
+                    Log.d("In-App Purchase", "query purchased item failed: " + result);
                     if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                 } else {
                     PreferenceManager.getDefaultSharedPreferences(ctx).edit().putBoolean(BitsListFragment.TASKS_COUNT_LIMIT_UNLOCKED, inventory.hasPurchase(InAppPurchaseActivity.SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK));

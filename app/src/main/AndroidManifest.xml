@@ -70,6 +70,7 @@
         <activity
             android:name="com.siqi.bits.app.ui.InAppPurchaseActivity"
             android:label="@string/title_activity_in_app_purchase"
+            android:logo="@android:color/transparent"
             android:parentActivityName="com.siqi.bits.app.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
