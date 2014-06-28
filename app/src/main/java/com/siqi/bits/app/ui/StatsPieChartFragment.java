@@ -50,7 +50,7 @@ public class StatsPieChartFragment extends BaseFragment {
     /**
      * The main series that will include all the data.
      */
-    private CategorySeries mSeries = new CategorySeries("Task by category");
+    private CategorySeries mSeries;
     /**
      * The main renderer for the main dataset.
      */
@@ -80,6 +80,8 @@ public class StatsPieChartFragment extends BaseFragment {
         mRenderer.setZoomButtonsVisible(false);
         mRenderer.setStartAngle(180);
         mRenderer.setDisplayValues(false);
+
+        mSeries = new CategorySeries(getActivity().getString(R.string.tasks_by_category));
 
         tm = TaskManager.getInstance(getActivity());
         cm = CategoryManager.getInstance(getActivity());
@@ -146,9 +148,10 @@ public class StatsPieChartFragment extends BaseFragment {
     }
 
     private boolean CheckValidation(CheckBox cb) {
-        if (!mActiveTasks && !mArchivedTasks) {
+        mCatIdToCount = tm.getCategoryWithCount(mActiveTasks, mArchivedTasks);
+        if (mCatIdToCount == null || mCatIdToCount.size() < PIE_DISPLAY_MIN_PARTS) {
             cb.setChecked(true);
-            Toast.makeText(getActivity(), "Not enough data", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.not_enough_data), Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;

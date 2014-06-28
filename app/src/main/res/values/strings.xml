@@ -137,5 +137,7 @@
     <string name="bits_reminder_title">Bits reminder</string>
     <string name="reminder_you_may_want_to">You may want to \"</string>
     <string name="reminder_questionmark">\"?</string>
+    <string name="not_enough_data">Not enough data</string>
+    <string name="tasks_by_category">Tasks by category</string>
 
 </resources>

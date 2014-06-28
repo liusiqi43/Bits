@@ -117,12 +117,14 @@ public class StatsXYChartFragment extends BaseFragment implements AdapterView.On
     private void reloadGraph() {
         Log.d("Charting", "reloadGraph()");
         List<ActionRecordManager.DateBurnratePair> items = arm.getActionRateForLastDays(mDisplayedAction, mLastDaysCount);
-        if (!items.isEmpty()) {
+        if (items.size() >= TREND_DISPLAY_MIN_NUMBERS) {
             BurndownChart chart = new BurndownChart();
             mChartViewContainer.removeAllViews();
             mChartViewContainer.addView(chart.getView(getActivity(), arm.getActionRateForLastDays(mDisplayedAction, mLastDaysCount)));
         } else {
-            Toast.makeText(getActivity(), "Not enough data", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.not_enough_data), Toast.LENGTH_SHORT).show();
+            if (mActionSpinner != null)
+                mActionSpinner.setSelection(0);
         }
     }
 
