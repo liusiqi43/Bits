@@ -10,6 +10,8 @@ import android.preference.PreferenceManager;
 
 import com.siqi.bits.app.R;
 
+import utils.Utils;
+
 /**
  * Proudly powered by me on 6/20/14.
  * Part of android productivity application Bits
@@ -31,7 +33,7 @@ public class SettingsActivity extends PreferenceActivity {
 
         addPreferencesFromResource(R.xml.preferences);
 
-        if (!prefs.getBoolean(BitsListFragment.REWARD_UNDO_ON_SHAKE_ENABLED, false)) {
+        if (!prefs.getBoolean(Utils.REWARD_UNDO_ON_SHAKE_ENABLED, false)) {
             PreferenceCategory category = (PreferenceCategory) findPreference("pref_bits_settings");
             CheckBoxPreference shakeCheckbox = (CheckBoxPreference) findPreference("IS_BITSLIST_SHAKE_ON");
             category.removePreference(shakeCheckbox);

@@ -31,7 +31,6 @@ import utils.Utils;
 public class InAppPurchaseActivity extends ActionBarActivity {
 
     public static final String SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK = "active_tasks_count_limit_unlock";
-    private static boolean GOD_MODE_ON = false;
     //    public static final String SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK = "android.test.purchased";
     private SharedPreferences mPreferences;
     private ProgressDialog mProgressDialog;
@@ -114,9 +113,9 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                 Utils.mIabHelper.launchPurchaseFlow(InAppPurchaseActivity.this, SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK, 647, new IabHelper.OnIabPurchaseFinishedListener() {
                     @Override
                     public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
-                        if (GOD_MODE_ON) {
+                        if (Utils.GOD_MODE_ON) {
                             Log.d("In-App Purchase", "purchase done");
-                            mPreferences.edit().putBoolean(BitsListFragment.TASKS_COUNT_LIMIT_UNLOCKED, true).commit();
+                            mPreferences.edit().putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, true).commit();
                             buildThankyouDialog();
                             if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                             return;
@@ -129,7 +128,7 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                             return;
                         } else if (purchase.getSku().equals(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK)) {
                             Log.d("In-App Purchase", "purchase done");
-                            mPreferences.edit().putBoolean(BitsListFragment.TASKS_COUNT_LIMIT_UNLOCKED, true).commit();
+                            mPreferences.edit().putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, true).commit();
                             buildThankyouDialog();
                             if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                             return;

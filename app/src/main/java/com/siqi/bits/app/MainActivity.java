@@ -155,7 +155,7 @@ public class MainActivity extends ActionBarActivity
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
                 View v = getLayoutInflater().inflate(R.layout.help_all, null, false);
-                if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(BitsListFragment.REWARD_HISTORY_ON_TAP_ENABLED, false)) {
+                if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED, false)) {
                     v.findViewById(R.id.view_history).setVisibility(View.VISIBLE);
                 }
                 builder.setView(v);

@@ -51,7 +51,7 @@ import android.widget.ViewSwitcher;
 import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
-import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
+import com.nhaarman.listviewanimations.swinginadapters.prepared.ScaleInAnimationAdapter;
 import com.siqi.bits.ActionRecord;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.MainActivity;
@@ -84,22 +84,13 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
     public static final int CARD_INFO = 0;
     public static final int CARD_ACTION = 1;
-    public static final String IS_BITSLIST_HELP_ON = "IS_BITSLIST_HELP_ON";
-    public static final String IS_BITSLIST_SHAKE_ON = "IS_BITSLIST_SHAKE_ON";
-    public static final String IS_BITSLIST_LONGPRESS_HELP_ON = "IS_BITSLIST_LONGPRESS_HELP_ON";
-    public static final String REWARD_HISTORY_ON_TAP_ENABLED = "REWARD_HISTORY_ON_TAP";
-    public static final String REWARD_UNDO_ON_SHAKE_ENABLED = "REWARD_UNDO_ON_SHAKE_ENABLED";
-    public static final String IS_FIRST_DONE = "IS_FIRST_DONE";
-    public static final String IS_FIRST_SKIP = "IS_FIRST_SKIP";
-    public static final String IS_FIRST_LATE = "IS_FIRST_LATE";
-    public static final String IS_FIRST_TASK_ADDED = "IS_FIRST_TASK_ADDED";
-    public static final String TASKS_COUNT_LIMIT_UNLOCKED = "TASKS_COUNT_LIMIT_UNLOCKED";
+
     private static final int REFRESH_PERIOD = 60 * 1000;
     private static final int FREEMIUM_TASK_COUNT_LIMIT = 5;
     SwipeListView mBitsListView;
     BitListArrayAdapter mAdapter;
     AnimateDismissAdapter mAnimateDismissAdapter;
-    SwingBottomInAnimationAdapter mSwingBottomInAnimationAdapter;
+    ScaleInAnimationAdapter mScaleInAnimationAdapter;
     // Reordering animation
     HashMap<Long, Integer> mSavedState = new HashMap<Long, Integer>();
     Interpolator mInterpolator = new DecelerateInterpolator();
@@ -159,7 +150,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
 
-        if (mPreferences.getBoolean("IS_AUTO_ROTATE_ENABLED", false)) {
+        if (mPreferences.getBoolean(Utils.IS_AUTO_ROTATE_ENABLED, false)) {
             getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         } else {
             getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -194,8 +185,10 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         mBanner.setInAnimation(in);
         mBanner.setOutAnimation(out);
 
-        mBitsListView.setAdapter(mSwingBottomInAnimationAdapter);
-        mSwingBottomInAnimationAdapter.setAbsListView(mBitsListView);
+        mBitsListView.setAdapter(mScaleInAnimationAdapter);
+
+
+        mScaleInAnimationAdapter.setAbsListView(mBitsListView);
         mAdapter.setLimit(1);
 
 
@@ -214,7 +207,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                     }
                 }, getResources().getInteger(R.integer.actionview_timeout));
 
-                if (mPreferences.getBoolean(IS_BITSLIST_LONGPRESS_HELP_ON, true)) {
+                if (mPreferences.getBoolean(Utils.IS_BITSLIST_LONGPRESS_HELP_ON, true)) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
                     builder.setView(getActivity().getLayoutInflater().inflate(R.layout.help_longclick, null, false));
@@ -226,7 +219,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                     });
 
                     builder.show();
-                    mPreferences.edit().putBoolean(IS_BITSLIST_LONGPRESS_HELP_ON, false).commit();
+                    mPreferences.edit().putBoolean(Utils.IS_BITSLIST_LONGPRESS_HELP_ON, false).commit();
                 }
 
                 return true;
@@ -298,7 +291,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
         mAdapter = new BitListArrayAdapter(getActivity(), new ArrayList<Task>());
         mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
-        mSwingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(mAnimateDismissAdapter);
+        mScaleInAnimationAdapter = new ScaleInAnimationAdapter(mAnimateDismissAdapter, 0.8f, 150, 300);
         mPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
     }
 
@@ -373,7 +366,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.action_new) {
-            if (mAdapter.getItemCount() < FREEMIUM_TASK_COUNT_LIMIT || mPreferences.getBoolean(TASKS_COUNT_LIMIT_UNLOCKED, false)) {
+            if (mAdapter.getItemCount() < FREEMIUM_TASK_COUNT_LIMIT || mPreferences.getBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, false)) {
                 Intent intent = new Intent(getActivity(), NewBitActivity.class);
                 getActivity().overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_top);
                 startActivity(intent);
@@ -389,7 +382,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
     @Override
     public void onShake() {
-        if (!mPreferences.getBoolean(IS_BITSLIST_SHAKE_ON, true) || !mPreferences.getBoolean(REWARD_UNDO_ON_SHAKE_ENABLED, false))
+        if (!mPreferences.getBoolean(Utils.IS_BITSLIST_SHAKE_ON, true) || !mPreferences.getBoolean(Utils.REWARD_UNDO_ON_SHAKE_ENABLED, false))
             return;
 
         if (mUndoDialogDisplayed)
@@ -504,40 +497,40 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         int lateCount = mPreferences.getInt(TaskManager.TOTAL_LATE_COUNT, 0);
         int newTaskCount = mPreferences.getInt(TaskManager.TOTAL_TASK_ADDED, 0);
 
-        if (newTaskCount > 0 && mPreferences.getBoolean(IS_FIRST_TASK_ADDED, true)) {
+        if (newTaskCount > 0 && mPreferences.getBoolean(Utils.IS_FIRST_TASK_ADDED, true)) {
             displayTextualDialog(getString(R.string.first_new_task_title), getString(R.string.first_new_task_summary), getString(R.string.first_new_task_details));
-            mPreferences.edit().putBoolean(IS_FIRST_TASK_ADDED, false).commit();
+            mPreferences.edit().putBoolean(Utils.IS_FIRST_TASK_ADDED, false).commit();
         }
 
-        if (doneCount > 0 && mPreferences.getBoolean(IS_FIRST_DONE, true)) {
+        if (doneCount > 0 && mPreferences.getBoolean(Utils.IS_FIRST_DONE, true)) {
             displayTextualDialog(getString(R.string.first_done), getString(R.string.first_done_summary), getString(R.string.first_done_details));
-            mPreferences.edit().putBoolean(IS_FIRST_DONE, false).commit();
+            mPreferences.edit().putBoolean(Utils.IS_FIRST_DONE, false).commit();
         }
 
-        if (skipCount > 0 && mPreferences.getBoolean(IS_FIRST_SKIP, true)) {
+        if (skipCount > 0 && mPreferences.getBoolean(Utils.IS_FIRST_SKIP, true)) {
             displayTextualDialog(getString(R.string.first_skip), getString(R.string.first_skip_summary), getString(R.string.first_skip_details));
-            mPreferences.edit().putBoolean(IS_FIRST_SKIP, false).commit();
+            mPreferences.edit().putBoolean(Utils.IS_FIRST_SKIP, false).commit();
         }
 
-        if (lateCount > 0 && mPreferences.getBoolean(IS_FIRST_LATE, true)) {
+        if (lateCount > 0 && mPreferences.getBoolean(Utils.IS_FIRST_LATE, true)) {
             displayTextualDialog(getString(R.string.first_late), getString(R.string.first_late_summary), getString(R.string.first_late_details));
-            mPreferences.edit().putBoolean(IS_FIRST_LATE, false).commit();
+            mPreferences.edit().putBoolean(Utils.IS_FIRST_LATE, false).commit();
         }
     }
 
     private void updateRewards() {
         int doneCount = mPreferences.getInt(TaskManager.TOTAL_DONE_COUNT, 0);
 
-        if (doneCount >= 5 && !mPreferences.getBoolean(REWARD_HISTORY_ON_TAP_ENABLED, false)) {
+        if (doneCount >= 5 && !mPreferences.getBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED, false)) {
             displayTextualDialog(getString(R.string.reward_history_on_tap), getString(R.string.reward_history_on_tap_summary), getString(R.string.reward_history_on_tap_details));
-            mPreferences.edit().putBoolean(REWARD_HISTORY_ON_TAP_ENABLED, true).commit();
-        } else if (doneCount >= 10 && !mPreferences.getBoolean(BitsListFragment.REWARD_HISTORY_ON_TAP_ENABLED, false)) {
+            mPreferences.edit().putBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED, true).commit();
+        } else if (doneCount >= 10 && !mPreferences.getBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED, false)) {
             displayTextualDialog(getString(R.string.reward_bitslist_help_off), getString(R.string.reward_bitslist_help_off_summary), getString(R.string.reward_bitslist_help_off_details));
-            mPreferences.edit().putBoolean(BitsListFragment.REWARD_HISTORY_ON_TAP_ENABLED, true).commit();
-            mPreferences.edit().putBoolean(BitsListFragment.IS_BITSLIST_HELP_ON, false).commit();
-        } else if (doneCount >= 30 && !mPreferences.getBoolean(REWARD_UNDO_ON_SHAKE_ENABLED, false)) {
+            mPreferences.edit().putBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED, true).commit();
+            mPreferences.edit().putBoolean(Utils.IS_BITSLIST_HELP_ON, false).commit();
+        } else if (doneCount >= 30 && !mPreferences.getBoolean(Utils.REWARD_UNDO_ON_SHAKE_ENABLED, false)) {
             displayTextualDialog(getString(R.string.reward_undo_on_shake), getString(R.string.reward_undo_on_shake_summary), getString(R.string.reward_undo_on_shake_details));
-            mPreferences.edit().putBoolean(REWARD_UNDO_ON_SHAKE_ENABLED, true).commit();
+            mPreferences.edit().putBoolean(Utils.REWARD_UNDO_ON_SHAKE_ENABLED, true).commit();
         }
     }
 
@@ -819,12 +812,12 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                         v = li.inflate(R.layout.help_new, parent, false);
                     } else {
                         v = li.inflate(R.layout.help_details, parent, false);
-                        if (mPreferences.getBoolean(REWARD_HISTORY_ON_TAP_ENABLED, false)) {
+                        if (mPreferences.getBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED, false)) {
                             v.findViewById(R.id.view_history).setVisibility(View.VISIBLE);
                         }
                     }
 
-                    if (!mPreferences.getBoolean(IS_BITSLIST_HELP_ON, true))
+                    if (!mPreferences.getBoolean(Utils.IS_BITSLIST_HELP_ON, true))
                         v.setVisibility(View.GONE);
 
                     return v;
@@ -885,7 +878,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                 holder.timeLine.setAdapter(adapter);
             }
 
-            if (!mPreferences.getBoolean(REWARD_HISTORY_ON_TAP_ENABLED, false)) {
+            if (!mPreferences.getBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED, false)) {
                 v.setVisibility(View.GONE);
             }
 

@@ -8,7 +8,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 
-import com.siqi.bits.app.ui.BitsListFragment;
 import com.siqi.bits.app.ui.InAppPurchaseActivity;
 
 /**
@@ -18,8 +17,21 @@ import com.siqi.bits.app.ui.InAppPurchaseActivity;
  * its fullness!
  */
 public class Utils {
+    public static final String IS_BITSLIST_HELP_ON = "IS_BITSLIST_HELP_ON";
+    public static final String IS_BITSLIST_SHAKE_ON = "IS_BITSLIST_SHAKE_ON";
+    public static final String IS_BITSLIST_LONGPRESS_HELP_ON = "IS_BITSLIST_LONGPRESS_HELP_ON";
+    public static final String REWARD_HISTORY_ON_TAP_ENABLED = "REWARD_HISTORY_ON_TAP";
+    public static final String REWARD_UNDO_ON_SHAKE_ENABLED = "REWARD_UNDO_ON_SHAKE_ENABLED";
+    public static final String IS_FIRST_DONE = "IS_FIRST_DONE";
+    public static final String IS_FIRST_SKIP = "IS_FIRST_SKIP";
+    public static final String IS_FIRST_LATE = "IS_FIRST_LATE";
+    public static final String IS_FIRST_TASK_ADDED = "IS_FIRST_TASK_ADDED";
+    public static final String TASKS_COUNT_LIMIT_UNLOCKED = "TASKS_COUNT_LIMIT_UNLOCKED";
+    public static final String IS_AUTO_ROTATE_ENABLED = "IS_AUTO_ROTATE_ENABLED";
+    public static boolean GOD_MODE_ON = false;
     public static DisplayMetrics mDisplayMetrics;
     public static IabHelper mIabHelper;
+
     private static Clock mClock = new SystemClock();
 
     public static Bitmap invertImage(Bitmap src) {
@@ -82,7 +94,7 @@ public class Utils {
                     Log.d("In-App Purchase", "query purchased item failed: " + result);
                     if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                 } else {
-                    PreferenceManager.getDefaultSharedPreferences(ctx).edit().putBoolean(BitsListFragment.TASKS_COUNT_LIMIT_UNLOCKED, inventory.hasPurchase(InAppPurchaseActivity.SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK));
+                    PreferenceManager.getDefaultSharedPreferences(ctx).edit().putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, inventory.hasPurchase(InAppPurchaseActivity.SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK));
                     Log.d("In-App Purchase", "purchased item restored");
                     if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                 }
