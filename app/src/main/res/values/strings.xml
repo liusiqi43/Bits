@@ -139,5 +139,9 @@
     <string name="reminder_questionmark">\"?</string>
     <string name="not_enough_data">Not enough data</string>
     <string name="tasks_by_category">Tasks by category</string>
-
+    <string name="remind_me_later">Remind me later</string>
+    <string name="feeling_more_productive">Feeling more productive with</string>
+    <string name="take_a_moment_to_rate">"? \nPlease take a moment to rate it!"</string>
+    <string name="yeah_sure">Yeah, sure!</string>
+    <string name="no_thanks">No, thanks</string>
 </resources>

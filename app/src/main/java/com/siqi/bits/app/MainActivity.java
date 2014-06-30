@@ -37,6 +37,7 @@ import java.util.Stack;
 
 import utils.IabHelper;
 import utils.Utils;
+import views.AppRater;
 
 public class MainActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -98,6 +99,7 @@ public class MainActivity extends ActionBarActivity
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         Utils.setupIabHelper(this);
+        AppRater.appLaunched(this);
     }
 
     @Override
