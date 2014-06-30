@@ -112,4 +112,13 @@
         <item name="android:padding">10dp</item>
         <item name="android:scaleType">fitCenter</item>
     </style>
+
+    <style name="AppTheme.LongPressHelpDialogIcon">
+        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_height">60dp</item>
+        <item name="android:layout_alignParentLeft">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
 </resources>
