@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:tag="bitslist_fragment"
+    android:background="@color/base_fragment_bg"
     tools:context="com.siqi.bits.app.MainActivity$PlaceholderFragment">
 
     <TextSwitcher
@@ -17,9 +18,8 @@
 
     <com.siqi.bits.swipelistview.SwipeListView xmlns:swipe="http://schemas.android.com/apk/res-auto"
         android:id="@+id/bitslist"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="@color/base_fragment_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:clipToPadding="false"
         android:divider="@android:color/transparent"
         android:listSelector="@android:color/transparent"

@@ -82,7 +82,7 @@
     <string name="tap_to_modify">Edit current task</string>
     <string name="tap_to_modify_details">Changed your plan? You can modify your schedule here. </string>
     <string name="tap_to_remove">Remove current task</string>
-    <string name="tap_to_remove_details">What\'s done is done :P Your dones, skips as well as lates will be kept in the stats</string>
+    <string name="tap_to_remove_details">What\'s done is done :P Your \'dones\', \'skips\' as well as \'lates\' will be kept in the stats</string>
     <string name="tap_to_achieve">Archive finished task</string>
     <string name="tap_to_achieve_details">Archived tasks are in the achievement section, with a task report reminding you of your victory!</string>
     <string name="no_email_client_installed">There are no email clients installed.</string>

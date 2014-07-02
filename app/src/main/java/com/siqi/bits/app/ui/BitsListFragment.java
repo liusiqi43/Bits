@@ -653,7 +653,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
         @Override
         public int getCount() {
-            return mItems.size() + EXTRA_ITEMS_COUNT;
+            return mPreferences.getBoolean(Utils.IS_BITSLIST_HELP_ON, true) ? mItems.size() + EXTRA_ITEMS_COUNT : mItems.size();
         }
 
         @Override
@@ -801,11 +801,12 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            View v = null;
             switch (getItemViewType(position)) {
                 case ITEM_TYPE_TASK:
-                    View v = super.getView(position, convertView, parent);
+                    v = super.getView(position, convertView, parent);
                     ((SwipeListView) parent).recycle(v, position);
-                    return v;
+                    break;
                 case ITEM_TYPE_HELP:
                     LayoutInflater li = getActivity().getLayoutInflater();
                     if (mItems.size() == 0) {
@@ -816,14 +817,10 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                             v.findViewById(R.id.view_history).setVisibility(View.VISIBLE);
                         }
                     }
-
-                    if (!mPreferences.getBoolean(Utils.IS_BITSLIST_HELP_ON, true))
-                        v.setVisibility(View.GONE);
-
-                    return v;
+                    break;
             }
             // Should not happen
-            return null;
+            return v;
         }
 
         @Override
