@@ -9,6 +9,7 @@ import com.siqi.bits.Category;
 import com.siqi.bits.CategoryDao;
 import com.siqi.bits.DaoMaster;
 import com.siqi.bits.DaoSession;
+import com.siqi.bits.app.R;
 
 import java.util.Date;
 import java.util.List;
@@ -25,6 +26,7 @@ public class CategoryManager {
     private DaoMaster mDaoMaster;
     private DaoSession mDaoSession;
     private CategoryDao mCategoryDao;
+    private Context mContext;
 
     private CategoryManager(Context ctx) {
         /**
@@ -38,6 +40,7 @@ public class CategoryManager {
         mDaoMaster = new DaoMaster(mDB);
         mDaoSession = mDaoMaster.newSession();
         mCategoryDao = mDaoSession.getCategoryDao();
+        mContext = ctx;
 
         initWithCategories();
     }
@@ -52,25 +55,25 @@ public class CategoryManager {
         if (mCategoryDao.count() < 19) {
             mCategoryDao.deleteAll();
 
-            addCategoryWithNameAndIcon("Reading", "literature-75");
-            addCategoryWithNameAndIcon("Love", "two_hearts-75");
-            addCategoryWithNameAndIcon("Culture", "university-75");
-            addCategoryWithNameAndIcon("Arts", "origami-75");
-            addCategoryWithNameAndIcon("Social", "message-75");
-            addCategoryWithNameAndIcon("Study", "student-75");
-            addCategoryWithNameAndIcon("Project", "compass2-75");
-            addCategoryWithNameAndIcon("Sports", "football2-75");
-            addCategoryWithNameAndIcon("Finance", "USD-75");
-            addCategoryWithNameAndIcon("Food", "diningroom-75");
-            addCategoryWithNameAndIcon("Movie", "film_reel-75");
-            addCategoryWithNameAndIcon("Concert", "french_horn-75");
-            addCategoryWithNameAndIcon("Health", "heart_monitor-75");
-            addCategoryWithNameAndIcon("Inspiration", "idea-75");
-            addCategoryWithNameAndIcon("Music", "music-75");
-            addCategoryWithNameAndIcon("Photography", "slr_camera2-75");
-            addCategoryWithNameAndIcon("Memory", "stack_of_photos-75");
-            addCategoryWithNameAndIcon("Excursion", "mountain_biking-75");
-            addCategoryWithNameAndIcon("Advanture", "treasury_map-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.reading), "literature-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.love), "two_hearts-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.culture), "university-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.arts), "origami-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.letter), "message-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.study), "student-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.project), "compass2-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.sports), "football2-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.finance), "USD-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.food), "diningroom-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.movie), "film_reel-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.instruments), "french_horn-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.health), "heart_monitor-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.inspiration), "idea-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.music), "music-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.photography), "slr_camera2-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.moments), "stack_of_photos-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.excursion), "mountain_biking-75");
+            addCategoryWithNameAndIcon(mContext.getString(R.string.adventure), "treasury_map-75");
         }
     }
 

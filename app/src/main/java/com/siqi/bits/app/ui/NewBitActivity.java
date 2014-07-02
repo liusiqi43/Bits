@@ -16,8 +16,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -110,7 +110,7 @@ public class NewBitActivity extends ActionBarActivity {
                 TextView t = new TextView(NewBitActivity.this);
                 t.setGravity(Gravity.CENTER_HORIZONTAL);
                 t.setBackgroundColor(getResources().getColor(R.color.MidnightBlue));
-                t.setPadding(5, 5, 5, 5);
+                t.setPadding(15, 5, 15, 5);
                 t.setTextAppearance(NewBitActivity.this, android.R.style.TextAppearance_Holo_Large_Inverse);
                 return t;
             }
@@ -141,7 +141,6 @@ public class NewBitActivity extends ActionBarActivity {
         };
 
         mCategoryGridView.setOnItemClickListener(mOnClickListener);
-
 
         if (mEditingBitID != null) {
             Log.d("BitListFrag", "Loading bit to edit");
@@ -192,6 +191,8 @@ public class NewBitActivity extends ActionBarActivity {
             Log.d("BitListFrag", "Handling new bit");
             mTask.setCategory(cm.getDefaultCategory());
         }
+
+        mCategorySelectedTV.setText(cm.getDefaultCategory().getName());
     }
 
     @Override
@@ -265,12 +266,6 @@ public class NewBitActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mCategorySelectedTV.setText(mTask.getCategory().getName());
     }
 
     private class CategoryAdapter extends ArrayAdapter<Category> {
