@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,12 +17,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextSwitcher;
+import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 import com.siqi.bits.Category;
@@ -55,9 +60,9 @@ public class NewBitActivity extends ActionBarActivity {
 
     private ExpandingGridView mCategoryGridView;
 
-    private CategoryAdapter mAdapter;
+    private TextSwitcher mCategorySelectedTV;
 
-    private OnNewBitInteractionListener mListener;
+    private CategoryAdapter mAdapter;
 
     private CategoryManager cm;
     private TaskManager tm;
@@ -94,9 +99,25 @@ public class NewBitActivity extends ActionBarActivity {
         mBitTitleEditText = (EditText) findViewById(R.id.bit_title_edittext);
         mFrequencyRBtnGroup = (RadioGroup) findViewById(R.id.frequency_radio_group);
         mPeriodRBtnGroup = (RadioGroup) findViewById(R.id.interval_radio_group);
+        mCategorySelectedTV = (TextSwitcher) findViewById(R.id.category_selected);
         mCategoryGridView = (ExpandingGridView) findViewById(R.id.category_gridview);
 
         mBitTitleEditText.requestFocus();
+
+        mCategorySelectedTV.setFactory(new ViewSwitcher.ViewFactory() {
+            @Override
+            public View makeView() {
+                TextView t = new TextView(NewBitActivity.this);
+                t.setGravity(Gravity.CENTER_HORIZONTAL);
+                t.setBackgroundColor(getResources().getColor(R.color.MidnightBlue));
+                t.setPadding(5, 5, 5, 5);
+                t.setTextAppearance(NewBitActivity.this, android.R.style.TextAppearance_Holo_Large_Inverse);
+                return t;
+            }
+        });
+
+        mCategorySelectedTV.setInAnimation(AnimationUtils.loadAnimation(this, R.anim.card_flip_top_in));
+        mCategorySelectedTV.setOutAnimation(AnimationUtils.loadAnimation(this, R.anim.card_flip_bottom_out));
 
         // Inflate the layout for this fragment
         mAdapter = new CategoryAdapter(this, cm.getAllCategories());
@@ -108,6 +129,7 @@ public class NewBitActivity extends ActionBarActivity {
 
         mOnClickListener = new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                mCategorySelectedTV.setText(mAdapter.getItem(position).getName());
                 v.setBackgroundResource(R.color.MidnightBlue);
 
                 if (mLastSelected != null && mLastSelected != v)
@@ -245,19 +267,10 @@ public class NewBitActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnNewBitInteractionListener {
-        // TODO: Update argument type and name
-        public void onNewDisposeInteraction();
+    @Override
+    public void onResume() {
+        super.onResume();
+        mCategorySelectedTV.setText(mTask.getCategory().getName());
     }
 
     private class CategoryAdapter extends ArrayAdapter<Category> {
