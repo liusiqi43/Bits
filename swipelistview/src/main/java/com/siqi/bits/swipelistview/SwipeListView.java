@@ -96,26 +96,20 @@ public class SwipeListView extends ListView {
      * Indicates no movement
      */
     private final static int TOUCH_STATE_REST = 0;
-
+    private int touchState = TOUCH_STATE_REST;
     /**
      * State scrolling x position
      */
     private final static int TOUCH_STATE_SCROLLING_X = 1;
-
     /**
      * State scrolling y position
      */
     private final static int TOUCH_STATE_SCROLLING_Y = 2;
-
-    private int touchState = TOUCH_STATE_REST;
-
+    int swipeFrontView = 0;
+    int swipeBackView = 0;
     private float lastMotionX;
     private float lastMotionY;
     private int touchSlop;
-
-    int swipeFrontView = 0;
-    int swipeBackView = 0;
-
     /**
      * Internal listener for common swipe events
      */
@@ -385,6 +379,12 @@ public class SwipeListView extends ListView {
     protected void onClickFrontView(int position) {
         if (swipeListViewListener != null && position != ListView.INVALID_POSITION) {
             swipeListViewListener.onClickFrontView(position);
+        }
+    }
+
+    protected void onGeneratedAnimationFinished() {
+        if (swipeListViewListener != null) {
+            swipeListViewListener.onGeneratedAnimationFinished();
         }
     }
 

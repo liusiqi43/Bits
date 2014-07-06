@@ -525,6 +525,7 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         swipeListView.resetScrolling();
+                        swipeListView.onGeneratedAnimationFinished();
                         resetCell();
                     }
                 });

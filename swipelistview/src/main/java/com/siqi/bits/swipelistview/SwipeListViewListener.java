@@ -128,4 +128,9 @@ public interface SwipeListViewListener {
      */
     void onRightChoiceAction(int position);
 
+    /**
+     * Close animation finishes after swipe
+     */
+    void onGeneratedAnimationFinished();
+
 }

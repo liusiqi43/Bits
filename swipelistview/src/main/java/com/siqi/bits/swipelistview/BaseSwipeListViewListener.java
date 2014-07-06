@@ -66,11 +66,16 @@ public class BaseSwipeListViewListener implements SwipeListViewListener {
 
     @Override
     public void onLeftChoiceAction(int position) {
-        Log.d("onLeftChoiceAction", position+"'s left choice Called");
+        Log.d("onLeftChoiceAction", position + "'s left choice Called");
     }
 
     @Override
     public void onRightChoiceAction(int position) {
-        Log.d("onRightChoiceAction", position+"'s right choice Called");
+        Log.d("onRightChoiceAction", position + "'s right choice Called");
+    }
+
+    @Override
+    public void onGeneratedAnimationFinished() {
+
     }
 }
