@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -92,7 +93,6 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     private static final int FREEMIUM_TASK_COUNT_LIMIT = 5;
 
     private static String TAG = "BitsListFragment";
-
     SwipeListView mBitsListView;
     BitListArrayAdapter mAdapter;
     AnimateDismissAdapter mAnimateDismissAdapter;
@@ -122,8 +122,11 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     Runnable mListReloader;
     Handler mListRefresherHandle = new Handler();
     Handler mBannerTextResetHandle = new Handler();
+    private boolean mNeedRearrange = false;
+    private MediaPlayer mTaskFinishNotificaiton;
     private TextSwitcher mBanner;
     private SharedPreferences mPreferences;
+    private boolean mNeedFinishNotification = false;
 
     public BitsListFragment() {
     }
@@ -241,6 +244,8 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                 tm.setSkipActionForTask(item);
 
                 updateBanner(getResources().getColor(R.color.Orange), getString(R.string.skipped));
+                mNeedRearrange = true;
+                mNeedFinishNotification = false;
             }
 
             @Override
@@ -252,12 +257,21 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                 tm.setDoneActionForTask(item);
 
                 updateBanner(getResources().getColor(R.color.Emerald), tm.getDoneSlogan());
+                mNeedRearrange = true;
+                mNeedFinishNotification = true;
             }
 
             @Override
             public void onGeneratedAnimationFinished() {
                 Log.d(TAG, "onGeneratedAnimationFinished");
-                new RearrangeTasks().execute();
+                if (mNeedRearrange) {
+                    new RearrangeTasks().execute();
+                    if (mNeedFinishNotification) {
+                        mTaskFinishNotificaiton.start();
+                        mNeedFinishNotification = false;
+                    }
+                    mNeedRearrange = false;
+                }
             }
 
         });
@@ -344,6 +358,8 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         }
 
         mBanner.setText(getString(R.string.default_banner_text));
+
+        mTaskFinishNotificaiton = MediaPlayer.create(getActivity(), com.siqi.bits.swipelistview.R.raw.chance_stage);
     }
 
     private void startPeriodicRefresh() {
@@ -375,6 +391,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
          * Stop banner from resetting
          */
         mBannerTextResetHandle.removeCallbacksAndMessages(null);
+        mTaskFinishNotificaiton.release();
     }
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -476,12 +493,14 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                 mSavedState.put(dataId, top);
             }
         }
-        for (int i = 0; i < mBitsListView.getChildCount() - BitListArrayAdapter.EXTRA_ITEMS_COUNT; i++) {
+        for (int i = 0; i < mBitsListView.getChildCount(); i++) {
             View v = mBitsListView.getChildAt(i);
             if (v == null)
                 continue;
             int top = v.getTop();
             int dataIdx = first + i;
+            if (dataIdx >= mAdapter.size())
+                break;
             long dataId = mAdapter.getItem(dataIdx).getId();
             mSavedState.put(dataId, top);
         }
@@ -568,8 +587,10 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     private void animateNewState() {
         int first = mBitsListView.getFirstVisiblePosition();
         int last = mBitsListView.getLastVisiblePosition();
-        for (int i = 0; i < mBitsListView.getChildCount() - BitListArrayAdapter.EXTRA_ITEMS_COUNT; i++) {
+        for (int i = 0; i < mBitsListView.getChildCount(); i++) {
             int dataIdx = first + i;
+            if (dataIdx >= mAdapter.size())
+                break;
             long dataId = mAdapter.getItem(dataIdx).getId();
             if (mSavedState.containsKey(dataId)) {
                 View v = mBitsListView.getChildAt(i);

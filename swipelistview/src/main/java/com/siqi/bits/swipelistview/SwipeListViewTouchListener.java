@@ -969,7 +969,9 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
                     case AudioManager.RINGER_MODE_NORMAL:
                         if (mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC) == 0)
                             hapticFeedbackVibrator.vibrate(50);
-                        else mAudioFeedbackPlayer.start();
+                        else {
+                            mAudioFeedbackPlayer.start();
+                        }
                         break;
                 }
                 feedBackSent = true;
