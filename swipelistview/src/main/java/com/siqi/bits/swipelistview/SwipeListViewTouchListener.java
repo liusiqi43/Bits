@@ -49,7 +49,6 @@ import com.nineoldandroids.view.ViewHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import static com.nineoldandroids.view.ViewHelper.setAlpha;
@@ -118,7 +117,6 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
 
     private Vibrator hapticFeedbackVibrator;
 
-    private LinkedList<Float> posXQueue = new LimitedLinkedList<Float>(3);
     private boolean feedBackSent = false;
 
     private AudioManager mAudioManager;
@@ -904,18 +902,6 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
                         deltaX += openedRight.get(downPosition) ? viewWidth - rightOffset : -viewWidth + leftOffset;
                     }
 
-                    if (posXQueue.size() > 2) {
-                        float lastX = posXQueue.getLast();
-                        float llastX = posXQueue.get(posXQueue.size() - 2);
-
-                        if ((motionEvent.getRawX() - lastX) * (lastX - llastX) < 0) {
-                            downX = motionEvent.getRawX();
-                        }
-                    }
-
-                    posXQueue.offer(motionEvent.getRawX());
-                    deltaX = motionEvent.getRawX() - downX;
-
                     move(deltaX);
                     return true;
                 }
@@ -966,7 +952,7 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
         } else if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE) {
             float px2dp = Resources.getSystem().getDisplayMetrics().density;
 
-            float p = 1.2f * (deltaX + posX) / px2dp;
+            float p = (deltaX + posX) / px2dp;
 
             int sign = p > 0 ? 1 : -1;
 
@@ -1073,23 +1059,6 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
         Resources resources = swipeListView.getContext().getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
         return DISPLACE_CHOICE * metrics.density;
-    }
-
-    private class LimitedLinkedList<E> extends LinkedList<E> {
-        private int mLimit;
-
-        public LimitedLinkedList(int s) {
-            this.mLimit = s;
-        }
-
-        @Override
-        public boolean offer(E e) {
-            if (this.size() > mLimit) {
-                this.poll();
-            }
-
-            return super.offer(e);
-        }
     }
 
     /**
