@@ -914,7 +914,6 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
         public TimeLineAdapter(Context ctx, List<ActionRecord> t) {
             super(ctx, R.layout.timeline_girdview_item, t);
-            Collections.reverse(t);
             mItems = t;
         }
 
@@ -929,7 +928,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
             FrameLayout item = (FrameLayout) v.findViewById(R.id.timeline_item);
 
-            switch (mItems.get(position).getAction()) {
+            switch (mItems.get(mItems.size() - position - 1).getAction()) {
                 case TaskManager.ACTION_TYPE_LATE:
                     item.setBackgroundColor(getResources().getColor(R.color.lateColor));
                     break;
