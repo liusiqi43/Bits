@@ -29,6 +29,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
@@ -52,6 +53,8 @@ import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.nhaarman.listviewanimations.swinginadapters.prepared.ScaleInAnimationAdapter;
+import com.nineoldandroids.animation.ArgbEvaluator;
+import com.nineoldandroids.animation.ObjectAnimator;
 import com.siqi.bits.ActionRecord;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.MainActivity;
@@ -237,14 +240,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                 Task item = mAdapter.getItem(position);
                 tm.setSkipActionForTask(item);
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        new RearrangeTasks().execute();
-                    }
-                }, 200);
-
-//                new RearrangeTasks().execute();
+                updateBanner(getResources().getColor(R.color.Orange), getString(R.string.skipped));
             }
 
             @Override
@@ -254,22 +250,14 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
 
                 Task item = mAdapter.getItem(position);
                 tm.setDoneActionForTask(item);
-                mBanner.setText(tm.getDoneSlogan());
 
-                mBannerTextResetHandle.removeCallbacksAndMessages(null);
-                mBannerTextResetHandle.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mBanner.setText(getString(R.string.default_banner_text));
-                    }
-                }, 3 * 1000);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        new RearrangeTasks().execute();
-                    }
-                }, 200);
+                updateBanner(getResources().getColor(R.color.Emerald), tm.getDoneSlogan());
+            }
 
+            @Override
+            public void onGeneratedAnimationFinished() {
+                Log.d(TAG, "onGeneratedAnimationFinished");
+                new RearrangeTasks().execute();
             }
 
         });
@@ -294,6 +282,23 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         startPeriodicRefresh();
 
         return rootView;
+    }
+
+    private void updateBanner(int color, CharSequence bannerText) {
+        ObjectAnimator anim = ObjectAnimator.ofInt(mBanner, "backgroundColor", getActivity().getResources().getColor(R.color.Turquoise));
+        anim.setEvaluator(new ArgbEvaluator());
+        anim.setInterpolator(new AccelerateInterpolator());
+        anim.setDuration(1000);
+        anim.setIntValues(color, getActivity().getResources().getColor(R.color.Turquoise));
+        anim.start();
+        mBanner.setText(bannerText);
+        mBannerTextResetHandle.removeCallbacksAndMessages(null);
+        mBannerTextResetHandle.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mBanner.setText(getString(R.string.default_banner_text));
+            }
+        }, 3 * 1000);
     }
 
     @Override
@@ -629,6 +634,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         // This is called when doInBackground() is finished
         protected void onPostExecute(Void v) {
             mAdapter.notifyDataSetChanged();
+
             animateNewState();
             updateForFeedbacks();
         }

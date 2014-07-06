@@ -146,4 +146,5 @@
     <string name="take_a_moment_to_rate">"? \nPlease take a moment to rate it!"</string>
     <string name="yeah_sure">Yeah, sure!</string>
     <string name="no_thanks">No, thanks</string>
+    <string name="skipped">Skipped!</string>
 </resources>
