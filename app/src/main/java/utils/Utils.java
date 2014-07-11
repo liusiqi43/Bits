@@ -28,7 +28,7 @@ public class Utils {
     public static final String IS_FIRST_TASK_ADDED = "IS_FIRST_TASK_ADDED";
     public static final String TASKS_COUNT_LIMIT_UNLOCKED = "TASKS_COUNT_LIMIT_UNLOCKED";
     public static final String IS_AUTO_ROTATE_ENABLED = "IS_AUTO_ROTATE_ENABLED";
-    public static boolean GOD_MODE_ON = true;
+    public static boolean GOD_MODE_ON = false;
     public static DisplayMetrics mDisplayMetrics;
     public static IabHelper mIabHelper;
 
