@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -126,6 +127,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     private MediaPlayer mTaskFinishNotificaiton;
     private TextSwitcher mBanner;
     private SharedPreferences mPreferences;
+    private AudioManager mAudioManager;
     private boolean mNeedFinishNotification = false;
 
     public BitsListFragment() {
@@ -267,7 +269,9 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                 if (mNeedRearrange) {
                     new RearrangeTasks().execute();
                     if (mNeedFinishNotification) {
-                        mTaskFinishNotificaiton.start();
+                        if (mAudioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL
+                                && mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC) > 0)
+                            mTaskFinishNotificaiton.start();
                         mNeedFinishNotification = false;
                     }
                     mNeedRearrange = false;
@@ -328,6 +332,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
         mScaleInAnimationAdapter = new ScaleInAnimationAdapter(mAnimateDismissAdapter, 0.8f, 150, 300);
         mPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mAudioManager = (AudioManager) getActivity().getSystemService(getActivity().AUDIO_SERVICE);
     }
 
     @Override

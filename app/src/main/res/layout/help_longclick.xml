@@ -75,7 +75,7 @@
                 android:id="@+id/ic_action_read"
                 style="@style/AppTheme.LongPressHelpDialogIcon"
                 android:background="@color/achieveColor"
-                android:src="@drawable/ic_action_read" />
+                android:src="@drawable/achievement_badge" />
 
             <TextView
                 android:id="@+id/ic_action_read_title"

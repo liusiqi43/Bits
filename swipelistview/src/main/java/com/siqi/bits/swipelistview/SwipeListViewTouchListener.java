@@ -61,6 +61,7 @@ import static com.nineoldandroids.view.ViewPropertyAnimator.animate;
 public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener {
 
     private static final int DISPLACE_CHOICE = 75;
+    private static final int STICKY_MARGIN = 10;
     private final SharedPreferences mPreferences;
     private MediaPlayer mAudioFeedbackPlayer;
 
@@ -815,9 +816,9 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
                 }
                 generateAnimate(frontView, swap, swapRight, downPosition);
                 // Left action
-                if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == getDisplayChoiceInPx()) {
+                if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == dp2px(DISPLACE_CHOICE)) {
                     this.swipeListView.onLeftChoiceAction(downPosition);
-                } else if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == -getDisplayChoiceInPx()) {
+                } else if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == -dp2px(DISPLACE_CHOICE)) {
                     this.swipeListView.onRightChoiceAction(downPosition);
                 }
 
@@ -957,11 +958,15 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
 
             int sign = p > 0 ? 1 : -1;
 
-            float newPosX = Math.abs(p) < getDisplayChoiceInPx() ? p : sign * getDisplayChoiceInPx();
-            if (Math.abs(posX) < getDisplayChoiceInPx() || Math.abs(newPosX) < getDisplayChoiceInPx()) {
+            float newPosX = Math.abs(p) < dp2px(DISPLACE_CHOICE) ? p : sign * dp2px(DISPLACE_CHOICE);
+            if (Math.abs(posX) < dp2px(DISPLACE_CHOICE - STICKY_MARGIN)
+                    || Math.abs(newPosX) < dp2px(DISPLACE_CHOICE - STICKY_MARGIN)) {
                 setTranslationX(frontView, newPosX);
                 feedBackSent = false;
-            } else if (mPreferences.getBoolean("IS_SWIPE_FEEDBACK_ON", true) && Math.abs(newPosX) == getDisplayChoiceInPx() && !feedBackSent) {
+            } else if (mPreferences.getBoolean("IS_SWIPE_FEEDBACK_ON", true)
+                    && Math.abs(newPosX) >= dp2px(DISPLACE_CHOICE - STICKY_MARGIN)
+                    && !feedBackSent) {
+                setTranslationX(frontView, sign * dp2px(DISPLACE_CHOICE));
                 switch (mAudioManager.getRingerMode()) {
                     case AudioManager.RINGER_MODE_VIBRATE:
                         hapticFeedbackVibrator.vibrate(50);
@@ -1058,10 +1063,10 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
 
     }
 
-    private float getDisplayChoiceInPx() {
+    private float dp2px(int dp) {
         Resources resources = swipeListView.getContext().getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
-        return DISPLACE_CHOICE * metrics.density;
+        return dp * metrics.density;
     }
 
     /**
