@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.util.LruCache;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -84,7 +83,6 @@ public class AchievementsFragment extends BaseFragment {
         reloadItems();
         mAchievementsListView.setAdapter(mAdapter);
 
-
         View emptyView = inflater.inflate(R.layout.placeholder_empty_view, null);
         TextView tv = (TextView) emptyView.findViewById(R.id.message);
         ImageView imageView = (ImageView) emptyView.findViewById(R.id.icon);
@@ -129,7 +127,7 @@ public class AchievementsFragment extends BaseFragment {
         mAdapter.addAll(tm.getAllSortedArchivedTasks());
 
         if (mAdapter.isEmpty())
-            Log.d("Adapter Empty", "Empty");
+            mAchievementsListView.setVisibility(View.GONE);
     }
 
     @Override
