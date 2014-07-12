@@ -224,7 +224,7 @@ public class TaskManager {
         }
     }
 
-    public ActionRecord getLastActiveActionForTask(Task t) {
+    private ActionRecord getLastActiveActionForTask(Task t) {
         QueryBuilder qb = mActionRecordDao.queryBuilder();
 
         List<ActionRecord> records = qb.where(
@@ -232,8 +232,7 @@ public class TaskManager {
                 qb.or(
                         ActionRecordDao.Properties.Action.eq(ACTION_TYPE_DONE),
                         ActionRecordDao.Properties.Action.eq(ACTION_TYPE_SKIP))
-        )
-                .orderDesc(ActionRecordDao.Properties.RecordOn).list();
+        ).orderDesc(ActionRecordDao.Properties.RecordOn).list();
 
         for (ActionRecord r : records) {
             if (r.getTask().getDeletedOn() == null && r.getTask().getArchieved_on() == null) {
@@ -470,34 +469,57 @@ public class TaskManager {
         }
 
         @Override
-        public int compare(Task task, Task task2) {
-            Long c1 = taskToCount.get(task);
-            Long c2 = taskToCount.get(task2);
+        public int compare(Task t1, Task t2) {
+            return getRankingScore(t1) > getRankingScore(t2) ? -1 : 1;
+        }
 
-            if (c1 == null) {
-                c1 = getActionCountForTaskSinceBeginningOfPeriod(task);
-                taskToCount.put(task, c1);
+        private double getRankingScore(Task t) {
+            double p = getOverdoPenalty(t);
+            double f = getFreshness(t);
+            double u = getUrgency(t);
+
+            Log.d("TaskManager", "======" + t.getDescription() + "=======");
+            Log.d("TaskManager", "p = " + p + " f = " + f + " u = " + u);
+            Log.d("TaskManager", "ranking score = " + (0.3 * p + 0.5 * f + 0.2 * u));
+            return 0.3 * p + 0.5 * f + 0.2 * u;
+        }
+
+        private double getOverdoPenalty(Task t) {
+            Long alreadyDone = taskToCount.get(t);
+
+            if (alreadyDone == null) {
+                alreadyDone = getActionCountForTaskSinceBeginningOfPeriod(t);
+                taskToCount.put(t, alreadyDone);
             }
 
-            if (c2 == null) {
-                c2 = getActionCountForTaskSinceBeginningOfPeriod(task2);
-                taskToCount.put(task2, c2);
-            }
+            long shouldBeDone = t.getFrequency();
 
-            if ((task).getFrequency() <= c1) {
+            // No penalty when we haven't exceeded our proper share
+            if (alreadyDone < shouldBeDone)
                 return 1;
-            } else if ((task2).getFrequency() <= c2) {
-                return -1;
-            }
 
+            return Math.exp(-(alreadyDone - shouldBeDone + 1));
+        }
 
-            if (task.getNextScheduledTime() < task2.getNextScheduledTime()) {
-                return -1;
-            } else if (task2.getNextScheduledTime() < task.getNextScheduledTime()) {
-                return 1;
-            } else {
-                return 0;
-            }
+        private double getFreshness(Task t) {
+            ActionRecord lastAction = getLastActiveActionForTask(t);
+            long lastActionTime = (lastAction != null)
+                    ? lastAction.getRecordOn().getTime()
+                    : t.getCreatedOn().getTime();
+
+            long currentTime = Utils.currentTimeMillis();
+            // >= 1 if the task is almost late, so totally fresh for users
+            // 0 if just done not long ago
+            double rawFreshness = Math.min(Math.max((currentTime - lastActionTime) / (double) t.getCurrentInterval(),
+                    0), 1);
+            // x^0.2 grows super fast when x is small, and finish at 1, so it's normalized
+            double freshness = Math.pow(rawFreshness, 0.2);
+            return freshness;
+        }
+
+        private double getUrgency(Task t) {
+            double urgency = (t.getNextScheduledTime() - Utils.currentTimeMillis()) / (double) t.getCurrentInterval();
+            return Math.exp(-5 * Math.min(Math.max(urgency, 0), 1));
         }
 
         @Override
