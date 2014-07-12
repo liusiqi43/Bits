@@ -11,7 +11,7 @@
         tools:context="com.siqi.bits.app.ui.NewBitActivity">
 
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/bit_title_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

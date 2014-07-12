@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -20,7 +21,7 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -52,7 +53,7 @@ public class NewBitActivity extends ActionBarActivity {
     private Long mEditingBitID;
     private Task mTask;
 
-    private EditText mBitTitleEditText;
+    private AutoCompleteTextView mBitTitleEditText;
     // n times
     private RadioGroup mFrequencyRBtnGroup;
     // per week
@@ -70,6 +71,7 @@ public class NewBitActivity extends ActionBarActivity {
     private AdapterView.OnItemClickListener mOnClickListener;
     private View mLastSelected = null;
     private SharedPreferences mPreferences;
+    private Handler mIdeasSuggestionRefresherHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +98,7 @@ public class NewBitActivity extends ActionBarActivity {
         }
 
         setContentView(R.layout.new_bit_fragment);
-        mBitTitleEditText = (EditText) findViewById(R.id.bit_title_edittext);
+        mBitTitleEditText = (AutoCompleteTextView) findViewById(R.id.bit_title_edittext);
         mFrequencyRBtnGroup = (RadioGroup) findViewById(R.id.frequency_radio_group);
         mPeriodRBtnGroup = (RadioGroup) findViewById(R.id.interval_radio_group);
         mCategorySelectedTV = (TextSwitcher) findViewById(R.id.category_selected);
@@ -193,6 +195,21 @@ public class NewBitActivity extends ActionBarActivity {
         }
 
         mCategorySelectedTV.setText(cm.getDefaultCategory().getName());
+
+        // Get the string array
+        final String[] ideas = getResources().getStringArray(R.array.bits_title_ideas);
+        // Create the adapter and set it to the AutoCompleteTextView
+        ArrayAdapter<String> adapter =
+                new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, ideas);
+        mBitTitleEditText.setAdapter(adapter);
+
+        mIdeasSuggestionRefresherHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mBitTitleEditText.setHint(ideas[Utils.getRandomInt(ideas.length)] + "?");
+                mIdeasSuggestionRefresherHandler.postDelayed(this, 3000);
+            }
+        }, 3000);
     }
 
     @Override

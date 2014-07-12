@@ -10,6 +10,8 @@ import android.util.TypedValue;
 
 import com.siqi.bits.app.ui.InAppPurchaseActivity;
 
+import java.util.Random;
+
 /**
  * Proudly powered by me on 5/21/14.
  * Part of android productivity application Bits
@@ -33,6 +35,7 @@ public class Utils {
     public static IabHelper mIabHelper;
 
     private static Clock mClock = new SystemClock();
+    private static Random mRandomiser = new Random();
 
     public static Bitmap invertImage(Bitmap src) {
         // create new bitmap with the same attributes(width,height)
@@ -62,6 +65,10 @@ public class Utils {
         }
 
         return bmOut;
+    }
+
+    public static int getRandomInt(int range) {
+        return mRandomiser.nextInt(range);
     }
 
     public static void setupIabHelper(final Context ctx) {

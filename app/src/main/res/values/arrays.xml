@@ -59,4 +59,58 @@
         <item>Good going!</item>
         <item>Kudos!</item>
     </string-array>
+
+    <string-array name="bits_title_ideas">
+        <item>Meditate</item>
+        <item>Self improvement</item>
+        <item>Read</item>
+        <item>Take a deep breath</item>
+        <item>Drink some water</item>
+        <item>Eat some fruit</item>
+        <item>See a friend</item>
+        <item>Game!</item>
+        <item>Plan my budget</item>
+        <item>Plan my todo list</item>
+
+        <item>Go outdoor</item>
+        <item>Go for a run</item>
+        <item>Yoga or stretching</item>
+        <item>Hit the gym</item>
+        <item>Go for a ride</item>
+        <item>Go swimming</item>
+        <item>Play some sport</item>
+        <item>Go for a walk</item>
+
+        <item>Celebrate wins</item>
+        <item>Be thankful</item>
+        <item>Be present</item>
+        <item>Call an old friend</item>
+        <item>Help someone</item>
+        <item>Time with family</item>
+        <item>Give someone a gift</item>
+        <item>Write a letter</item>
+
+        <item>Take a great photo</item>
+        <item>Build something</item>
+        <item>Write a blog entry</item>
+        <item>Draw something</item>
+        <item>Write in my journal</item>
+        <item>Play an instrument</item>
+        <item>Learn an instrument</item>
+        <item>Learn a new dish</item>
+
+        <item>Go on an adventure</item>
+        <item>Leave my confort zone</item>
+        <item>Talk to someone new</item>
+        <item>Meet new people</item>
+        <item>Check my posture</item>
+        <item>Set goals for today</item>
+
+        <item>Watch a foreign film</item>
+        <item>Learn something new</item>
+        <item>Listen to a new brand</item>
+        <item>Go travel</item>
+        <item>Watch a TED talk</item>
+    </string-array>
+
 </resources>

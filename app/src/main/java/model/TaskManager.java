@@ -27,7 +27,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.greenrobot.dao.query.QueryBuilder;
@@ -59,7 +58,6 @@ public class TaskManager {
     private PrettyTime mPrettyTime;
     private Context mContext;
     private String[] mDoneSlogans;
-    private Random mRandomiser;
     private ReminderScheduleService mScheduleService = null;
     private SharedPreferences mPreferences;
 
@@ -116,7 +114,6 @@ public class TaskManager {
         mDoneSlogans = mContext.getResources().getStringArray(R.array.done_slogans);
 
         mPrettyTime = new PrettyTime();
-        mRandomiser = new Random();
 
         mBitsComparator = new CachedComparator();
     }
@@ -458,7 +455,7 @@ public class TaskManager {
     }
 
     public CharSequence getDoneSlogan() {
-        return mDoneSlogans[mRandomiser.nextInt(mDoneSlogans.length)];
+        return mDoneSlogans[Utils.getRandomInt(mDoneSlogans.length)];
     }
 
     public class CachedComparator implements Comparator<Task> {
@@ -519,7 +516,7 @@ public class TaskManager {
 
         private double getUrgency(Task t) {
             double urgency = (t.getNextScheduledTime() - Utils.currentTimeMillis()) / (double) t.getCurrentInterval();
-            return Math.exp(-5 * Math.min(Math.max(urgency, 0), 1));
+            return Math.exp(-Math.min(Math.max(urgency, 0), 1));
         }
 
         @Override
