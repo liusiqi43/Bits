@@ -8,6 +8,8 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.siqi.bits.app.ui.InAppPurchaseActivity;
 
 import java.util.Random;
@@ -19,6 +21,7 @@ import java.util.Random;
  * its fullness!
  */
 public class Utils {
+    public static final String TAG = "Utils";
     public static final String IS_BITSLIST_HELP_ON = "IS_BITSLIST_HELP_ON";
     public static final String IS_BITSLIST_SHAKE_ON = "IS_BITSLIST_SHAKE_ON";
     public static final String IS_BITSLIST_LONGPRESS_HELP_ON = "IS_BITSLIST_LONGPRESS_HELP_ON";
@@ -30,9 +33,12 @@ public class Utils {
     public static final String IS_FIRST_TASK_ADDED = "IS_FIRST_TASK_ADDED";
     public static final String TASKS_COUNT_LIMIT_UNLOCKED = "TASKS_COUNT_LIMIT_UNLOCKED";
     public static final String IS_AUTO_ROTATE_ENABLED = "IS_AUTO_ROTATE_ENABLED";
+    public static final String BITS_ADS_SUPPORT_ENABLED = "BITS_ADS_SUPPORT_ENABLED";
+
     public static boolean GOD_MODE_ON = false;
     public static DisplayMetrics mDisplayMetrics;
     public static IabHelper mIabHelper;
+    private static InterstitialAd interstitialAd;
 
     private static Clock mClock = new SystemClock();
     private static Random mRandomiser = new Random();
@@ -122,5 +128,25 @@ public class Utils {
 
     public static long currentTimeMillis() {
         return mClock.currentTimeMillis();
+    }
+
+    public static void loadInterstitialAds(Context context) {
+        // Create the interstitial.
+        interstitialAd = new InterstitialAd(context);
+        interstitialAd.setAdUnitId("ca-app-pub-2295213482033436/3191624502");
+
+        // Create ad request.
+        AdRequest adRequest = new AdRequest.Builder().build();
+
+        // Begin loading your interstitial.
+        interstitialAd.loadAd(adRequest);
+    }
+
+    // Invoke displayInterstitial() when you are ready to display an interstitial.
+    public static void displayInterstitial() {
+        Log.d(TAG, "displayInterstitial called, ads loaded: " + interstitialAd.isLoaded());
+        if (interstitialAd.isLoaded() && getRandomInt(100) < 20) {
+            interstitialAd.show();
+        }
     }
 }

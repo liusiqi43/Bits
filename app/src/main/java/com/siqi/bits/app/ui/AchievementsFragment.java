@@ -102,7 +102,6 @@ public class AchievementsFragment extends BaseFragment {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-//        Log.d("Achievement", "Creating ContextMenu1");
         MenuInflater inflater = getActivity().getMenuInflater();
         inflater.inflate(R.menu.achievement_listview_menu, menu);
     }
@@ -257,7 +256,6 @@ public class AchievementsFragment extends BaseFragment {
         class HeaderViewHolder {
             TextView text;
         }
-
 
 
     }

@@ -11,6 +11,35 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:key="pref_bits_settings"
+        android:title="@string/pref_bits_settings">
+
+        <Preference
+            android:key="BITS_ADS_SUPPORT_ENABLED"
+            android:summary="@string/unlimited_tasks_with_ads_support"
+            android:title="@string/opt_in_ads_support"></Preference>
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="IS_SWIPE_FEEDBACK_ON"
+            android:summary="@string/enable_swipe_feedback_text"
+            android:title="@string/enable_swipe_feedback_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="IS_BITSLIST_HELP_ON"
+            android:summary="@string/show_instructions_text"
+            android:title="@string/show_instructions_title" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="IS_BITSLIST_SHAKE_ON"
+            android:summary="@string/enable_shake_text"
+            android:title="@string/enable_shake_title" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:key="pref_notifications_settings"
         android:title="@string/pref_notifications_settings">
 
@@ -29,29 +58,6 @@
             android:key="NOTIFY_MINUTES_COUNT_BEFORE_LATE"
             android:summary="@string/show_notifications_delay_text"
             android:title="@string/show_notifications_delay_title" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:key="pref_bits_settings"
-        android:title="@string/pref_bits_settings">
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="IS_SWIPE_FEEDBACK_ON"
-            android:summary="@string/enable_swipe_feedback_text"
-            android:title="@string/enable_swipe_feedback_title" />
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="IS_BITSLIST_HELP_ON"
-            android:summary="@string/show_instructions_text"
-            android:title="@string/show_instructions_title" />
-
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="IS_BITSLIST_SHAKE_ON"
-            android:summary="@string/enable_shake_text"
-            android:title="@string/enable_shake_title" />
 
     </PreferenceCategory>
 

@@ -51,6 +51,10 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
@@ -123,6 +127,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
     Runnable mListReloader;
     Handler mListRefresherHandle = new Handler();
     Handler mBannerTextResetHandle = new Handler();
+    private InterstitialAd interstitial;
     private boolean mNeedRearrange = false;
     private MediaPlayer mTaskFinishNotificaiton;
     private TextSwitcher mBanner;
@@ -248,6 +253,10 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                 updateBanner(getResources().getColor(R.color.Orange), getString(R.string.skipped));
                 mNeedRearrange = true;
                 mNeedFinishNotification = false;
+
+                // loading interstitioal Ads
+                if (mPreferences.getBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, false))
+                    Utils.displayInterstitial();
             }
 
             @Override
@@ -298,7 +307,6 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
                 SensorManager.SENSOR_DELAY_UI);
 
         startPeriodicRefresh();
-
         return rootView;
     }
 
@@ -365,6 +373,23 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
         mBanner.setText(getString(R.string.default_banner_text));
 
         mTaskFinishNotificaiton = MediaPlayer.create(getActivity(), com.siqi.bits.swipelistview.R.raw.chance_stage);
+
+        if (mPreferences.getBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, false)) {
+            // Look up the AdView as a resource and load a request.
+            final AdView adView = (AdView) getActivity().findViewById(R.id.adView);
+            adView.setAdListener(new AdListener() {
+                @Override
+                public void onAdLoaded() {
+                    super.onAdLoaded();
+                    adView.setVisibility(View.VISIBLE);
+                }
+            });
+            AdRequest adRequest = new AdRequest.Builder().build();
+            adView.loadAd(adRequest);
+
+            // loading interstitioal Ads
+            Utils.loadInterstitialAds(getActivity());
+        }
     }
 
     private void startPeriodicRefresh() {
@@ -455,7 +480,7 @@ public class BitsListFragment extends BaseFragment implements ShakeEventListener
             builder.setView(tv);
             builder.setTitle(getString(R.string.do_you_want_to_undo_it));
 
-            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(R.string.yes_please, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     tm.removeActionRecordById(record.getId());
                     new ReloadSortedTasks().execute();

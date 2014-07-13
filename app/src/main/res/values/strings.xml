@@ -35,7 +35,8 @@
     <string name="last_record_seems_to_be">Your last action seems to be a </string>
     <string name="do_you_want_to_undo_it">\nDo you want to undo it?</string>
     <string name="on_task"> on task </string>
-    <string name="ok">Yes, Please</string>
+    <string name="yes_please">Yes, Please</string>
+    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="finish">Finish</string>
     <string name="edit">Edit</string>
@@ -127,11 +128,13 @@
     <string name="title_activity_in_app_purchase">Upgrade</string>
     <string name="hello_world">Hello world!</string>
     <string name="want_more_than_5_tasks">Want more than 5 tasks?</string>
-    <string name="upgrade_to_add_unlimited">Get the hang of your 5 tasks? \nUpgrade to add unlimited tasks and get more control over your time!</string>
+    <string name="upgrade_to_add_unlimited">Get the hang of your 5 tasks? \n\nUpgrade to add unlimited tasks and get more control over your time!</string>
     <string name="all_for_just">All for just</string>
     <string name="upgrade_now">Upgrade Now!</string>
     <string name="failed_to_connect_to_play_store">Failed to make the purchase on Google Play.</string>
     <string name="make_sure_your_device_is_connected">Please make sure that your device is online and try again later. \nSorry about this.</string>
+    <string name="unexpected_error">Unexpected failure while communicating with Play Store.</string>
+    <string name="please_send_us_a_feedback">Please help us fix this issue by clicking on the feedback in the sidebar.\n\nSorry about this.</string>
     <string name="oops">Something went wrong :\'/</string>
     <string name="thank_you_for_your_purchase">Purchase completed!</string>
     <string name="thanks_to_people_like_you">Thanks to people like you, Bits can continue its development and bring better experience to you! \nNow go back and add new tasks as you like!</string>
@@ -147,4 +150,14 @@
     <string name="yeah_sure">Yeah, sure!</string>
     <string name="no_thanks">No, thanks</string>
     <string name="skipped">Skipped!</string>
+    <string name="opt_in_ads_support">Disable opt-in ads support</string>
+    <string name="you_have_a_choice">And you do have a choice:</string>
+    <string name="I_understand">In order to upgrade, you can opt-in the ads-support version or pay for the upgrade pacakge on Google Play.</string>
+    <string name="buy_me_a_coffee">Buy me a coffee</string>
+    <string name="ads_support">Opt-in Ads</string>
+    <string name="but_you_can_optin_ads">But you can still opt-in ads support for bits!</string>
+    <string name="ads_support_enabled">Ads support enabled</string>
+    <string name="you_can_switch_to_upgrade_package_if_you_change_mind">You can always switch back to an upgrade package from Google Play in settings to disable ads.\n\nEnjoy!</string>
+    <string name="opt_in_ads">Opt-in Ads</string>
+    <string name="unlimited_tasks_with_ads_support">Click here to switch to an upgrade option from Google Play.</string>
 </resources>

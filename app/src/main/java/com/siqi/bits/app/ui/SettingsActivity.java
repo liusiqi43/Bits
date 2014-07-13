@@ -1,9 +1,11 @@
 package com.siqi.bits.app.ui;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
@@ -35,8 +37,18 @@ public class SettingsActivity extends PreferenceActivity {
 
         if (!prefs.getBoolean(Utils.REWARD_UNDO_ON_SHAKE_ENABLED, false)) {
             PreferenceCategory category = (PreferenceCategory) findPreference("pref_bits_settings");
-            CheckBoxPreference shakeCheckbox = (CheckBoxPreference) findPreference("IS_BITSLIST_SHAKE_ON");
+            CheckBoxPreference shakeCheckbox = (CheckBoxPreference) findPreference(Utils.IS_BITSLIST_SHAKE_ON);
             category.removePreference(shakeCheckbox);
+        }
+
+        PreferenceCategory category = (PreferenceCategory) findPreference("pref_bits_settings");
+        Preference optInAds = findPreference(Utils.BITS_ADS_SUPPORT_ENABLED);
+
+        if (!prefs.getBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, false)) {
+            category.removePreference(optInAds);
+        } else {
+            Intent intent = new Intent(this, InAppPurchaseActivity.class);
+            optInAds.setIntent(intent);
         }
 
     }

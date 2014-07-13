@@ -1,25 +1,40 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bitlist_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/base_fragment_bg"
     android:orientation="vertical"
     android:tag="bitslist_fragment"
-    android:background="@color/base_fragment_bg"
     tools:context="com.siqi.bits.app.MainActivity$PlaceholderFragment">
 
     <TextSwitcher
         android:id="@+id/bitslist_banner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:background="@color/Turquoise"
         android:gravity="center"
         android:padding="7dp" />
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/bitslist_banner"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-2295213482033436/4668357702" />
 
     <com.siqi.bits.swipelistview.SwipeListView xmlns:swipe="http://schemas.android.com/apk/res-auto"
         android:id="@+id/bitslist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/adView"
         android:clipToPadding="false"
         android:divider="@android:color/transparent"
         android:listSelector="@android:color/transparent"
@@ -35,4 +50,4 @@
         swipe:swipeOffsetRight="30dp"
         swipe:swipeOpenOnLongPress="false" />
 
-</LinearLayout>
+</RelativeLayout>

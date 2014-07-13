@@ -31,9 +31,11 @@ import utils.Utils;
 public class InAppPurchaseActivity extends ActionBarActivity {
 
     public static final String SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK = "active_tasks_count_limit_unlock";
+    private static final String TAG = "InAppPurchaseActivity";
     //    public static final String SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK = "android.test.purchased";
     private SharedPreferences mPreferences;
     private ProgressDialog mProgressDialog;
+    private boolean mPlayStoreConnectionSucceeded = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,20 +55,18 @@ public class InAppPurchaseActivity extends ActionBarActivity {
 
         Utils.mIabHelper.queryInventoryAsync(true, additionalSkuList, new IabHelper.QueryInventoryFinishedListener() {
             public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-                if (result.isFailure()) {
-                    Log.d("In-App Purchase", "query failed");
-                    mProgressDialog.cancel();
-                    buildFailureDialog();
-                    if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
-                    return;
-                }
-
                 if (inventory == null || inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) == null) {
-                    Log.d("In-App Purchase", "inventory == null || inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) == null");
+                    Log.d(TAG, "inventory == null || inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) == null");
                     mProgressDialog.cancel();
-                    buildFailureDialog();
+//                    buildUnexpectedFailureDialog();
                     if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                    mPlayStoreConnectionSucceeded = false;
                     return;
+                } else {
+                    Log.d(TAG, "Inventory retrieved");
+                    mProgressDialog.cancel();
+                    if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                    mPlayStoreConnectionSucceeded = true;
                 }
 
                 String UnlockPrice =
@@ -74,24 +74,10 @@ public class InAppPurchaseActivity extends ActionBarActivity {
 
                 TextView priceTextView = (TextView) findViewById(R.id.price_tag);
                 priceTextView.setText(getString(R.string.all_for_just) + " " + UnlockPrice);
+                priceTextView.setVisibility(View.VISIBLE);
                 mProgressDialog.cancel();
                 if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
-
-//                IabHelper.OnConsumeFinishedListener mConsumeFinishedListener =
-//                        new IabHelper.OnConsumeFinishedListener() {
-//                            public void onConsumeFinished(Purchase purchase, IabResult result) {
-//                                if (result.isSuccess()) {
-//                                    Log.d("In-App Purchase", "item consumed");
-//                                }
-//                                else {
-//                                    Log.d("In-App Purchase", "item consumption failed");
-//                                }
-//                            }
-//                        };
-
-//                Log.d("In-App Purchase", "inventory.hasPurchase(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) = " + inventory.hasPurchase(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK));
-//                Utils.mIabHelper.consumeAsync(inventory.getPurchase(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK),
-//                        mConsumeFinishedListener);
+                mPlayStoreConnectionSucceeded = true;
             }
         });
 
@@ -99,44 +85,10 @@ public class InAppPurchaseActivity extends ActionBarActivity {
         purchaseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
-
-                final String tmDevice, tmSerial, androidId;
-                tmDevice = "" + tm.getDeviceId();
-                tmSerial = "" + tm.getSimSerialNumber();
-                androidId = "" + android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-
-                UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
-                String deviceId = deviceUuid.toString();
-
-
-                Utils.mIabHelper.launchPurchaseFlow(InAppPurchaseActivity.this, SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK, 647, new IabHelper.OnIabPurchaseFinishedListener() {
-                    @Override
-                    public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
-                        if (Utils.GOD_MODE_ON) {
-                            Log.d("In-App Purchase", "purchase done");
-                            mPreferences.edit().putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, true).commit();
-                            buildThankyouDialog();
-                            if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
-                            return;
-                        }
-
-                        if (result.isFailure()) {
-                            buildFailureDialog();
-                            Log.d("In-App Purchase", "purchase failed:" + result);
-                            if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
-                            return;
-                        } else if (purchase.getSku().equals(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK)) {
-                            Log.d("In-App Purchase", "purchase done");
-                            mPreferences.edit().putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, true).commit();
-                            buildThankyouDialog();
-                            if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
-                            return;
-                        }
-                        Log.d("In-App Purchase", "purchase.getSku() = " + purchase.getSku());
-                    }
-                }, deviceId);
-                if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                if (mPlayStoreConnectionSucceeded)
+                    buildUpgradeChoiceDialog();
+                else
+                    buildFallbackOptionDialog();
             }
         });
     }
@@ -145,15 +97,52 @@ public class InAppPurchaseActivity extends ActionBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        Log.d("In-App Purchase", "onActivityResult(" + requestCode + "," + resultCode + ","
+        Log.d(TAG, "onActivityResult(" + requestCode + "," + resultCode + ","
                 + data);
 
         // Pass on the activity result to the helper for handling
         if (!Utils.mIabHelper.handleActivityResult(requestCode, resultCode, data)) {
             super.onActivityResult(requestCode, resultCode, data);
         } else {
-            Log.d("In-App Purchase", "onActivityResult handled by IABUtil.");
+            Log.d(TAG, "onActivityResult handled by IABUtil.");
         }
+    }
+
+    private void buildFallbackOptionDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(InAppPurchaseActivity.this);
+
+        View v = getLayoutInflater().inflate(R.layout.help_textual_dialog, null, false);
+
+        TextView titleView = (TextView) v.findViewById(R.id.title);
+        TextView subtitleView = (TextView) v.findViewById(R.id.subtitle);
+
+        titleView.setText(getString(R.string.unexpected_error));
+        subtitleView.setText(getString(R.string.but_you_can_optin_ads));
+
+        builder.setView(v);
+        builder.setTitle(getString(R.string.upgrade_now));
+
+        builder.setPositiveButton(R.string.ads_support, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                Log.d(TAG, "Enabling ads-support");
+                mPreferences.edit()
+                        .putBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, true)
+                        .putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, true)
+                        .commit();
+                dialog.cancel();
+                buildAdsSettingInfoDialog();
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+                onBackPressed();
+            }
+        });
+
+        builder.show();
     }
 
     private void buildFailureDialog() {
@@ -170,15 +159,40 @@ public class InAppPurchaseActivity extends ActionBarActivity {
         builder.setView(v);
         builder.setTitle(getString(R.string.oops));
 
-        builder.setPositiveButton(R.string.got_it, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.cancel();
                 onBackPressed();
             }
         });
 
-        builder.show();
+        builder.show().setCancelable(false);
     }
+
+    private void buildUnexpectedFailureDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(InAppPurchaseActivity.this);
+
+        View v = getLayoutInflater().inflate(R.layout.help_textual_dialog, null, false);
+
+        TextView titleView = (TextView) v.findViewById(R.id.title);
+        TextView subtitleView = (TextView) v.findViewById(R.id.subtitle);
+
+        titleView.setText(getString(R.string.unexpected_error));
+        subtitleView.setText(getString(R.string.please_send_us_a_feedback));
+
+        builder.setView(v);
+        builder.setTitle(getString(R.string.oops));
+
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+                onBackPressed();
+            }
+        });
+
+        builder.show().setCancelable(false);
+    }
+
 
     private void buildThankyouDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(InAppPurchaseActivity.this);
@@ -201,6 +215,119 @@ public class InAppPurchaseActivity extends ActionBarActivity {
             }
         });
 
+        builder.show().setCancelable(false);
+    }
+
+    private void buildUpgradeChoiceDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(InAppPurchaseActivity.this);
+
+        View v = getLayoutInflater().inflate(R.layout.help_textual_dialog, null, false);
+
+        TextView titleView = (TextView) v.findViewById(R.id.title);
+        TextView subtitleView = (TextView) v.findViewById(R.id.subtitle);
+
+        titleView.setText(getString(R.string.you_have_a_choice));
+        subtitleView.setText(getString(R.string.I_understand));
+
+        builder.setView(v);
+        builder.setTitle(getString(R.string.upgrade_now));
+
+        builder.setPositiveButton(R.string.buy_me_a_coffee, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                dialog.cancel();
+
+                final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
+
+                final String tmDevice, tmSerial, androidId;
+                tmDevice = "" + tm.getDeviceId();
+                tmSerial = "" + tm.getSimSerialNumber();
+                androidId = "" + android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+
+                UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
+                String deviceId = deviceUuid.toString();
+
+
+                Utils.mIabHelper.launchPurchaseFlow(InAppPurchaseActivity.this, SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK, 647, new IabHelper.OnIabPurchaseFinishedListener() {
+                    @Override
+                    public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
+                        if (Utils.GOD_MODE_ON) {
+                            Log.d(TAG, "purchase done");
+                            mPreferences.edit()
+                                    .putBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, false)
+                                    .putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, true)
+                                    .commit();
+                            buildThankyouDialog();
+                            if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                            return;
+                        }
+
+                        if (result.isFailure()) {
+                            buildUnexpectedFailureDialog();
+                            Log.d(TAG, "purchase failed:" + result);
+                            if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                            return;
+                        } else if (purchase.getSku().equals(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK)) {
+                            Log.d(TAG, "purchase done");
+                            mPreferences.edit()
+                                    .putBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, false)
+                                    .putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, true)
+                                    .commit();
+                            buildThankyouDialog();
+                            if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                            return;
+                        }
+                        Log.d(TAG, "purchase.getSku() = " + purchase.getSku());
+                    }
+                }, deviceId);
+                if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+            }
+        });
+
+        builder.setNeutralButton(R.string.ads_support, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                Log.d(TAG, "Enabling ads-support");
+                mPreferences.edit()
+                        .putBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, true)
+                        .putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, true)
+                        .commit();
+                dialog.cancel();
+                buildAdsSettingInfoDialog();
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+                onBackPressed();
+            }
+        });
+
         builder.show();
+    }
+
+    private void buildAdsSettingInfoDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(InAppPurchaseActivity.this);
+
+        View v = getLayoutInflater().inflate(R.layout.help_textual_dialog, null, false);
+
+        TextView titleView = (TextView) v.findViewById(R.id.title);
+        TextView subtitleView = (TextView) v.findViewById(R.id.subtitle);
+
+        titleView.setText(getString(R.string.ads_support_enabled));
+        subtitleView.setText(getString(R.string.you_can_switch_to_upgrade_package_if_you_change_mind));
+
+        builder.setView(v);
+        builder.setTitle(getString(R.string.success));
+
+        builder.setPositiveButton(R.string.got_it, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+                onBackPressed();
+            }
+        });
+
+        builder.show().setCancelable(false);
     }
 }
