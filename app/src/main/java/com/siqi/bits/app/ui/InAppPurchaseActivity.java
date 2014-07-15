@@ -267,7 +267,7 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                         }
 
                         if (result.isFailure()) {
-                            buildUnexpectedFailureDialog();
+//                            buildUnexpectedFailureDialog();
                             Log.d(TAG, "purchase failed:" + result);
                             if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                             return;
