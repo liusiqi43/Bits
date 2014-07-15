@@ -8,8 +8,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.Pair;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.siqi.bits.ActionRecord;
 import com.siqi.bits.ActionRecordDao;
 import com.siqi.bits.BitsDevOpenHelper;
@@ -37,7 +35,8 @@ import utils.Utils;
  * Created by me on 4/9/14.
  */
 public class TaskManager {
-    public static final BiMap<String, Integer> PeriodStringToDays = HashBiMap.create();
+    public static final HashMap<String, Integer> PeriodStringToDays = new HashMap();
+    public static final HashMap<Integer, String> DaysToPeriodStrings = new HashMap();
     public static final ConcurrentHashMap<Long, Integer> PeriodToDays = new ConcurrentHashMap<Long, Integer>();
     public static final long DAY_IN_MILLIS = 24 * 3600 * 1000;
     public static final int ACTION_TYPE_DONE = 1;
@@ -105,6 +104,11 @@ public class TaskManager {
         PeriodStringToDays.put(mContext.getString(R.string.radio_week), 7);
         PeriodStringToDays.put(mContext.getString(R.string.radio_month), 30);
         PeriodStringToDays.put(mContext.getString(R.string.radio_year), 365);
+
+        DaysToPeriodStrings.put(1, mContext.getString(R.string.radio_day));
+        DaysToPeriodStrings.put(7, mContext.getString(R.string.radio_week));
+        DaysToPeriodStrings.put(30, mContext.getString(R.string.radio_month));
+        DaysToPeriodStrings.put(365, mContext.getString(R.string.radio_year));
 
         PeriodToDays.put((long) 1 * 24 * 60 * 60 * 1000, 1);
         PeriodToDays.put((long) 7 * 24 * 60 * 60 * 1000, 7);

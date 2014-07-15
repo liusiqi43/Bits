@@ -234,8 +234,8 @@ public class AchievementsFragment extends BaseFragment {
 
             holder.taskIcon.setImageBitmap(bitmap);
             holder.taskTitle.setText(t.getDescription());
-            holder.taskGoal.setText(t.getFrequency() + " times/" + TaskManager.PeriodStringToDays.inverse().get(periodInDays));
-            holder.interval.setText("t/" + TaskManager.PeriodStringToDays.inverse().get(periodInDays));
+            holder.taskGoal.setText(t.getFrequency() + " times/" + TaskManager.DaysToPeriodStrings.get(periodInDays));
+            holder.interval.setText("t/" + TaskManager.DaysToPeriodStrings.get(periodInDays));
             holder.freq.setText(actualDoneFrequency.toString());
             holder.daysCount.setText(days.toString());
             holder.lateCount.setText(Integer.toString(t.getLateCount()));
