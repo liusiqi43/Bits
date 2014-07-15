@@ -81,7 +81,7 @@ public class Utils {
         /**
          * In-app billing
          */
-        String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn1vS35/bnUlJ+TmB29ZkXcMTLHQmjxhG6rCl5iqRkbhFFk7QnCEyYTPVEQN5nRizs5pi9eyrXXe3Cm2e8Xh/xyH9upCMf9ICPF4TXRPqwmmmh0ghg9b/cnz3w8rrgzBZOCDiDl0agpeo0weiQ11UTdrLGXc7iS4tUx8LN7H9SMux62z6gkaMOOkJOdPTzH+cogE5HqBFGzg1AvR3lnGM+pDGm7L6rJ6omQcmeM2FonnDwzY1Ww+5OVutY4D4IQuwUPmGsOJMJwAY4JKbUiNMwkG1PsfQG/QSJc6dJ8oLq12dXKftB8bCQB3CDt50Nlp8AGp6g3deiC6TCHjqrx/NUwIDAQAB";
+        String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiNVRydS9aTj3bUDSTVt3bPrWt/AAgHF3Gl6rWTVxE+EjyUC09Wnoeh4V8uxjmQGx2DGUHXQzAa9pJli8zwEiTrr4CIjUZrjOPeLrB+K+V7sWTRogpdXpcetSsblPuIKp0mnPkgc6TtucgeilVC5uLMLjWR+XvT7g1XVXxjuKCoU5pL5rLVigGIIOMp937Hkg1L165zrmxbhhRUjizVSfhF/TrW/al5Tp5WK21+Gufx5/p37U0EplepuNx5u0MgX4x5xpJa9bA8NqXAZafetexmc1Jxz+BNf8q+Qj/MCWHuOSvGj9/7EQMUZ7bZN41vHitHUWdeGWy2LH3CLLP516MQIDAQAB";
         mIabHelper = new IabHelper(ctx, base64EncodedPublicKey);
         mIabHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
             public void onIabSetupFinished(IabResult result) {

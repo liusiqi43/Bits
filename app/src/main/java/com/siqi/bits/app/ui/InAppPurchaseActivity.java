@@ -53,33 +53,37 @@ public class InAppPurchaseActivity extends ActionBarActivity {
         mProgressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
         mProgressDialog.show();
 
-        Utils.mIabHelper.queryInventoryAsync(true, additionalSkuList, new IabHelper.QueryInventoryFinishedListener() {
-            public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-                if (inventory == null || inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) == null) {
-                    Log.d(TAG, "inventory == null || inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) == null");
-                    mProgressDialog.cancel();
+        if (Utils.mIabHelper != null) {
+            Utils.mIabHelper.queryInventoryAsync(true, additionalSkuList, new IabHelper.QueryInventoryFinishedListener() {
+                public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+                    if (inventory == null || inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) == null) {
+                        Log.d(TAG, "inventory == null || inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) == null");
+                        mProgressDialog.cancel();
 //                    buildUnexpectedFailureDialog();
-                    if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
-                    mPlayStoreConnectionSucceeded = false;
-                    return;
-                } else {
-                    Log.d(TAG, "Inventory retrieved");
+                        if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                        mPlayStoreConnectionSucceeded = false;
+                        return;
+                    } else {
+                        Log.d(TAG, "Inventory retrieved");
+                        mProgressDialog.cancel();
+                        if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                        mPlayStoreConnectionSucceeded = true;
+                    }
+
+                    String UnlockPrice =
+                            inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK).getPrice();
+
+                    TextView priceTextView = (TextView) findViewById(R.id.price_tag);
+                    priceTextView.setText(getString(R.string.all_for_just) + " " + UnlockPrice);
+                    priceTextView.setVisibility(View.VISIBLE);
                     mProgressDialog.cancel();
                     if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                     mPlayStoreConnectionSucceeded = true;
                 }
-
-                String UnlockPrice =
-                        inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK).getPrice();
-
-                TextView priceTextView = (TextView) findViewById(R.id.price_tag);
-                priceTextView.setText(getString(R.string.all_for_just) + " " + UnlockPrice);
-                priceTextView.setVisibility(View.VISIBLE);
-                mProgressDialog.cancel();
-                if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
-                mPlayStoreConnectionSucceeded = true;
-            }
-        });
+            });
+        } else {
+            mProgressDialog.cancel();
+        }
 
         Button purchaseButton = (Button) findViewById(R.id.purchase_button);
         purchaseButton.setOnClickListener(new View.OnClickListener() {
