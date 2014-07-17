@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.util.LruCache;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -40,7 +41,7 @@ import utils.Utils;
  * A tool that helps you to architect your life to
  * its fullness!
  */
-public class AchievementsFragment extends BaseFragment {
+public class AchievementsFragment extends Fragment {
     public final static int FRAGMENT_ID = 1;
 
     private StickyListHeadersListView mAchievementsListView;

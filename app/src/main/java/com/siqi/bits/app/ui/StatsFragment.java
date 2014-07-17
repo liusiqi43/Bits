@@ -21,7 +21,7 @@ import utils.Utils;
  * A tool that helps you to architect your life to
  * its fullness!
  */
-public class StatsFragment extends BaseFragment {
+public class StatsFragment extends Fragment {
     public final static int FRAGMENT_ID = 2;
 
     ViewPager mViewPager;

@@ -3,6 +3,7 @@ package com.siqi.bits.app.ui;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,7 +41,7 @@ import utils.Utils;
  * A tool that helps you to architect your life to
  * its fullness!
  */
-public class StatsXYChartFragment extends BaseFragment implements AdapterView.OnItemSelectedListener {
+public class StatsXYChartFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
     private static final int TREND_DISPLAY_MIN_NUMBERS = 3;
     private ActionRecordManager arm;

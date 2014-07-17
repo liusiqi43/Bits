@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.util.LruCache;
 import android.text.Html;
 import android.util.Log;
@@ -88,7 +89,7 @@ import utils.Utils;
  * A tool that helps you to architect your life to
  * its fullness!
  */
-public class BitsListFragment extends BaseFragment implements ShakeEventListener.OnShakeListener {
+public class BitsListFragment extends Fragment implements ShakeEventListener.OnShakeListener {
     public static final int FRAGMENT_ID = 0;
 
     public static final int CARD_INFO = 0;
