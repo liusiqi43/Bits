@@ -12,7 +12,7 @@
     <!-- ActionBar styles -->
     <style name="CustomActionBarTheme" parent="@style/Widget.AppCompat.ActionBar">
         <!-- Support library compatibility -->
-        <item name="android:background">@color/Turquoise</item>
+        <item name="background">@color/Turquoise</item>
         <item name="titleTextStyle">@style/CustomActionBarTitleText</item>
     </style>
 
