@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import utils.ActionHandle;
 import utils.IabHelper;
 import utils.IabResult;
 import utils.Inventory;
@@ -44,46 +45,49 @@ public class InAppPurchaseActivity extends ActionBarActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        List additionalSkuList = new ArrayList();
-        additionalSkuList.add(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK);
-
         mProgressDialog = new ProgressDialog(this, R.style.AppTheme_busyspinner);
         mProgressDialog.setCancelable(false);
         mProgressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
         mProgressDialog.show();
 
-        if (Utils.mIabHelper != null) {
-            Utils.mIabHelper.queryInventoryAsync(true, additionalSkuList, new IabHelper.QueryInventoryFinishedListener() {
-                public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-                    if (inventory == null || inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) == null) {
-                        Log.d(TAG, "inventory == null || inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) == null");
-                        mProgressDialog.cancel();
-//                    buildUnexpectedFailureDialog();
-                        if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
-                        mPlayStoreConnectionSucceeded = false;
-                        return;
-                    } else {
-                        Log.d(TAG, "Inventory retrieved");
-                        mProgressDialog.cancel();
-                        if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
-                        mPlayStoreConnectionSucceeded = true;
-                    }
+        Utils.setupIabHelper(this, new ActionHandle() {
+            @Override
+            public void onSetupDone() {
+                if (Utils.mIabHelper != null && Utils.mIabHelper.isSetUpDone()) {
+                    List additionalSkuList = new ArrayList();
+                    additionalSkuList.add(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK);
+                    Utils.mIabHelper.queryInventoryAsync(true, additionalSkuList, new IabHelper.QueryInventoryFinishedListener() {
+                        public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+                            if (inventory == null || inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) == null) {
+                                Log.d(TAG, "inventory == null || inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK) == null");
+                                mProgressDialog.cancel();
+                                if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                                mPlayStoreConnectionSucceeded = false;
+                                return;
+                            } else {
+                                Log.d(TAG, "Inventory retrieved");
+                                mProgressDialog.cancel();
+                                if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                                mPlayStoreConnectionSucceeded = true;
+                            }
 
-                    String UnlockPrice =
-                            inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK).getPrice();
+                            String UnlockPrice =
+                                    inventory.getSkuDetails(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK).getPrice();
 
-                    TextView priceTextView = (TextView) findViewById(R.id.price_tag);
-                    priceTextView.setText(getString(R.string.all_for_just) + " " + UnlockPrice);
-                    priceTextView.setVisibility(View.VISIBLE);
+                            TextView priceTextView = (TextView) findViewById(R.id.price_tag);
+                            priceTextView.setText(getString(R.string.all_for_just) + " " + UnlockPrice);
+                            priceTextView.setVisibility(View.VISIBLE);
+                            mProgressDialog.cancel();
+                            if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                            mPlayStoreConnectionSucceeded = true;
+                        }
+                    });
+                } else {
                     mProgressDialog.cancel();
-                    if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
-                    mPlayStoreConnectionSucceeded = true;
+                    mPlayStoreConnectionSucceeded = false;
                 }
-            });
-        } else {
-            mProgressDialog.cancel();
-        }
+            }
+        });
 
         Button purchaseButton = (Button) findViewById(R.id.purchase_button);
         purchaseButton.setOnClickListener(new View.OnClickListener() {

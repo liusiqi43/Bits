@@ -462,6 +462,14 @@ public class TaskManager {
         return mDoneSlogans[Utils.getRandomInt(mDoneSlogans.length)];
     }
 
+    public Task getTaskOrNew(Long id) {
+        if (id != null) {
+            return getTask(id);
+        } else {
+            return newTask();
+        }
+    }
+
     public class CachedComparator implements Comparator<Task> {
         HashMap<Task, Long> taskToCount = new HashMap<Task, Long>();
 

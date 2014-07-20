@@ -49,8 +49,6 @@ public class NewBitActivity extends ActionBarActivity {
     public static final int FRAGMENT_ID = 9;
     public static final String EDITING_BIT_ID = "bit_id";
 
-
-    private Long mEditingBitID;
     private Task mTask;
 
     private AutoCompleteTextView mBitTitleEditText;
@@ -79,6 +77,7 @@ public class NewBitActivity extends ActionBarActivity {
 
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+
         if (mPreferences.getBoolean("IS_AUTO_ROTATE_ENABLED", false)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         } else {
@@ -86,25 +85,23 @@ public class NewBitActivity extends ActionBarActivity {
         }
 
         long id = getIntent().getLongExtra(EDITING_BIT_ID, -1);
-        mEditingBitID = id == -1 ? null : id;
+        Long editingBitId = id == -1 ? null : id;
 
         tm = TaskManager.getInstance(this);
         cm = CategoryManager.getInstance(this);
 
-        if (mEditingBitID != null) {
-            mTask = tm.getTask(mEditingBitID);
-        } else {
-            mTask = tm.newTask();
-        }
+        mTask = tm.getTaskOrNew(editingBitId);
 
+        viewsSetUp(editingBitId);
+    }
+
+    private void viewsSetUp(Long id) {
         setContentView(R.layout.new_bit_fragment);
         mBitTitleEditText = (AutoCompleteTextView) findViewById(R.id.bit_title_edittext);
         mFrequencyRBtnGroup = (RadioGroup) findViewById(R.id.frequency_radio_group);
         mPeriodRBtnGroup = (RadioGroup) findViewById(R.id.interval_radio_group);
         mCategorySelectedTV = (TextSwitcher) findViewById(R.id.category_selected);
         mCategoryGridView = (ExpandingGridView) findViewById(R.id.category_gridview);
-
-        mBitTitleEditText.requestFocus();
 
         mCategorySelectedTV.setFactory(new ViewSwitcher.ViewFactory() {
             @Override
@@ -132,10 +129,10 @@ public class NewBitActivity extends ActionBarActivity {
         mOnClickListener = new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 mCategorySelectedTV.setText(mAdapter.getItem(position).getName());
-                v.setBackgroundResource(R.color.MidnightBlue);
+                v.setBackgroundColor(getResources().getColor(R.color.MidnightBlue));
 
                 if (mLastSelected != null && mLastSelected != v)
-                    mLastSelected.setBackgroundResource(android.R.color.transparent);
+                    mLastSelected.setBackgroundColor(getResources().getColor(android.R.color.transparent));
                 mLastSelected = v;
 
                 Log.d("BitListFrag", "Detected Click on View with tag: " + ((Category) mLastSelected.getTag()).getName());
@@ -144,7 +141,7 @@ public class NewBitActivity extends ActionBarActivity {
 
         mCategoryGridView.setOnItemClickListener(mOnClickListener);
 
-        if (mEditingBitID != null) {
+        if (id != null) {
             Log.d("BitListFrag", "Loading bit to edit");
             // Editing!!
             mBitTitleEditText.setText(mTask.getDescription());
@@ -194,7 +191,8 @@ public class NewBitActivity extends ActionBarActivity {
             mTask.setCategory(cm.getDefaultCategory());
         }
 
-        mCategorySelectedTV.setText(cm.getDefaultCategory().getName());
+        mCategorySelectedTV.setText(mTask.getCategory().getName());
+
 
         // Get the string array
         final String[] ideas = getResources().getStringArray(R.array.bits_title_ideas);
@@ -210,6 +208,8 @@ public class NewBitActivity extends ActionBarActivity {
                 mIdeasSuggestionRefresherHandler.postDelayed(this, 3000);
             }
         }, 3000);
+
+        mBitTitleEditText.requestFocus();
     }
 
     @Override
@@ -256,7 +256,7 @@ public class NewBitActivity extends ActionBarActivity {
              */
             mTask.setDescription(mBitTitleEditText.getText().toString().trim());
             mTask.setModifiedOn(new Date(Utils.currentTimeMillis()));
-            if (mEditingBitID == null) {
+            if (mTask.getCreatedOn() == null) {
                 mTask.setCreatedOn(new Date(Utils.currentTimeMillis()));
                 try {
                     tm.insertTask(mTask);
@@ -324,7 +324,9 @@ public class NewBitActivity extends ActionBarActivity {
                 }
             }
 
-            if (mTask.getCategoryId() != -1 && mLastSelected == null && mAdapter.getItem(position).getId() == mTask.getCategory().getId()) {
+            if (mTask.getCategoryId() != -1
+                    && mLastSelected == null
+                    && mAdapter.getItem(position).getId() == mTask.getCategory().getId()) {
                 v.setBackgroundColor(getResources().getColor(R.color.MidnightBlue));
                 mLastSelected = v;
                 Log.d("INIT", "METHOD CALLED FOR CAT " + mTask.getCategory().getName());

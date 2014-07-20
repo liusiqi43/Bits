@@ -35,6 +35,7 @@ import com.siqi.bits.app.ui.StatsFragment;
 import java.util.List;
 import java.util.Stack;
 
+import utils.ActionHandle;
 import utils.IabHelper;
 import utils.Utils;
 import views.AppRater;
@@ -98,7 +99,12 @@ public class MainActivity extends ActionBarActivity
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-        Utils.setupIabHelper(this);
+        Utils.setupIabHelper(this, new ActionHandle() {
+            @Override
+            public void onSetupDone() {
+                Utils.checkIfPremiumPurchased(MainActivity.this);
+            }
+        });
         AppRater.appLaunched(this);
     }
 

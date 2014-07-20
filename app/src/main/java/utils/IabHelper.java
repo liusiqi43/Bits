@@ -898,6 +898,10 @@ public class IabHelper {
         })).start();
     }
 
+    public boolean isSetUpDone() {
+        return mSetupDone;
+    }
+
     void logDebug(String msg) {
         if (mDebugLog) Log.d(mDebugTag, msg);
     }

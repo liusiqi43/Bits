@@ -77,10 +77,16 @@ public class Utils {
         return mRandomiser.nextInt(range);
     }
 
-    public static void setupIabHelper(final Context ctx) {
+    public static void setupIabHelper(final Context ctx, final ActionHandle handle) {
         /**
          * In-app billing
          */
+
+        if (Utils.mIabHelper != null && Utils.mIabHelper.isSetUpDone()) {
+            handle.onSetupDone();
+            return;
+        }
+
         String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiNVRydS9aTj3bUDSTVt3bPrWt/AAgHF3Gl6rWTVxE+EjyUC09Wnoeh4V8uxjmQGx2DGUHXQzAa9pJli8zwEiTrr4CIjUZrjOPeLrB+K+V7sWTRogpdXpcetSsblPuIKp0mnPkgc6TtucgeilVC5uLMLjWR+XvT7g1XVXxjuKCoU5pL5rLVigGIIOMp937Hkg1L165zrmxbhhRUjizVSfhF/TrW/al5Tp5WK21+Gufx5/p37U0EplepuNx5u0MgX4x5xpJa9bA8NqXAZafetexmc1Jxz+BNf8q+Qj/MCWHuOSvGj9/7EQMUZ7bZN41vHitHUWdeGWy2LH3CLLP516MQIDAQAB";
         mIabHelper = new IabHelper(ctx, base64EncodedPublicKey);
         mIabHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
@@ -89,32 +95,50 @@ public class Utils {
                     // Oh noes, there was a problem.
                     Log.d("In-App Purchase", "Problem setting up In-app Billing: " + result);
                     if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                    return;
                 }
                 Log.d("In-App Purchase", "Set-up: Success");
-
-                checkIfPremiumPurchased(ctx);
                 if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                handle.onSetupDone();
             }
         });
     }
 
     public static void checkIfPremiumPurchased(final Context ctx) {
-        IabHelper.QueryInventoryFinishedListener mGotInventoryListener
+        IabHelper.QueryInventoryFinishedListener gotInventoryListener
                 = new IabHelper.QueryInventoryFinishedListener() {
             public void onQueryInventoryFinished(IabResult result,
                                                  Inventory inventory) {
                 if (result.isFailure()) {
                     Log.d("In-App Purchase", "query purchased item failed: " + result);
-                    if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
                 } else {
-                    PreferenceManager.getDefaultSharedPreferences(ctx).edit().putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, inventory.hasPurchase(InAppPurchaseActivity.SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK));
-                    Log.d("In-App Purchase", "purchased item restored");
-                    if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
+                    if (inventory.hasPurchase(InAppPurchaseActivity.SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK)) {
+                        PreferenceManager.getDefaultSharedPreferences(ctx)
+                                .edit()
+                                .putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, true)
+                                .putBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, false)
+                                .commit();
+                        Log.d("In-App Purchase", "purchased item restored");
+                    } else {
+                        // We will potentially face the problem that users could have faked their payment
+                        // and then have more than 5 tasks. Here we will reset unlocked to false but not
+                        // ads support. Which means users haven't paid but don't get ads
+                        // However, users will not be able to add new tasks.
+                        boolean adsActivated = PreferenceManager.getDefaultSharedPreferences(ctx)
+                                .getBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, false);
+                        PreferenceManager.getDefaultSharedPreferences(ctx)
+                                .edit()
+                                .putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, adsActivated)
+                                .commit();
+                        Log.d("In-App Purchase", "purchased item restored");
+                    }
                 }
+                if (Utils.mIabHelper != null) Utils.mIabHelper.flagEndAsync();
             }
         };
 
-        mIabHelper.queryInventoryAsync(mGotInventoryListener);
+        if (mIabHelper != null && mIabHelper.isSetUpDone())
+            mIabHelper.queryInventoryAsync(gotInventoryListener);
     }
 
     public static void setClockEntity(Clock clock) {
