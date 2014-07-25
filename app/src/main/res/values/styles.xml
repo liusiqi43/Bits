@@ -7,6 +7,8 @@
 
         <item name="actionBarStyle">@style/CustomActionBarTheme</item>
         <item name="actionMenuTextColor">@color/white</item>
+
+        <item name="android:alertDialogStyle">@style/CustomAlertDialogTitle</item>
     </style>
 
     <!-- ActionBar styles -->
@@ -121,4 +123,20 @@
         <item name="android:padding">10dp</item>
         <item name="android:scaleType">fitCenter</item>
     </style>
+
+    <style name="CustomAlertDialogTitle" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/MidnightBlue</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="AlertDialogTheme">
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="android:windowTitleStyle">@style/CustomAlertDialogTitle</item>
+    </style>
+
 </resources>

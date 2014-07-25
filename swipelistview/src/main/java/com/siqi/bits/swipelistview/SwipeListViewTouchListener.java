@@ -816,20 +816,19 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
                 }
                 generateAnimate(frontView, swap, swapRight, downPosition);
                 // Left action
-                if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == dp2px(DISPLACE_CHOICE)) {
+                if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE
+                        && frontView != null
+                        && ViewHelper.getX(frontView) == dp2px(DISPLACE_CHOICE)) {
                     this.swipeListView.onLeftChoiceAction(downPosition);
-                } else if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE && ViewHelper.getX(frontView) == -dp2px(DISPLACE_CHOICE)) {
+                } else if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE
+                        && frontView != null
+                        && ViewHelper.getX(frontView) == -dp2px(DISPLACE_CHOICE)) {
                     this.swipeListView.onRightChoiceAction(downPosition);
                 }
 
                 velocityTracker.recycle();
                 velocityTracker = null;
                 downX = 0;
-                // change clickable front view
-//                if (swap) {
-//                    frontView.setClickable(opened.get(downPosition));
-//                    frontView.setLongClickable(opened.get(downPosition));
-//                }
                 swiping = false;
                 break;
             }
@@ -954,7 +953,7 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
         } else if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_CHOICE) {
             float px2dp = Resources.getSystem().getDisplayMetrics().density;
 
-            float p = (deltaX + posX) / px2dp;
+            float p = (int) ((posX + deltaX) / px2dp + 0.5);
 
             int sign = p > 0 ? 1 : -1;
 

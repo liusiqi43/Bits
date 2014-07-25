@@ -1,8 +1,8 @@
-package utils;
+package interfaces;
 
 /**
  * Created by me on 7/20/14.
  */
-public interface ActionHandle {
+public interface IabSetupActionHandler {
     void onSetupDone();
 }

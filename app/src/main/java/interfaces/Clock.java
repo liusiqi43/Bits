@@ -1,4 +1,4 @@
-package utils;
+package interfaces;
 
 /**
  * Proudly powered by me on 6/14/14.

@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Created by me on 4/9/14.
@@ -43,7 +44,6 @@ public class ActionRecordManager {
          */
         BitsDevOpenHelper helper = new BitsDevOpenHelper(
                 ctx,
-                "bits-db",
                 null);
         mDB = helper.getWritableDatabase();
         mDaoMaster = new DaoMaster(mDB);
@@ -83,6 +83,7 @@ public class ActionRecordManager {
         int dateColIndex = burnrateCursor.getColumnIndex("date");
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        formatter.setTimeZone(TimeZone.getDefault());
 
         if (burnrateCursor.moveToFirst() == true) {
             do {

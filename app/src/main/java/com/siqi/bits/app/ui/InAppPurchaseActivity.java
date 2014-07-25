@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import utils.ActionHandle;
+import interfaces.IabSetupActionHandler;
 import utils.IabHelper;
 import utils.IabResult;
 import utils.Inventory;
@@ -50,7 +50,7 @@ public class InAppPurchaseActivity extends ActionBarActivity {
         mProgressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
         mProgressDialog.show();
 
-        Utils.setupIabHelper(this, new ActionHandle() {
+        Utils.setupIabHelper(this, new IabSetupActionHandler() {
             @Override
             public void onSetupDone() {
                 if (Utils.mIabHelper != null && Utils.mIabHelper.isSetUpDone()) {
@@ -134,7 +134,7 @@ public class InAppPurchaseActivity extends ActionBarActivity {
             public void onClick(DialogInterface dialog, int id) {
                 Log.d(TAG, "Enabling ads-support");
                 mPreferences.edit()
-                        .putBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, true)
+                        .putBoolean(Utils.IS_BITS_ADS_SUPPORT_ENABLED, true)
                         .putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, true)
                         .commit();
                 dialog.cancel();
@@ -262,7 +262,7 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                         if (Utils.GOD_MODE_ON) {
                             Log.d(TAG, "purchase done");
                             mPreferences.edit()
-                                    .putBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, false)
+                                    .putBoolean(Utils.IS_BITS_ADS_SUPPORT_ENABLED, false)
                                     .putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, true)
                                     .commit();
                             buildThankyouDialog();
@@ -278,7 +278,7 @@ public class InAppPurchaseActivity extends ActionBarActivity {
                         } else if (purchase.getSku().equals(SKU_ACTIVE_TASKS_COUNT_LIMIT_UNLOCK)) {
                             Log.d(TAG, "purchase done");
                             mPreferences.edit()
-                                    .putBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, false)
+                                    .putBoolean(Utils.IS_BITS_ADS_SUPPORT_ENABLED, false)
                                     .putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, true)
                                     .commit();
                             buildThankyouDialog();
@@ -296,7 +296,7 @@ public class InAppPurchaseActivity extends ActionBarActivity {
             public void onClick(DialogInterface dialog, int id) {
                 Log.d(TAG, "Enabling ads-support");
                 mPreferences.edit()
-                        .putBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, true)
+                        .putBoolean(Utils.IS_BITS_ADS_SUPPORT_ENABLED, true)
                         .putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, true)
                         .commit();
                 dialog.cancel();

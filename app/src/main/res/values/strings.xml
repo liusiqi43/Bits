@@ -106,7 +106,7 @@
     <string name="first_done">First Task Done!</string>
     <string name="first_new_task_title">New Task!</string>
     <string name="first_new_task_summary">Well done! You have just created your first task!</string>
-    <string name="first_new_task_details">Tasks are arranged by their next due time, the more often you want to do it, the more often it will be on top of the list.</string>
+    <string name="first_new_task_details">Tasks are arranged by their priority. Focus on your top tasks to achieve your goals.</string>
     <string name="first_done_summary">Marking your first done!</string>
     <string name="first_done_details">Tasks will be rearranged into the right order, it will go to the bottom as you do it as planned.</string>
     <string name="first_skip">Skipping</string>

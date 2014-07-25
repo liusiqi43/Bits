@@ -1,5 +1,7 @@
 package utils;
 
+import interfaces.Clock;
+
 /**
  * Proudly powered by me on 6/15/14.
  * Part of android productivity application Bits

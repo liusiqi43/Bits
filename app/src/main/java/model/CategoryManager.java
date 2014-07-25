@@ -34,7 +34,6 @@ public class CategoryManager {
          */
         BitsDevOpenHelper helper = new BitsDevOpenHelper(
                 ctx,
-                "bits-db",
                 null);
         mDB = helper.getWritableDatabase();
         mDaoMaster = new DaoMaster(mDB);

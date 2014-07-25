@@ -256,7 +256,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                 mNeedFinishNotification = false;
 
                 // loading interstitioal Ads
-                if (mPreferences.getBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, false))
+                if (mPreferences.getBoolean(Utils.IS_BITS_ADS_SUPPORT_ENABLED, false))
                     Utils.displayInterstitial();
             }
 
@@ -375,7 +375,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
         mTaskFinishNotificaiton = MediaPlayer.create(getActivity(), com.siqi.bits.swipelistview.R.raw.chance_stage);
 
-        if (mPreferences.getBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, false)) {
+        if (mPreferences.getBoolean(Utils.IS_BITS_ADS_SUPPORT_ENABLED, false)) {
             // Look up the AdView as a resource and load a request.
             final AdView adView = (AdView) getActivity().findViewById(R.id.adView);
             adView.setAdListener(new AdListener() {
@@ -689,6 +689,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
             animateNewState();
             updateForFeedbacks();
+            Utils.requestBackup(getActivity());
         }
     }
 

@@ -42,7 +42,7 @@ public class SettingsActivity extends PreferenceActivity {
         }
 
         PreferenceCategory category = (PreferenceCategory) findPreference("pref_bits_settings");
-        Preference optInAds = findPreference(Utils.BITS_ADS_SUPPORT_ENABLED);
+        Preference optInAds = findPreference(Utils.IS_BITS_ADS_SUPPORT_ENABLED);
 
         if (!prefs.getBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, false)) {
             category.removePreference(optInAds);

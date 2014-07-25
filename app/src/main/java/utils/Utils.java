@@ -1,5 +1,6 @@
 package utils;
 
+import android.app.backup.BackupManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -13,6 +14,9 @@ import com.google.android.gms.ads.InterstitialAd;
 import com.siqi.bits.app.ui.InAppPurchaseActivity;
 
 import java.util.Random;
+
+import interfaces.Clock;
+import interfaces.IabSetupActionHandler;
 
 /**
  * Proudly powered by me on 5/21/14.
@@ -33,7 +37,7 @@ public class Utils {
     public static final String IS_FIRST_TASK_ADDED = "IS_FIRST_TASK_ADDED";
     public static final String TASKS_COUNT_LIMIT_UNLOCKED = "TASKS_COUNT_LIMIT_UNLOCKED";
     public static final String IS_AUTO_ROTATE_ENABLED = "IS_AUTO_ROTATE_ENABLED";
-    public static final String BITS_ADS_SUPPORT_ENABLED = "BITS_ADS_SUPPORT_ENABLED";
+    public static final String IS_BITS_ADS_SUPPORT_ENABLED = "BITS_ADS_SUPPORT_ENABLED";
 
     public static boolean GOD_MODE_ON = false;
     public static DisplayMetrics mDisplayMetrics;
@@ -77,7 +81,7 @@ public class Utils {
         return mRandomiser.nextInt(range);
     }
 
-    public static void setupIabHelper(final Context ctx, final ActionHandle handle) {
+    public static void setupIabHelper(final Context ctx, final IabSetupActionHandler handle) {
         /**
          * In-app billing
          */
@@ -116,7 +120,7 @@ public class Utils {
                         PreferenceManager.getDefaultSharedPreferences(ctx)
                                 .edit()
                                 .putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, true)
-                                .putBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, false)
+                                .putBoolean(Utils.IS_BITS_ADS_SUPPORT_ENABLED, false)
                                 .commit();
                         Log.d("In-App Purchase", "purchased item restored");
                     } else {
@@ -125,7 +129,7 @@ public class Utils {
                         // ads support. Which means users haven't paid but don't get ads
                         // However, users will not be able to add new tasks.
                         boolean adsActivated = PreferenceManager.getDefaultSharedPreferences(ctx)
-                                .getBoolean(Utils.BITS_ADS_SUPPORT_ENABLED, false);
+                                .getBoolean(Utils.IS_BITS_ADS_SUPPORT_ENABLED, false);
                         PreferenceManager.getDefaultSharedPreferences(ctx)
                                 .edit()
                                 .putBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, adsActivated)
@@ -172,5 +176,12 @@ public class Utils {
         if (interstitialAd.isLoaded() && getRandomInt(100) < 20) {
             interstitialAd.show();
         }
+    }
+
+
+    public static void requestBackup(Context ctx) {
+        BackupManager bm = new BackupManager(ctx);
+        bm.dataChanged();
+        Log.d(TAG, "requestBackup sent");
     }
 }

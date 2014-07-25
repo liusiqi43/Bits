@@ -66,7 +66,6 @@ public class TaskManager {
          */
         BitsDevOpenHelper helper = new BitsDevOpenHelper(
                 ctx,
-                "bits-db",
                 null);
         mDB = helper.getWritableDatabase();
         mDaoMaster = new DaoMaster(mDB);
@@ -128,12 +127,15 @@ public class TaskManager {
 
     public void insertTask(Task t) throws DuplicatedTaskException {
         if (mTaskDao.queryBuilder()
-                .where(TaskDao.Properties.Description.eq(t.getDescription()), TaskDao.Properties.DeletedOn.isNull(), TaskDao.Properties.Archieved_on.isNull())
+                .where(TaskDao.Properties.Description.eq(t.getDescription()),
+                        TaskDao.Properties.DeletedOn.isNull(),
+                        TaskDao.Properties.Archieved_on.isNull())
                 .list().size() > 0)
             throw new DuplicatedTaskException();
         else {
             mTaskDao.insert(t);
-            mPreferences.edit().putInt(TOTAL_TASK_ADDED, mPreferences.getInt(TOTAL_TASK_ADDED, 0) + 1).commit();
+            mPreferences.edit().putInt(TOTAL_TASK_ADDED,
+                    mPreferences.getInt(TOTAL_TASK_ADDED, 0) + 1).commit();
         }
     }
 
@@ -263,7 +265,9 @@ public class TaskManager {
         return null;
     }
 
-    public void setNextScheduledTimeForTaskAfterUndo(Task t, long nextScheduledTime, long currentInterval) {
+    public void setNextScheduledTimeForTaskAfterUndo(Task t,
+                                                     long nextScheduledTime,
+                                                     long currentInterval) {
         if (mScheduleService != null)
             mScheduleService.unScheduleForTask(t);
         else {
