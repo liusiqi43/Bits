@@ -56,8 +56,8 @@
     <string name="spinner_text_show">Display</string>
     <string name="stats_linechart_maxrate">Max rate</string>
     <string name="stats_linechart_avgrate">Avg. rate</string>
-    <string name="piechart_archived_tasks">Archived Tasks</string>
-    <string name="piechart_active_tasks">Active Tasks</string>
+    <string name="piechart_finished_tasks">Finished</string>
+    <string name="piechart_active_tasks">Active</string>
     <string name="task_in_this_category"> tasks in this category</string>
     <string name="added">added</string>
     <string name="default_banner_text">Get something done? </string>

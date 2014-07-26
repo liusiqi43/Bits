@@ -212,7 +212,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         mBitsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, final View view, int position, long id) {
-
+                mBitsListView.setSwipeMode(SwipeListView.SWIPE_MODE_NONE);
                 final ViewSwitcher viewSwitcher = (ViewSwitcher) view.findViewById(R.id.card_viewswitcher);
                 viewSwitcher.showNext();
 
@@ -221,6 +221,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                         if (viewSwitcher.getDisplayedChild() == CARD_ACTION) {
                             viewSwitcher.setDisplayedChild(CARD_INFO);
                         }
+                        mBitsListView.setSwipeMode(SwipeListView.SWIPE_MODE_BOTH);
                     }
                 }, getResources().getInteger(R.integer.actionview_timeout));
 

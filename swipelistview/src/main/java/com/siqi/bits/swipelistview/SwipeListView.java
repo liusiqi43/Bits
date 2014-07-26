@@ -24,6 +24,7 @@ import android.database.DataSetObserver;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -668,16 +669,16 @@ public class SwipeListView extends ListView {
         final int yDiff = (int) Math.abs(y - lastMotionY);
 
         final int touchSlop = this.touchSlop;
-        boolean xMoved = xDiff > touchSlop;
-        boolean yMoved = yDiff > touchSlop;
 
-        if (xMoved) {
+        if (xDiff > 0) {
+            Log.d(getClass().getSimpleName(), "SETTING to X");
             touchState = TOUCH_STATE_SCROLLING_X;
             lastMotionX = x;
             lastMotionY = y;
         }
 
-        if (yMoved) {
+        if (yDiff > xDiff) {
+            Log.d(getClass().getSimpleName(), "SETTING to Y");
             touchState = TOUCH_STATE_SCROLLING_Y;
             lastMotionX = x;
             lastMotionY = y;
