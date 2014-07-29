@@ -30,7 +30,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import model.TaskManager;
+import managers.TaskManager;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 import utils.Utils;

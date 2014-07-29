@@ -15,7 +15,7 @@ import com.siqi.bits.Task;
 import java.util.Date;
 import java.util.List;
 
-import model.TaskManager;
+import managers.TaskManager;
 import utils.Utils;
 
 /**

@@ -31,8 +31,8 @@ import org.achartengine.renderer.XYSeriesRenderer;
 import java.util.HashMap;
 import java.util.List;
 
-import model.ActionRecordManager;
-import model.TaskManager;
+import managers.ActionRecordManager;
+import managers.TaskManager;
 import utils.Utils;
 
 /**

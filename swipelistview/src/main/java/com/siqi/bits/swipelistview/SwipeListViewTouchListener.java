@@ -721,6 +721,11 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
             return false;
         }
 
+        if (mVelocityTracker == null)
+            mVelocityTracker = VelocityTracker.obtain();
+        else
+            mVelocityTracker.clear();
+
         if (viewWidth < 2) {
             viewWidth = swipeListView.getWidth();
         }
@@ -760,11 +765,6 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
 
                         frontView.setClickable(!opened.get(downPosition));
                         frontView.setLongClickable(!opened.get(downPosition));
-
-                        if (mVelocityTracker == null)
-                            mVelocityTracker = VelocityTracker.obtain();
-                        else
-                            mVelocityTracker.clear();
 
                         mVelocityTracker.addMovement(motionEvent);
 
@@ -840,6 +840,8 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
                 break;
 
             case MotionEvent.ACTION_MOVE: {
+                if (mVelocityTracker == null)
+                    mVelocityTracker = VelocityTracker.obtain();
                 mVelocityTracker.addMovement(motionEvent);
                 mVelocityTracker.computeCurrentVelocity(1000);
                 float velocityX = Math.abs(mVelocityTracker.getXVelocity());

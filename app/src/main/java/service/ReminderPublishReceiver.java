@@ -16,7 +16,7 @@ import com.siqi.bits.app.R;
 
 import java.io.IOException;
 
-import model.TaskManager;
+import managers.TaskManager;
 
 /**
  * Created by me on 4/30/14.

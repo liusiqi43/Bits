@@ -11,7 +11,11 @@ import android.util.TypedValue;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.siqi.bits.Task;
 import com.siqi.bits.app.ui.InAppPurchaseActivity;
+
+import org.apache.http.Header;
 
 import java.util.Random;
 
@@ -46,6 +50,7 @@ public class Utils {
 
     private static Clock mClock = new SystemClock();
     private static Random mRandomiser = new Random();
+    private static BitsRestClient mBitsRestClient = new BitsRestClient();
 
     public static Bitmap invertImage(Bitmap src) {
         // create new bitmap with the same attributes(width,height)
@@ -183,5 +188,19 @@ public class Utils {
         BackupManager bm = new BackupManager(ctx);
         bm.dataChanged();
         Log.d(TAG, "requestBackup sent");
+    }
+
+    public static void BitsAsyncUpload(Task t) {
+        mBitsRestClient.post(t, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int i, Header[] headers, byte[] bytes) {
+                Log.d(TAG, "Post Bit with Success!");
+            }
+
+            @Override
+            public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
+                Log.d(TAG, "Post Bit with Failure code: " + i + throwable.getMessage());
+            }
+        });
     }
 }

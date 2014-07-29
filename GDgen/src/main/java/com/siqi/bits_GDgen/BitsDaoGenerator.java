@@ -10,7 +10,7 @@ import de.greenrobot.daogenerator.ToMany;
 public class BitsDaoGenerator {
 
     public static void main(String args[]) throws Exception {
-        Schema schema = new Schema(5, "com.siqi.bits");
+        Schema schema = new Schema(6, "com.siqi.bits");
         schema.enableKeepSectionsByDefault();
 
         /**
@@ -22,6 +22,7 @@ public class BitsDaoGenerator {
         task.addDateProperty("createdOn").notNull();
         task.addDateProperty("modifiedOn").notNull();
         task.addDateProperty("deletedOn");
+        task.addDateProperty("doneOn");
         task.addIntProperty("doneCount").notNull();
         task.addIntProperty("lateCount").notNull();
         task.addIntProperty("skipCount").notNull();

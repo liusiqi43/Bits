@@ -28,8 +28,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import model.CategoryManager;
-import model.TaskManager;
+import managers.CategoryManager;
+import managers.TaskManager;
 import utils.Utils;
 
 /**

@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.siqi.bits.Task;
 
-import model.TaskManager;
+import managers.TaskManager;
 
 /**
  * Created by me on 5/1/14.

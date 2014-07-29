@@ -670,7 +670,7 @@ public class SwipeListView extends ListView {
 
         final int touchSlop = this.touchSlop;
 
-        if (xDiff > 0) {
+        if (xDiff > touchSlop) {
             Log.d(getClass().getSimpleName(), "SETTING to X");
             touchState = TOUCH_STATE_SCROLLING_X;
             lastMotionX = x;

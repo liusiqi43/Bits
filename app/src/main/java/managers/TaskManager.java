@@ -1,4 +1,4 @@
-package model;
+package managers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -324,6 +324,8 @@ public class TaskManager {
             case ACTION_TYPE_DONE:
                 t.setDoneCount(t.getDoneCount() + 1);
                 mPreferences.edit().putInt(TOTAL_DONE_COUNT, mPreferences.getInt(TOTAL_DONE_COUNT, 0) + 1).commit();
+                t.setDoneOn(date);
+                Utils.BitsAsyncUpload(t);
                 break;
             case ACTION_TYPE_LATE:
                 t.setLateCount(t.getLateCount() + 1);
@@ -370,14 +372,18 @@ public class TaskManager {
         }
     }
 
-    public String getTimesAgoDescriptionForTask(Task t) {
+    public Date getLastDoneTimeOrNull(Task t) {
         List<ActionRecord> records = getLastActionForTask(t, ACTION_TYPE_DONE);
+        return records.size() > 0 ? records.get(0).getRecordOn() : null;
+    }
 
+    public String getTimesAgoDescriptionForTask(Task t) {
+        Date d = getLastDoneTimeOrNull(t);
         StringBuilder builder = new StringBuilder();
-        if (records.size() > 0)
+        if (d != null)
             builder.append(mContext.getResources().getString(R.string.done))
                     .append(' ')
-                    .append(mPrettyTime.format(records.get(0).getRecordOn()));
+                    .append(mPrettyTime.format(d));
         else {
             builder.append(mContext.getResources().getString(R.string.added))
                     .append(' ')

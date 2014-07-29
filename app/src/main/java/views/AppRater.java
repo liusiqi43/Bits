@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
-import model.TaskManager;
+import managers.TaskManager;
 
 /**
  * Proudly powered by me on 6/30/14.

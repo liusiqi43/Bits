@@ -39,8 +39,8 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
-import model.CategoryManager;
-import model.TaskManager;
+import managers.CategoryManager;
+import managers.TaskManager;
 import utils.Utils;
 import views.ExpandingGridView;
 

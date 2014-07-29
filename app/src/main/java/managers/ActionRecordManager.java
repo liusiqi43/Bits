@@ -1,4 +1,4 @@
-package model;
+package managers;
 
 /**
  * Proudly powered by me on 5/17/14.

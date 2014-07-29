@@ -78,7 +78,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import model.TaskManager;
+import managers.TaskManager;
 import service.ReminderScheduleService;
 import utils.ShakeEventListener;
 import utils.Utils;

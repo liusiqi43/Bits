@@ -8,7 +8,7 @@ import com.siqi.bits.Task;
 import java.util.Date;
 
 import de.greenrobot.dao.test.AbstractDaoSessionTest;
-import model.TaskManager;
+import managers.TaskManager;
 import utils.FreezedClock;
 import utils.SystemClock;
 import utils.Utils;
@@ -29,7 +29,7 @@ public class TaskManagerTest extends AbstractDaoSessionTest<DaoMaster, DaoSessio
     public void testGetLastActionRecord() throws Exception {
         TaskManager tm = TaskManager.getTestInstance(getContext(), db);
         Utils.setClockEntity(new SystemClock());
-        Task t = new Task(null, "Test", new Date(), new Date(), null, 0, 0, 0, 0, 0, 0, 0, null, 0);
+        Task t = new Task(null, "Test", new Date(), new Date(), null, null, 0, 0, 0, 0, 0, 0, 0, null, 0);
         t.setPeriod(TaskManager.PeriodStringToDays.get("week") * TaskManager.DAY_IN_MILLIS);
         t.setFrequency(4);
         tm.setNextScheduledTimeForTask(t);
@@ -79,7 +79,7 @@ public class TaskManagerTest extends AbstractDaoSessionTest<DaoMaster, DaoSessio
         TaskManager tm = TaskManager.getTestInstance(getContext(), db);
         Utils.setClockEntity(freezedClock);
 
-        Task t = new Task(null, "Test", new Date(freezedClock.currentTimeMillis()), new Date(freezedClock.currentTimeMillis()), null, 0, 0, 0, 0, 0, 0, 0, null, 0);
+        Task t = new Task(null, "Test", new Date(freezedClock.currentTimeMillis()), new Date(freezedClock.currentTimeMillis()), null, null, 0, 0, 0, 0, 0, 0, 0, null, 0);
         t.setPeriod(TaskManager.PeriodStringToDays.get("week") * TaskManager.DAY_IN_MILLIS);
         t.setFrequency(4);
         tm.setNextScheduledTimeForTask(t);
@@ -100,7 +100,7 @@ public class TaskManagerTest extends AbstractDaoSessionTest<DaoMaster, DaoSessio
         TaskManager tm = TaskManager.getTestInstance(getContext(), db);
         Utils.setClockEntity(freezedClock);
 
-        Task t = new Task(null, "Test", new Date(freezedClock.currentTimeMillis()), new Date(freezedClock.currentTimeMillis()), null, 0, 0, 0, 0, 0, 0, 0, null, 0);
+        Task t = new Task(null, "Test", new Date(freezedClock.currentTimeMillis()), new Date(freezedClock.currentTimeMillis()), null, null, 0, 0, 0, 0, 0, 0, 0, null, 0);
         t.setPeriod(TaskManager.PeriodStringToDays.get("week") * TaskManager.DAY_IN_MILLIS);
         t.setFrequency(4);
         tm.setNextScheduledTimeForTask(t);
@@ -139,7 +139,7 @@ public class TaskManagerTest extends AbstractDaoSessionTest<DaoMaster, DaoSessio
         TaskManager tm = TaskManager.getTestInstance(getContext(), db);
         Utils.setClockEntity(freezedClock);
 
-        Task t = new Task(null, "Test", new Date(freezedClock.currentTimeMillis()), new Date(freezedClock.currentTimeMillis()), null, 0, 0, 0, 0, 0, 0, 0, null, 0);
+        Task t = new Task(null, "Test", new Date(freezedClock.currentTimeMillis()), new Date(freezedClock.currentTimeMillis()), null, null, 0, 0, 0, 0, 0, 0, 0, null, 0);
         t.setPeriod(TaskManager.PeriodStringToDays.get("week") * TaskManager.DAY_IN_MILLIS);
         t.setFrequency(4);
         tm.setNextScheduledTimeForTask(t);
@@ -188,7 +188,7 @@ public class TaskManagerTest extends AbstractDaoSessionTest<DaoMaster, DaoSessio
         TaskManager tm = TaskManager.getTestInstance(getContext(), db);
         Utils.setClockEntity(freezedClock);
 
-        Task t = new Task(null, "Test", new Date(freezedClock.currentTimeMillis()), new Date(freezedClock.currentTimeMillis()), null, 0, 0, 0, 0, 0, 0, 0, null, 0);
+        Task t = new Task(null, "Test", new Date(freezedClock.currentTimeMillis()), new Date(freezedClock.currentTimeMillis()), null, null, 0, 0, 0, 0, 0, 0, 0, null, 0);
         t.setPeriod(TaskManager.PeriodStringToDays.get("week") * TaskManager.DAY_IN_MILLIS);
         t.setFrequency(4);
         tm.setNextScheduledTimeForTask(t);
@@ -239,7 +239,7 @@ public class TaskManagerTest extends AbstractDaoSessionTest<DaoMaster, DaoSessio
         /**
          * Create dumb task
          */
-        Task t = new Task(null, "Test", new Date(freezedClock.currentTimeMillis()), new Date(freezedClock.currentTimeMillis()), null, 0, 0, 0, 0, 0, 0, 0, null, 0);
+        Task t = new Task(null, "Test", new Date(freezedClock.currentTimeMillis()), new Date(freezedClock.currentTimeMillis()), null, null, 0, 0, 0, 0, 0, 0, 0, null, 0);
         t.setPeriod(TaskManager.PeriodStringToDays.get("week") * TaskManager.DAY_IN_MILLIS);
         t.setFrequency(4);
         tm.setNextScheduledTimeForTask(t);
