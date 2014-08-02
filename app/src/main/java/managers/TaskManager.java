@@ -325,7 +325,6 @@ public class TaskManager {
                 t.setDoneCount(t.getDoneCount() + 1);
                 mPreferences.edit().putInt(TOTAL_DONE_COUNT, mPreferences.getInt(TOTAL_DONE_COUNT, 0) + 1).commit();
                 t.setDoneOn(date);
-                Utils.BitsAsyncUpload(t);
                 break;
             case ACTION_TYPE_LATE:
                 t.setLateCount(t.getLateCount() + 1);
@@ -468,7 +467,7 @@ public class TaskManager {
         return pairs;
     }
 
-    public CharSequence getDoneSlogan() {
+    public String getDoneSlogan() {
         return mDoneSlogans[Utils.getRandomInt(mDoneSlogans.length)];
     }
 

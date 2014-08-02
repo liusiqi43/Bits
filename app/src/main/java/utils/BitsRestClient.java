@@ -16,7 +16,7 @@ import java.io.UnsupportedEncodingException;
  * Created by me on 7/27/14.
  */
 public class BitsRestClient {
-    private static final String BASE_URL = "http://192.168.178.35:8080";
+    private static final String BASE_URL = "http://bits-dashboard.herokuapp.com";
 
     private static AsyncHttpClient client = new AsyncHttpClient();
 

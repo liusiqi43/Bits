@@ -160,4 +160,5 @@
     <string name="you_can_switch_to_upgrade_package_if_you_change_mind">You can always switch back to an upgrade package from Google Play in settings to disable ads.\n\nEnjoy!</string>
     <string name="opt_in_ads">Opt-in Ads</string>
     <string name="unlimited_tasks_with_ads_support">Click here to switch to an upgrade option from Google Play.</string>
+    <string name="bits_done_around_the_word">%1$d+ dones around the world!</string>
 </resources>

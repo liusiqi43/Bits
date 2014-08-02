@@ -11,16 +11,19 @@ import android.util.TypedValue;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
-import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.ui.InAppPurchaseActivity;
 
 import org.apache.http.Header;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Random;
 
 import interfaces.Clock;
 import interfaces.IabSetupActionHandler;
+import interfaces.InfoUpdateCallback;
 
 /**
  * Proudly powered by me on 5/21/14.
@@ -42,6 +45,7 @@ public class Utils {
     public static final String TASKS_COUNT_LIMIT_UNLOCKED = "TASKS_COUNT_LIMIT_UNLOCKED";
     public static final String IS_AUTO_ROTATE_ENABLED = "IS_AUTO_ROTATE_ENABLED";
     public static final String IS_BITS_ADS_SUPPORT_ENABLED = "BITS_ADS_SUPPORT_ENABLED";
+    public static final String LAST_GLOBAL_COUNT = "LAST_GLOBAL_COUNT";
 
     public static boolean GOD_MODE_ON = false;
     public static DisplayMetrics mDisplayMetrics;
@@ -190,16 +194,15 @@ public class Utils {
         Log.d(TAG, "requestBackup sent");
     }
 
-    public static void BitsAsyncUpload(Task t) {
-        mBitsRestClient.post(t, new AsyncHttpResponseHandler() {
+    public static void BitsAsyncUpload(Task t, final InfoUpdateCallback callback) {
+        mBitsRestClient.post(t, new JsonHttpResponseHandler() {
             @Override
-            public void onSuccess(int i, Header[] headers, byte[] bytes) {
-                Log.d(TAG, "Post Bit with Success!");
-            }
-
-            @Override
-            public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
-                Log.d(TAG, "Post Bit with Failure code: " + i + throwable.getMessage());
+            public void onSuccess(int i, Header[] headers, JSONObject response) {
+                try {
+                    callback.globalBitsCountUpdate(response.getInt("count"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

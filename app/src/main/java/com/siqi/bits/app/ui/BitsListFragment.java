@@ -55,7 +55,6 @@ import android.widget.ViewSwitcher;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
@@ -78,6 +77,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import interfaces.InfoUpdateCallback;
 import managers.TaskManager;
 import service.ReminderScheduleService;
 import utils.ShakeEventListener;
@@ -128,7 +128,6 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     Runnable mListReloader;
     Handler mListRefresherHandle = new Handler();
     Handler mBannerTextResetHandle = new Handler();
-    private InterstitialAd interstitial;
     private boolean mNeedRearrange = false;
     private MediaPlayer mTaskFinishNotificaiton;
     private TextSwitcher mBanner;
@@ -189,6 +188,10 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                 bannerTextView.setTextSize(20);
                 bannerTextView.setTypeface(null, Typeface.BOLD);
                 bannerTextView.setTextColor(Color.WHITE);
+                bannerTextView.setLayoutParams(new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
+
                 return bannerTextView;
             }
 
@@ -203,7 +206,6 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         mBanner.setOutAnimation(out);
 
         mBitsListView.setAdapter(mScaleInAnimationAdapter);
-
 
         mScaleInAnimationAdapter.setAbsListView(mBitsListView);
         mAdapter.setLimit(1);
@@ -269,9 +271,25 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
                 Task item = mAdapter.getItem(position);
                 tm.setDoneActionForTask(item);
 
-                updateBanner(getResources().getColor(R.color.Emerald), tm.getDoneSlogan());
                 mNeedRearrange = true;
                 mNeedFinishNotification = true;
+
+                Utils.BitsAsyncUpload(item, new InfoUpdateCallback() {
+                    @Override
+                    public void globalBitsCountUpdate(int count) {
+
+                        if (count - mPreferences.getInt(Utils.LAST_GLOBAL_COUNT, 0) > 50) {
+                            updateBanner(getResources().getColor(R.color.SeaGreen),
+                                    String.format(getString(R.string.bits_done_around_the_word),
+                                            10 * (count / 10))
+                            );
+                            mPreferences.edit().putInt(Utils.LAST_GLOBAL_COUNT, count).commit();
+                        } else {
+                            updateBanner(getResources().getColor(R.color.Emerald),
+                                    tm.getDoneSlogan());
+                        }
+                    }
+                });
             }
 
             @Override
@@ -316,10 +334,10 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         ObjectAnimator anim = ObjectAnimator.ofInt(mBanner, "backgroundColor", getActivity().getResources().getColor(R.color.Turquoise));
         anim.setEvaluator(new ArgbEvaluator());
         anim.setInterpolator(new AccelerateInterpolator());
-        anim.setDuration(1000);
+        anim.setDuration(1500);
         anim.setIntValues(color, getActivity().getResources().getColor(R.color.Turquoise));
-        anim.start();
         mBanner.setText(bannerText);
+        anim.start();
         mBannerTextResetHandle.removeCallbacksAndMessages(null);
         mBannerTextResetHandle.postDelayed(new Runnable() {
             @Override
