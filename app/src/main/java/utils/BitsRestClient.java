@@ -1,10 +1,7 @@
 package utils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.siqi.bits.Task;
 
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
@@ -24,23 +21,15 @@ public class BitsRestClient {
         return BASE_URL + relativeUrl;
     }
 
-    public void post(Task t, AsyncHttpResponseHandler responseHandler) {
-        // Configure GSON
-        final GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(Task.class, new BitsJsonSerializer());
+  public void post(String json, AsyncHttpResponseHandler responseHandler) {
+    StringEntity se = null;
+    try {
+      se = new StringEntity(json, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
 
-        gsonBuilder.setPrettyPrinting();
-        final Gson gson = gsonBuilder.create();
-
-        StringEntity se;
-        try {
-            se = new StringEntity(gson.toJson(t));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return;
-        }
-        se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-
-        client.post(null, getAbsoluteUrl("/dashboard/create"), se, "application/json", responseHandler);
+    se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+    client.post(null, getAbsoluteUrl("/dashboard/create"), se, "application/json", responseHandler);
     }
 }
