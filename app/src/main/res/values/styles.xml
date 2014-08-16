@@ -16,6 +16,7 @@
         <!-- Support library compatibility -->
         <item name="background">@color/Turquoise</item>
         <item name="titleTextStyle">@style/CustomActionBarTitleText</item>
+        <item name="displayOptions">showHome|useLogo</item>
     </style>
 
     <!-- ActionBar title text -->

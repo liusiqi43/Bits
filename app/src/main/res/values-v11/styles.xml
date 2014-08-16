@@ -15,7 +15,7 @@
     <style name="CustomActionBarTheme" parent="@style/Widget.AppCompat.ActionBar">
         <item name="android:titleTextStyle">@style/CustomActionBarTitleText</item>
         <item name="android:background">@color/Turquoise</item>
-
+        <item name="android:displayOptions">showHome|useLogo</item>
         <!-- Support library compatibility -->
         <item name="titleTextStyle">@style/CustomActionBarTitleText</item>
     </style>
