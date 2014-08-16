@@ -1,5 +1,6 @@
 package utils;
 
+import android.app.Activity;
 import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -229,26 +230,37 @@ public class Utils {
     });
   }
 
-  public static void asyncUploadBitsToDashboard(final Context ctx) {
-    if (!Utils.isOnline()) {
-      Log.d("Utils", "No internet connection.");
-      return;
-    }
-
-    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ctx);
-
-    final Set<String> backlog = preferences.getStringSet(Utils.FAILED_POST_BACKLOG, new HashSet<String>());
-
-    for (final String json : backlog) {
-      Log.d("Utils", "Uploading " + json);
-      mBitsRestClient.post(json, new JsonHttpResponseHandler() {
-        @Override
-        public void onSuccess(int i, Header[] headers, JSONObject response) {
-          Log.d(getClass().getSimpleName(), "Successful upload.");
+  public static void asyncUploadBitsToDashboard(final Activity activity) {
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        if (!Utils.isOnline()) {
+          Log.d("Utils", "No internet connection.");
+          return;
         }
-      });
-    }
-    preferences.edit().putStringSet(Utils.FAILED_POST_BACKLOG, new HashSet<String>()).commit();
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
+
+        final Set<String> backlog = preferences.getStringSet(Utils.FAILED_POST_BACKLOG, new HashSet<String>());
+
+        activity.runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            for (final String json : backlog) {
+              Log.d("Utils", "Uploading " + json);
+              mBitsRestClient.post(json, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int i, Header[] headers, JSONObject response) {
+                  Log.d(getClass().getSimpleName(), "Successful upload.");
+                }
+              });
+            }
+          }
+        });
+
+        preferences.edit().putStringSet(Utils.FAILED_POST_BACKLOG, new HashSet<String>()).commit();
+      }
+    }).start();
   }
 
   public static Boolean isOnline() {
