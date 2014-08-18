@@ -29,13 +29,4 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/concrete" />
 
-    <ProgressBar
-        android:id="@+id/timeAgoProgressBar"
-        style="@style/AppTheme.progressbar.light"
-        android:layout_width="fill_parent"
-        android:layout_height="5dp"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@id/taskSubtitle"
-        android:indeterminate="false"
-        android:progress="50" />
 </RelativeLayout>

@@ -47,7 +47,6 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
@@ -58,9 +57,9 @@ import com.google.android.gms.ads.AdView;
 import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapter;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
-import com.nhaarman.listviewanimations.swinginadapters.prepared.ScaleInAnimationAdapter;
 import com.nineoldandroids.animation.ArgbEvaluator;
 import com.nineoldandroids.animation.ObjectAnimator;
+import com.nineoldandroids.animation.ValueAnimator;
 import com.siqi.bits.ActionRecord;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.MainActivity;
@@ -104,7 +103,6 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
   SwipeListView mBitsListView;
   BitListArrayAdapter mAdapter;
   AnimateDismissAdapter mAnimateDismissAdapter;
-  ScaleInAnimationAdapter mScaleInAnimationAdapter;
   // Reordering animation
   HashMap<Long, Integer> mSavedState = new HashMap<Long, Integer>();
   Interpolator mInterpolator = new DecelerateInterpolator();
@@ -207,15 +205,17 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     mBanner.setInAnimation(in);
     mBanner.setOutAnimation(out);
 
-    mBitsListView.setAdapter(mScaleInAnimationAdapter);
+    mBitsListView.setAdapter(mAnimateDismissAdapter);
 
-    mScaleInAnimationAdapter.setAbsListView(mBitsListView);
+    mAnimateDismissAdapter.setAbsListView(mBitsListView);
+    // Set the maximum number of items allowed to be expanded.
     mAdapter.setLimit(1);
 
 
     mBitsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
       @Override
-      public boolean onItemLongClick(AdapterView<?> adapterView, final View view, int position, long id) {
+      public boolean onItemLongClick(AdapterView<?> adapterView, final View view, int position,
+                                     long id) {
         mBitsListView.setSwipeMode(SwipeListView.SWIPE_MODE_NONE);
         final ViewSwitcher viewSwitcher = (ViewSwitcher) view.findViewById(R.id.card_viewswitcher);
         viewSwitcher.showNext();
@@ -232,7 +232,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         if (mPreferences.getBoolean(Utils.IS_BITSLIST_LONGPRESS_HELP_ON, true)) {
           AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-          builder.setView(getActivity().getLayoutInflater().inflate(R.layout.help_longclick, null, false));
+          builder.setView(getActivity().getLayoutInflater().inflate(R.layout.help_longclick,
+              null, false));
 
           builder.setPositiveButton(R.string.got_it, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -299,7 +300,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
           @Override
           public void onPostFailed(String json) {
             // If failed, store the pending json to backlog.
-            Set<String> set = mPreferences.getStringSet(Utils.FAILED_POST_BACKLOG, new HashSet<String>());
+            Set<String> set = mPreferences.getStringSet(Utils.FAILED_POST_BACKLOG,
+                new HashSet<String>());
             if (set.size() > 20)
               set.clear();
             set.add(json);
@@ -354,7 +356,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
   }
 
   private void updateBanner(int color, CharSequence bannerText, int delay) {
-    ObjectAnimator anim = ObjectAnimator.ofInt(mBanner, "backgroundColor", getActivity().getResources().getColor(R.color.Turquoise));
+    ObjectAnimator anim = ObjectAnimator.ofInt(mBanner, "backgroundColor",
+        getActivity().getResources().getColor(R.color.Turquoise));
     anim.setEvaluator(new ArgbEvaluator());
     anim.setInterpolator(new AccelerateInterpolator());
     anim.setDuration(1500);
@@ -382,7 +385,6 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
     mAdapter = new BitListArrayAdapter(getActivity(), new ArrayList<Task>());
     mAnimateDismissAdapter = new AnimateDismissAdapter(mAdapter, new OnBitDismissCallback());
-    mScaleInAnimationAdapter = new ScaleInAnimationAdapter(mAnimateDismissAdapter, 0.8f, 150, 300);
     mPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
     mAudioManager = (AudioManager) getActivity().getSystemService(getActivity().AUDIO_SERVICE);
   }
@@ -416,7 +418,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
     mBanner.setText(getString(R.string.default_banner_text));
 
-    mTaskFinishNotificaiton = MediaPlayer.create(getActivity(), com.siqi.bits.swipelistview.R.raw.chance_stage);
+    mTaskFinishNotificaiton = MediaPlayer.create(getActivity(), com.siqi.bits.swipelistview.R.raw
+        .chance_stage);
 
     if (mPreferences.getBoolean(Utils.IS_BITS_ADS_SUPPORT_ENABLED, false)) {
       // Look up the AdView as a resource and load a request.
@@ -478,7 +481,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
   public boolean onOptionsItemSelected(MenuItem item) {
 
     if (item.getItemId() == R.id.action_new) {
-      if (mAdapter.getItemCount() < FREEMIUM_TASK_COUNT_LIMIT || mPreferences.getBoolean(Utils.TASKS_COUNT_LIMIT_UNLOCKED, false)) {
+      if (mAdapter.getItemCount() < FREEMIUM_TASK_COUNT_LIMIT || mPreferences.getBoolean(Utils
+          .TASKS_COUNT_LIMIT_UNLOCKED, false)) {
         Intent intent = new Intent(getActivity(), NewBitActivity.class);
         getActivity().overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_top);
         startActivity(intent);
@@ -494,7 +498,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
   @Override
   public void onShake() {
-    if (!mPreferences.getBoolean(Utils.IS_BITSLIST_SHAKE_ON, true) || !mPreferences.getBoolean(Utils.REWARD_UNDO_ON_SHAKE_ENABLED, false))
+    if (!mPreferences.getBoolean(Utils.IS_BITSLIST_SHAKE_ON, true) || !mPreferences.getBoolean
+        (Utils.REWARD_UNDO_ON_SHAKE_ENABLED, false))
       return;
 
     if (mUndoDialogDisplayed)
@@ -582,7 +587,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     Iterator it = mSavedState.entrySet().iterator();
     while (it.hasNext()) {
       Map.Entry<Long, Integer> entry = (Map.Entry<Long, Integer>) it.next();
-      Log.d("ANIMATION", "saving : " + tm.getTask(entry.getKey()).getDescription() + ":" + entry.getValue());
+      Log.d("ANIMATION", "saving : " + tm.getTask(entry.getKey()).getDescription() + ":" + entry
+          .getValue());
     }
   }
 
@@ -616,22 +622,26 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     int newTaskCount = mPreferences.getInt(TaskManager.TOTAL_TASK_ADDED, 0);
 
     if (newTaskCount > 0 && mPreferences.getBoolean(Utils.IS_FIRST_TASK_ADDED, true)) {
-      displayTextualDialog(getString(R.string.first_new_task_title), getString(R.string.first_new_task_summary), getString(R.string.first_new_task_details));
+      displayTextualDialog(getString(R.string.first_new_task_title),
+          getString(R.string.first_new_task_summary), getString(R.string.first_new_task_details));
       mPreferences.edit().putBoolean(Utils.IS_FIRST_TASK_ADDED, false).commit();
     }
 
     if (doneCount > 0 && mPreferences.getBoolean(Utils.IS_FIRST_DONE, true)) {
-      displayTextualDialog(getString(R.string.first_done), getString(R.string.first_done_summary), getString(R.string.first_done_details));
+      displayTextualDialog(getString(R.string.first_done), getString(R.string.first_done_summary)
+          , getString(R.string.first_done_details));
       mPreferences.edit().putBoolean(Utils.IS_FIRST_DONE, false).commit();
     }
 
     if (skipCount > 0 && mPreferences.getBoolean(Utils.IS_FIRST_SKIP, true)) {
-      displayTextualDialog(getString(R.string.first_skip), getString(R.string.first_skip_summary), getString(R.string.first_skip_details));
+      displayTextualDialog(getString(R.string.first_skip), getString(R.string.first_skip_summary)
+          , getString(R.string.first_skip_details));
       mPreferences.edit().putBoolean(Utils.IS_FIRST_SKIP, false).commit();
     }
 
     if (lateCount > 0 && mPreferences.getBoolean(Utils.IS_FIRST_LATE, true)) {
-      displayTextualDialog(getString(R.string.first_late), getString(R.string.first_late_summary), getString(R.string.first_late_details));
+      displayTextualDialog(getString(R.string.first_late), getString(R.string.first_late_summary)
+          , getString(R.string.first_late_details));
       mPreferences.edit().putBoolean(Utils.IS_FIRST_LATE, false).commit();
     }
   }
@@ -640,14 +650,22 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     int doneCount = mPreferences.getInt(TaskManager.TOTAL_DONE_COUNT, 0);
 
     if (doneCount >= 5 && !mPreferences.getBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED, false)) {
-      displayTextualDialog(getString(R.string.reward_history_on_tap), getString(R.string.reward_history_on_tap_summary), getString(R.string.reward_history_on_tap_details));
+      displayTextualDialog(getString(R.string.reward_history_on_tap),
+          getString(R.string.reward_history_on_tap_summary),
+          getString(R.string.reward_history_on_tap_details));
       mPreferences.edit().putBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED, true).commit();
-    } else if (doneCount >= 10 && !mPreferences.getBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED, false)) {
-      displayTextualDialog(getString(R.string.reward_bitslist_help_off), getString(R.string.reward_bitslist_help_off_summary), getString(R.string.reward_bitslist_help_off_details));
+    } else if (doneCount >= 10 && !mPreferences.getBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED,
+        false)) {
+      displayTextualDialog(getString(R.string.reward_bitslist_help_off),
+          getString(R.string.reward_bitslist_help_off_summary),
+          getString(R.string.reward_bitslist_help_off_details));
       mPreferences.edit().putBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED, true).commit();
       mPreferences.edit().putBoolean(Utils.IS_BITSLIST_HELP_ON, false).commit();
-    } else if (doneCount >= 30 && !mPreferences.getBoolean(Utils.REWARD_UNDO_ON_SHAKE_ENABLED, false)) {
-      displayTextualDialog(getString(R.string.reward_undo_on_shake), getString(R.string.reward_undo_on_shake_summary), getString(R.string.reward_undo_on_shake_details));
+    } else if (doneCount >= 30 && !mPreferences.getBoolean(Utils.REWARD_UNDO_ON_SHAKE_ENABLED,
+        false)) {
+      displayTextualDialog(getString(R.string.reward_undo_on_shake),
+          getString(R.string.reward_undo_on_shake_summary),
+          getString(R.string.reward_undo_on_shake_details));
       mPreferences.edit().putBoolean(Utils.REWARD_UNDO_ON_SHAKE_ENABLED, true).commit();
     }
   }
@@ -687,7 +705,6 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     ImageView icon;
     TextView title;
     TextView timeAgo;
-    ProgressBar progressBar;
     Button skipButton, doneButton;
     ImageButton editButton, deleteButton, achieveButton;
     ViewSwitcher viewSwitcher;
@@ -756,7 +773,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
 
     public BitListArrayAdapter(Context ctx, List<Task> t) {
-      super(ctx, R.layout.card_main_layout, R.id.expandable_list_item_card_title, R.id.expandable_list_item_card_content, t);
+      super(ctx, R.layout.card_main_layout, R.id.expandable_list_item_card_title,
+          R.id.expandable_list_item_card_content, t);
       this.setActionViewResId(R.id.front);
       final int cacheSize = (int) (Runtime.getRuntime().maxMemory() / 1024);
       mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
@@ -777,7 +795,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
     @Override
     public int getCount() {
-      return mPreferences.getBoolean(Utils.IS_BITSLIST_HELP_ON, true) || mItems.size() == 0 ? mItems.size() + EXTRA_ITEMS_COUNT : mItems.size();
+      return mPreferences.getBoolean(Utils.IS_BITSLIST_HELP_ON, true) || mItems.size() == 0 ?
+          mItems.size() + EXTRA_ITEMS_COUNT : mItems.size();
     }
 
     @Override
@@ -805,7 +824,6 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
         holder.icon = (ImageView) v.findViewById(R.id.taskIcon);
         holder.title = (TextView) v.findViewById(R.id.taskTitle);
         holder.timeAgo = (TextView) v.findViewById(R.id.taskSubtitle);
-        holder.progressBar = (ProgressBar) v.findViewById(R.id.timeAgoProgressBar);
         holder.doneButton = (Button) v.findViewById(R.id.done_button);
         holder.skipButton = (Button) v.findViewById(R.id.skip_button);
         holder.editButton = (ImageButton) v.findViewById(R.id.edit_button);
@@ -822,9 +840,11 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
           holder.viewSwitcher.setOutAnimation(null);
           holder.viewSwitcher.setDisplayedChild(CARD_INFO);
 
-          Animation inAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left);
+          Animation inAnimation = AnimationUtils.loadAnimation(getActivity(),
+              android.R.anim.slide_in_left);
           inAnimation.setDuration(300);
-          Animation outAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right);
+          Animation outAnimation = AnimationUtils.loadAnimation(getActivity(),
+              android.R.anim.slide_out_right);
           outAnimation.setDuration(300);
 
           holder.viewSwitcher.setInAnimation(inAnimation);
@@ -842,7 +862,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
           if (mScheduleService != null)
             mScheduleService.unScheduleForTask(item);
           else
-            Log.d("ReminderScheduleService", "mScheduleService == null, deleted item still scheduled");
+            Log.d("ReminderScheduleService", "mScheduleService == null, " +
+                "deleted item still scheduled");
           // Implicitly calls datasetChanged() method
 
           mAnimateDismissAdapter.animateDismiss(position);
@@ -859,7 +880,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
           if (mScheduleService != null)
             mScheduleService.unScheduleForTask(item);
           else
-            Log.d("ReminderScheduleService", "mScheduleService == null, deleted item still scheduled");
+            Log.d("ReminderScheduleService", "mScheduleService == null, " +
+                "deleted item still scheduled");
           // Implicitly calls datasetChanged() method
 
           mAnimateDismissAdapter.animateDismiss(position);
@@ -894,23 +916,20 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
       holder.title.setText(t.getDescription());
       holder.timeAgo.setText(tm.getTimesAgoDescriptionForTask(t));
 
+      // TODO(liusiqi) Use color instead of progress bar.
       int progress = tm.getProgressForTask(t);
       if (progress > 100) {
-        // Only triggered when t.getFrequency() - actionCountSinceBeginOfInternval > 0, and progress > 100, which means... well, late!
+        // Only triggered when t.getFrequency() - actionCountSinceBeginOfInternval > 0,
+        // and progress > 100, which means... well, late!
         tm.updateActionRecordForTask(t);
       }
-      holder.progressBar.setProgress(progress);
-      if (progress < 50) {
-        holder.progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_horizontal_success));
-      } else if (progress < 80) {
-        holder.progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_horizontal_warning));
-      } else {
-        holder.progressBar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_horizontal_danger));
-      }
+      holder.icon.setBackgroundColor(progressToColor(progress));
 
-      Animation inAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left);
+      Animation inAnimation = AnimationUtils.loadAnimation(getActivity(),
+          android.R.anim.slide_in_left);
       inAnimation.setDuration(300);
-      Animation outAnimation = AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right);
+      Animation outAnimation = AnimationUtils.loadAnimation(getActivity(),
+          android.R.anim.slide_out_right);
       outAnimation.setDuration(300);
 
       holder.viewSwitcher.setInAnimation(inAnimation);
@@ -1009,6 +1028,30 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
       Collections.sort(mItems, TaskManager.mBitsComparator);
     }
 
+    private int bounded(int number) {
+      return Math.min(Math.max(0, number), 100);
+    }
+
+    private int progressToColor(int progress) {
+      return Color.rgb(22 + Math.round(1.92f * bounded(progress)),
+          160 - Math.round(0.62f * bounded(progress)),
+          133 - Math.round(0.36f * bounded(progress)));
+    }
+
+    private ValueAnimator progressToColorAnim(int progress, final View v) {
+      Integer colorFrom = getResources().getColor(R.color.MidnightBlue);
+      Integer colorTo = progressToColor(progress);
+      ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom,
+          colorTo);
+      colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        @Override
+        public void onAnimationUpdate(ValueAnimator animator) {
+          v.setBackgroundColor((Integer) animator.getAnimatedValue());
+        }
+      });
+
+      return colorAnimation;
+    }
   }
 
   private class TimeLineAdapter extends ArrayAdapter<ActionRecord> {
