@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
     package="com.siqi.bits.app"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="internalOnly">
 
     <application
@@ -10,90 +11,109 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
-
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-
+            android:value="@integer/google_play_services_version"/>
         <meta-data
             android:name="com.google.android.backup.api_key"
-            android:value="AEdPqrEAAAAIYFEHZj-AbsIcjB7gyrI-7O-mlfobX_xptSITng" />
+            android:value="AEdPqrEAAAAIYFEHZj-AbsIcjB7gyrI-7O-mlfobX_xptSITng"/>
 
         <activity
-            android:name="com.siqi.bits.app.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:logo="@drawable/ic_banner"
             android:screenOrientation="fullSensor">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
-            android:name="com.siqi.bits.app.ui.NewBitActivity"
+            android:name=".ui.NewBitActivity"
             android:label="@string/create_new_bit"
             android:logo="@android:color/transparent"
-            android:parentActivityName="com.siqi.bits.app.MainActivity"
+            android:parentActivityName=".MainActivity"
             android:screenOrientation="fullSensor">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.siqi.bits.app.MainActivity" />
+                android:value="com.siqi.bits.app.MainActivity"/>
             >
         </activity>
         <activity
-            android:name="com.siqi.bits.app.ui.SettingsActivity"
+            android:name=".ui.SettingsActivity"
             android:label="@string/action_settings"
             android:logo="@android:color/transparent"
-            android:parentActivityName="com.siqi.bits.app.MainActivity"
+            android:parentActivityName=".MainActivity"
             android:screenOrientation="fullSensor">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.siqi.bits.app.MainActivity" />
+                android:value="com.siqi.bits.app.MainActivity"/>
             >
         </activity>
 
         <receiver android:name="service.ReminderServiceStartReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
         <receiver android:name="service.ActionOnTaskReceiver">
             <intent-filter>
-                <action android:name="com.siqi.bits.intent.action.DONE_ACTION" />
-                <action android:name="com.siqi.bits.intent.action.SKIP_ACTION" />
+                <action android:name="com.siqi.bits.intent.action.DONE_ACTION"/>
+                <action android:name="com.siqi.bits.intent.action.SKIP_ACTION"/>
             </intent-filter>
         </receiver>
         <receiver
             android:name="service.ReminderPublishReceiver"
-            android:process=":remote" />
+            android:process=":remote"/>
 
         <service
             android:name="service.ReminderScheduleService"
-            android:enabled="true" />
+            android:enabled="true"/>
 
         <activity
-            android:name="com.siqi.bits.app.ui.InAppPurchaseActivity"
+            android:name=".ui.InAppPurchaseActivity"
             android:label="@string/title_activity_in_app_purchase"
             android:logo="@android:color/transparent"
-            android:parentActivityName="com.siqi.bits.app.MainActivity">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.siqi.bits.app.MainActivity" />
+                android:value="com.siqi.bits.app.MainActivity"/>
         </activity>
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
+
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_login"
+            android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen"
+            android:windowSoftInputMode="adjustResize|stateVisible">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="com.android.vending.BILLING" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="com.android.vending.BILLING"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
+    <!--
+     To retrieve OAuth 2.0 tokens or invalidate tokens to disconnect a user. This disconnect
+     option is required to comply with the Google+ Sign-In developer policies
+    -->
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+
+    <!-- To retrieve the account name (email) as part of sign-in: -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.READ_PROFILE"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+
 </manifest>
