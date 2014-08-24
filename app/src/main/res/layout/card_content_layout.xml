@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
     android:id="@+id/card_content_global_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
@@ -17,7 +18,7 @@
         android:layout_margin="20dp"
         android:text="@string/done_on_time_rate"
         android:textAppearance="?android:attr/textAppearanceLargeInverse"
-        android:textStyle="bold" />
+        android:textStyle="bold"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:text="For this activity"
-            android:textAppearance="?android:attr/textAppearanceLargeInverse" />
+            android:textAppearance="?android:attr/textAppearanceLargeInverse"/>
 
         <TextView
             android:id="@+id/bit_done_rate"
@@ -43,7 +44,7 @@
             android:textAlignment="gravity"
             android:textAppearance="?android:attr/textAppearanceLargeInverse"
             android:textColor="@color/Emerald"
-            android:textSize="@dimen/large_text" />
+            android:textSize="@dimen/large_text"/>
     </LinearLayout>
 
     <LinearLayout
@@ -58,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="5"
             android:text="For everything else"
-            android:textAppearance="?android:attr/textAppearanceLargeInverse" />
+            android:textAppearance="?android:attr/textAppearanceLargeInverse"/>
 
         <TextView
             android:id="@+id/others_done_rate"
@@ -70,7 +71,7 @@
             android:textAlignment="gravity"
             android:textAppearance="?android:attr/textAppearanceLargeInverse"
             android:textColor="@color/Emerald"
-            android:textSize="@dimen/large_text" />
+            android:textSize="@dimen/large_text"/>
     </LinearLayout>
 
     <TextView
@@ -80,13 +81,14 @@
         android:layout_margin="15dp"
         android:text="Timeline for this activity"
         android:textAppearance="?android:attr/textAppearanceLargeInverse"
-        android:textStyle="bold" />
+        android:textStyle="bold"/>
 
-    <views.ExpandingGridView xmlns:android="http://schemas.android.com/apk/res/android"
+    <views.ExpandingGridView
         android:id="@+id/timeline_gridview"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:columnWidth="15dp"
+        android:columnWidth="20dp"
         android:gravity="center"
         android:horizontalSpacing="1dp"
         android:numColumns="auto_fit"
@@ -96,6 +98,6 @@
         android:scrollingCache="true"
         android:stretchMode="spacingWidthUniform"
         android:verticalSpacing="1dp"
-        tools:listitem="@android:layout/simple_list_item_1" />
+        tools:listitem="@android:layout/simple_list_item_1"/>
 
 </LinearLayout>

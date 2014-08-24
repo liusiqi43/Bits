@@ -1,9 +1,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/MidnightBlue"
-    tools:context="com.siqi.bits.app.NavigationDrawerFragment">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/MidnightBlue"
+                tools:context="com.siqi.bits.app.ui.NavigationDrawerFragment">
 
     <se.emilsjolander.stickylistheaders.StickyListHeadersListView
         android:id="@+id/drawer_listview"
@@ -15,7 +15,7 @@
         android:dividerHeight="1dp"
         android:drawSelectorOnTop="true"
         android:focusable="true"
-        android:focusableInTouchMode="true" />
+        android:focusableInTouchMode="true"/>
 
     <Button
         android:id="@+id/share_bit_button"
@@ -26,5 +26,5 @@
         android:background="@drawable/share_button_selector"
         android:paddingBottom="10dp"
         android:paddingTop="10dp"
-        android:text="@string/share" />
+        android:text="@string/share"/>
 </RelativeLayout>

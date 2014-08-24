@@ -26,8 +26,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.nineoldandroids.view.ViewHelper;
+import com.parse.Parse;
 import com.siqi.bits.app.ui.AchievementsFragment;
 import com.siqi.bits.app.ui.BitsListFragment;
+import com.siqi.bits.app.ui.NavigationDrawerFragment;
 import com.siqi.bits.app.ui.NewBitActivity;
 import com.siqi.bits.app.ui.SettingsActivity;
 import com.siqi.bits.app.ui.StatsFragment;
@@ -99,6 +101,10 @@ public class MainActivity extends ActionBarActivity
     setVolumeControlStream(AudioManager.STREAM_MUSIC);
     PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
+    Parse.initialize(this, "JVJxLjY79oAAFxZdQTv0DaClVGEJ7kecbhO0hv77",
+        "25mg02YYjnip7W9ucJtyxjt3BLz3QtiA17IwtdgS");
+    Parse.enableLocalDatastore(this);
+
     Utils.setupIabHelper(this, new IabSetupActionHandler() {
       @Override
       public void onSetupDone() {
@@ -117,6 +123,7 @@ public class MainActivity extends ActionBarActivity
 
     restoreActionBar();
     Utils.asyncUploadBitsToDashboard(this);
+    Utils.updateLastActiveTime(this);
   }
 
   private Intent createEmailOnlyChooserIntent(Intent source,

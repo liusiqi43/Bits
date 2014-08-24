@@ -6,6 +6,7 @@
     <color name="concrete">#95a5a6</color>
     <color name="silver">#bdc3c7</color>
     <color name="silver_transparent">#80bdc3c7</color>
+    <color name="white_transparent">#80ffffff</color>
     <color name="cloud">#ecf0f1</color>
     <color name="White">#ffffff</color>
     <color name="Alizarin">#e74c3c</color>

@@ -17,8 +17,6 @@ import com.siqi.bits.Task;
 import com.siqi.bits.TaskDao;
 import com.siqi.bits.app.R;
 
-import org.ocpsoft.prettytime.PrettyTime;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -54,7 +52,6 @@ public class TaskManager {
     private DaoSession mDaoSession;
     private TaskDao mTaskDao;
     private ActionRecordDao mActionRecordDao;
-    private PrettyTime mPrettyTime;
     private Context mContext;
     private String[] mDoneSlogans;
     private ReminderScheduleService mScheduleService = null;
@@ -95,7 +92,8 @@ public class TaskManager {
         INSTANCE.mTaskDao = INSTANCE.mDaoSession.getTaskDao();
         INSTANCE.mActionRecordDao = INSTANCE.mDaoSession.getActionRecordDao();
 
-        return INSTANCE;
+
+      return INSTANCE;
     }
 
     private void setUp() {
@@ -115,8 +113,6 @@ public class TaskManager {
         PeriodToDays.put((long) 365 * 24 * 60 * 60 * 1000, 365);
 
         mDoneSlogans = mContext.getResources().getStringArray(R.array.done_slogans);
-
-        mPrettyTime = new PrettyTime();
 
         mBitsComparator = new CachedComparator();
     }
@@ -382,11 +378,11 @@ public class TaskManager {
         if (d != null)
             builder.append(mContext.getResources().getString(R.string.done))
                     .append(' ')
-                    .append(mPrettyTime.format(d));
+                .append(Utils.prettyPrint(d));
         else {
             builder.append(mContext.getResources().getString(R.string.added))
                     .append(' ')
-                    .append(mPrettyTime.format(t.getCreatedOn()));
+                .append(Utils.prettyPrint(t.getCreatedOn()));
         }
         return builder.toString();
     }
@@ -395,8 +391,8 @@ public class TaskManager {
         return new StringBuilder()
                 .append(mContext.getResources().getString(R.string.achieved))
                 .append(' ')
-                .append(mPrettyTime.format(t.getArchieved_on()))
-                .toString();
+            .append(Utils.prettyPrint(t.getArchieved_on()))
+            .toString();
     }
 
     public void removeActionRecordById(long id) {

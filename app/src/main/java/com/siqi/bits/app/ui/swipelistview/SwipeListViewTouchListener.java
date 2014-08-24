@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-package com.siqi.bits.swipelistview;
+package com.siqi.bits.app.ui.swipelistview;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -42,10 +42,13 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
+import com.nhaarman.listviewanimations.itemmanipulation.AnimateDismissAdapter;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorListenerAdapter;
 import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.view.ViewHelper;
+import com.siqi.bits.app.R;
+import com.siqi.bits.app.ui.BitsListFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,7 +61,8 @@ import static com.nineoldandroids.view.ViewPropertyAnimator.animate;
 /**
  * Touch listener impl for the SwipeListView
  */
-public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener {
+public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureListener
+    implements View.OnTouchListener {
 
   private static final int DISPLACE_CHOICE = 75;
   private static final int STICKY_MARGIN = 10;
@@ -128,13 +132,15 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
    * @param swipeFrontView front view Identifier
    * @param swipeBackView  back view Identifier
    */
-  public SwipeListViewTouchListener(Context ctx, SwipeListView swipeListView, int swipeFrontView, int swipeBackView) {
+  public SwipeListViewTouchListener(Context ctx, SwipeListView swipeListView, int swipeFrontView,
+                                    int swipeBackView) {
     this.swipeFrontView = swipeFrontView;
     this.swipeBackView = swipeBackView;
     ViewConfiguration vc = ViewConfiguration.get(swipeListView.getContext());
     minFlingVelocity = vc.getScaledMinimumFlingVelocity();
     maxFlingVelocity = vc.getScaledMaximumFlingVelocity();
-    configShortAnimationTime = swipeListView.getContext().getResources().getInteger(android.R.integer.config_shortAnimTime);
+    configShortAnimationTime = swipeListView.getContext().getResources().getInteger(android.R
+        .integer.config_shortAnimTime);
     animationTime = configShortAnimationTime;
     this.swipeListView = swipeListView;
     hapticFeedbackVibrator = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
@@ -339,7 +345,8 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
    * @param position Position of list
    */
   protected void openAnimate(int position) {
-    openAnimate(swipeListView.getChildAt(position - swipeListView.getFirstVisiblePosition()).findViewById(swipeFrontView), position);
+    openAnimate(swipeListView.getChildAt(position - swipeListView.getFirstVisiblePosition())
+        .findViewById(swipeFrontView), position);
   }
 
   /**
@@ -348,7 +355,8 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
    * @param position Position of list
    */
   protected void closeAnimate(int position) {
-    closeAnimate(swipeListView.getChildAt(position - swipeListView.getFirstVisiblePosition()).findViewById(swipeFrontView), position);
+    closeAnimate(swipeListView.getChildAt(position - swipeListView.getFirstVisiblePosition())
+        .findViewById(swipeFrontView), position);
   }
 
   /**
@@ -385,7 +393,8 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
     int end = swipeListView.getLastVisiblePosition();
     for (int i = 0; i < checked.size(); i++) {
       if (checked.get(i) && i >= start && i <= end) {
-        reloadChoiceStateInView(swipeListView.getChildAt(i - start).findViewById(swipeFrontView), i);
+        reloadChoiceStateInView(swipeListView.getChildAt(i - start).findViewById(swipeFrontView),
+            i);
       }
       checked.set(i, false);
     }
@@ -497,8 +506,10 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
    * @param swapRight If swap is true, this parameter tells if move is to the right or left
    * @param position  Position of list
    */
-  private void generateAnimate(final View view, final boolean swap, final boolean swapRight, final int position) {
-    Log.d("SwipeListView", "swap: " + swap + " - swapRight: " + swapRight + " - position: " + position);
+  private void generateAnimate(final View view, final boolean swap, final boolean swapRight,
+                               final int position) {
+    Log.d("SwipeListView", "swap: " + swap + " - swapRight: " + swapRight + " - position: " +
+        position);
     if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_REVEAL) {
       generateRevealAnimate(view, swap, swapRight, position);
     }
@@ -538,11 +549,13 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
    * @param swapRight If swap is true, this parameter tells if move is to the right or left
    * @param position  Position of list
    */
-  private void generateDismissAnimate(final View view, final boolean swap, final boolean swapRight, final int position) {
+  private void generateDismissAnimate(final View view, final boolean swap,
+                                      final boolean swapRight, final int position) {
     int moveTo = 0;
     if (opened.get(position)) {
       if (!swap) {
-        moveTo = openedRight.get(position) ? (int) (viewWidth - rightOffset) : (int) (-viewWidth + leftOffset);
+        moveTo = openedRight.get(position) ? (int) (viewWidth - rightOffset) : (int) (-viewWidth
+            + leftOffset);
       }
     } else {
       if (swap) {
@@ -581,11 +594,13 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
    * @param swapRight If swap is true, this parameter tells if movement is toward right or left
    * @param position  list position
    */
-  private void generateRevealAnimate(final View view, final boolean swap, final boolean swapRight, final int position) {
+  private void generateRevealAnimate(final View view, final boolean swap,
+                                     final boolean swapRight, final int position) {
     int moveTo = 0;
     if (opened.get(position)) {
       if (!swap) {
-        moveTo = openedRight.get(position) ? (int) (viewWidth - rightOffset) : (int) (-viewWidth + leftOffset);
+        moveTo = openedRight.get(position) ? (int) (viewWidth - rightOffset) : (int) (-viewWidth
+            + leftOffset);
       }
     } else {
       if (swap) {
@@ -656,8 +671,10 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
           listViewMoving = true;
           setEnabled(false);
         }
-        if (scrollState != AbsListView.OnScrollListener.SCROLL_STATE_FLING && scrollState != SCROLL_STATE_TOUCH_SCROLL) {
-          Log.d("makeScrollListener", "scrollState != AbsListView.OnScrollListener.SCROLL_STATE_FLING && scrollState != SCROLL_STATE_TOUCH_SCROLL");
+        if (scrollState != AbsListView.OnScrollListener.SCROLL_STATE_FLING && scrollState !=
+            SCROLL_STATE_TOUCH_SCROLL) {
+          Log.d("makeScrollListener", "scrollState != AbsListView.OnScrollListener" +
+              ".SCROLL_STATE_FLING && scrollState != SCROLL_STATE_TOUCH_SCROLL");
           listViewMoving = false;
           downPosition = ListView.INVALID_POSITION;
           swipeListView.resetScrolling();
@@ -666,7 +683,8 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
       }
 
       @Override
-      public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+      public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+                           int totalItemCount) {
         if (isFirstItem) {
           boolean onSecondItemList = firstVisibleItem == 1;
           if (onSecondItemList) {
@@ -725,9 +743,11 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
       viewWidth = swipeListView.getWidth();
     }
 
+    Log.d("beta: onTouch", "get " + MotionEvent.actionToString(motionEvent.getAction()));
     switch (MotionEventCompat.getActionMasked(motionEvent)) {
       case MotionEvent.ACTION_DOWN: {
         if (paused && downPosition != ListView.INVALID_POSITION) {
+          Log.d("beta: onTouch", "return false");
           return false;
         }
         swipeCurrentAction = SwipeListView.SWIPE_ACTION_NONE;
@@ -738,15 +758,24 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
         int x = (int) motionEvent.getRawX() - listViewCoords[0];
         int y = (int) motionEvent.getRawY() - listViewCoords[1];
         View child;
+        AnimateDismissAdapter dismissAdapter = (AnimateDismissAdapter) swipeListView.getAdapter();
+        BitsListFragment.BitListArrayAdapter adapter = (BitsListFragment.BitListArrayAdapter)
+            dismissAdapter.getDecoratedBaseAdapter();
+
         for (int i = 0; i < childCount; i++) {
           child = swipeListView.getChildAt(i);
           child.getHitRect(mCurrentHitRect);
 
           int childPosition = swipeListView.getPositionForView(child);
-          if (swipeListView.getAdapter().getItemViewType(childPosition) != 0)
+          if (swipeListView.getAdapter().getItemViewType(childPosition) != BitsListFragment
+              .BitListArrayAdapter.ITEM_TYPE_TASK) {
+            Log.d("beta: onTouch", "swipeListView.getAdapter().getItemViewType(childPosition) != " +
+                "0, return true");
             return true;
+          }
 
-          // dont allow swiping if this is on the header or footer or IGNORE_ITEM_VIEW_TYPE or enabled is false on the adapter
+          // don't allow swiping if this is on the header or footer or IGNORE_ITEM_VIEW_TYPE or
+          // enabled is false on the adapter
           boolean allowSwipe = swipeListView.getAdapter().isEnabled(childPosition)
               && swipeListView.getAdapter().getItemViewType(childPosition) >= 0;
 
@@ -770,6 +799,7 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
           }
         }
         view.onTouchEvent(motionEvent);
+        Log.d("beta: onTouch", "End of ACTION_DOWN return true");
         return true;
       }
 
@@ -793,7 +823,8 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
         float velocityY = Math.abs(mVelocityTracker.getYVelocity());
         boolean swap = false;
         boolean swapRight = false;
-        if (minFlingVelocity <= velocityX && velocityX <= maxFlingVelocity && velocityY * 2 < velocityX) {
+        if (minFlingVelocity <= velocityX && velocityX <= maxFlingVelocity && velocityY * 2 <
+            velocityX) {
           swapRight = mVelocityTracker.getXVelocity() > 0;
           Log.d("SwipeListView", "swapRight: " + swapRight + " - swipingRight: " + swipingRight);
           if (swapRight != swipingRight && swipeActionLeft != swipeActionRight) {
@@ -842,13 +873,14 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
 
         int[] listViewCoords = new int[2];
         swipeListView.getLocationOnScreen(listViewCoords);
+        int x = (int) motionEvent.getRawX() - listViewCoords[0];
         int y = (int) motionEvent.getRawY() - listViewCoords[1];
 
         float deltaX = motionEvent.getRawX() - downX;
 
         Log.d("Velocity", "x:" + velocityX + " y:" + velocityY);
         if (swipeCurrentAction == SwipeListView.SWIPE_ACTION_NONE
-            && y < mCurrentHitRect.bottom && y > mCurrentHitRect.top
+            && mCurrentHitRect.contains(x, y)
             && velocityX > 3 * Math.max(velocityY, 10)) {
           swiping = true;
           swipingRight = (deltaX > 0);
@@ -874,11 +906,14 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
         }
         if (swiping && downPosition != ListView.INVALID_POSITION) {
           move(deltaX);
+          Log.d("beta: onTouch", "swiping && downPosition != ListView.INVALID_POSITION, " +
+              "return true");
           return true;
         }
         break;
       }
     }
+    Log.d("beta: onTouch", "return false");
     return false;
   }
 
@@ -948,7 +983,8 @@ public class SwipeListViewTouchListener extends GestureDetector.SimpleOnGestureL
    * @param dismissView     View
    * @param dismissPosition Position of list
    */
-  protected void performDismiss(final View dismissView, final int dismissPosition, boolean doPendingDismiss) {
+  protected void performDismiss(final View dismissView, final int dismissPosition,
+                                boolean doPendingDismiss) {
     final ViewGroup.LayoutParams lp = dismissView.getLayoutParams();
     final int originalHeight = dismissView.getHeight();
 

@@ -1,7 +1,8 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout
     android:id="@+id/bitlist_layout"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/base_fragment_bg"
@@ -16,7 +17,7 @@
         android:layout_alignParentTop="true"
         android:background="@color/Turquoise"
         android:gravity="center"
-        android:padding="7dp" />
+        android:padding="7dp"/>
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
@@ -28,10 +29,11 @@
         android:layout_centerHorizontal="true"
         android:visibility="gone"
         ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-2295213482033436/4668357702" />
+        ads:adUnitId="ca-app-pub-2295213482033436/4668357702"/>
 
-    <com.siqi.bits.swipelistview.SwipeListView xmlns:swipe="http://schemas.android.com/apk/res-auto"
+    <com.siqi.bits.app.ui.swipelistview.SwipeListView
         android:id="@+id/bitslist"
+        xmlns:swipe="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/adView"
@@ -48,6 +50,6 @@
         swipe:swipeMode="both"
         swipe:swipeOffsetLeft="30dp"
         swipe:swipeOffsetRight="30dp"
-        swipe:swipeOpenOnLongPress="false" />
+        swipe:swipeOpenOnLongPress="false"/>
 
 </RelativeLayout>

@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -25,11 +26,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.util.LruCache;
 import android.text.Html;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -47,6 +50,7 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
@@ -59,15 +63,15 @@ import com.nhaarman.listviewanimations.itemmanipulation.ExpandableListItemAdapte
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.nineoldandroids.animation.ArgbEvaluator;
 import com.nineoldandroids.animation.ObjectAnimator;
-import com.nineoldandroids.animation.ValueAnimator;
 import com.siqi.bits.ActionRecord;
 import com.siqi.bits.Task;
 import com.siqi.bits.app.MainActivity;
 import com.siqi.bits.app.R;
-import com.siqi.bits.swipelistview.BaseSwipeListViewListener;
-import com.siqi.bits.swipelistview.SwipeListView;
+import com.siqi.bits.app.ui.swipelistview.BaseSwipeListViewListener;
+import com.siqi.bits.app.ui.swipelistview.SwipeListView;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -124,6 +128,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
       tm.setScheduleService(null);
     }
   };
+  TextView popupTextView;
   boolean mIsBound = false;
   Runnable mListReloader;
   Handler mListRefresherHandle = new Handler();
@@ -418,8 +423,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
     mBanner.setText(getString(R.string.default_banner_text));
 
-    mTaskFinishNotificaiton = MediaPlayer.create(getActivity(), com.siqi.bits.swipelistview.R.raw
-        .chance_stage);
+    mTaskFinishNotificaiton = MediaPlayer.create(getActivity(), R.raw.chance_stage);
 
     if (mPreferences.getBoolean(Utils.IS_BITS_ADS_SUPPORT_ENABLED, false)) {
       // Look up the AdView as a resource and load a request.
@@ -593,7 +597,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
   }
 
   private void displayTextualDialog(String title, String summary, String details) {
-    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+    final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
     View v = getActivity().getLayoutInflater().inflate(R.layout.help_textual_dialog, null, false);
 
@@ -612,7 +616,12 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
       }
     });
 
-    builder.show();
+    getActivity().runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        builder.show();
+      }
+    });
   }
 
   private void updateInstructions() {
@@ -649,7 +658,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
   private void updateRewards() {
     int doneCount = mPreferences.getInt(TaskManager.TOTAL_DONE_COUNT, 0);
 
-    if (doneCount >= 5 && !mPreferences.getBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED, false)) {
+    if (doneCount >= 3 && !mPreferences.getBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED, false)) {
       displayTextualDialog(getString(R.string.reward_history_on_tap),
           getString(R.string.reward_history_on_tap_summary),
           getString(R.string.reward_history_on_tap_details));
@@ -670,9 +679,14 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     }
   }
 
-  private void updateForFeedbacks() {
-    updateInstructions();
-    updateRewards();
+  private void asyncUpdateForFeedbacks() {
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        updateInstructions();
+        updateRewards();
+      }
+    }).start();
   }
 
 
@@ -730,7 +744,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
       mAdapter.clear();
       mAdapter.addAll(l);
       animateNewState();
-      updateForFeedbacks();
+      asyncUpdateForFeedbacks();
     }
   }
 
@@ -748,7 +762,7 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
       mAdapter.notifyDataSetChanged();
 
       animateNewState();
-      updateForFeedbacks();
+      asyncUpdateForFeedbacks();
       Utils.requestBackup(getActivity());
     }
   }
@@ -763,11 +777,11 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
     }
   }
 
-  private class BitListArrayAdapter extends ExpandableListItemAdapter<Task> {
+  public class BitListArrayAdapter extends ExpandableListItemAdapter<Task> {
 
+    public static final int ITEM_TYPE_HELP = 1;
+    public static final int ITEM_TYPE_TASK = 0;
     private static final int EXTRA_ITEMS_COUNT = 1;
-    private static final int ITEM_TYPE_HELP = 1;
-    private static final int ITEM_TYPE_TASK = 0;
     private final LruCache<String, Bitmap> mMemoryCache;
     List<Task> mItems;
 
@@ -970,6 +984,13 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
       Task t = mAdapter.getItem(position);
 
       View v = convertView;
+
+      if (!mPreferences.getBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED, false)) {
+        if (v != null)
+          v.setVisibility(View.GONE);
+        return v;
+      }
+
       BitContentHolder holder;
 
       if (v == null) {
@@ -1014,10 +1035,113 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
 
         TimeLineAdapter adapter = new TimeLineAdapter(getActivity(), t.getActionsRecords());
         holder.timeLine.setAdapter(adapter);
-      }
 
-      if (!mPreferences.getBoolean(Utils.REWARD_HISTORY_ON_TAP_ENABLED, false)) {
-        v.setVisibility(View.GONE);
+        holder.timeLine.setOnTouchListener(new View.OnTouchListener() {
+          int highlightedItem;
+
+          @Override
+          public boolean onTouch(View v, MotionEvent event) {
+            GridView gridView = (GridView) v;
+            gridView.requestDisallowInterceptTouchEvent(true);
+
+            switch (event.getAction()) {
+              case MotionEvent.ACTION_DOWN:
+              case MotionEvent.ACTION_MOVE:
+                int[] gridViewCoords = new int[2];
+                gridView.getLocationOnScreen(gridViewCoords);
+
+                Rect gridViewHitRect = new Rect();
+                gridView.getHitRect(gridViewHitRect);
+                if (!gridViewHitRect.contains(v.getLeft() + (int) event.getX(),
+                    v.getTop() + (int) event.getY())) {
+                  gridView.getChildAt(highlightedItem).findViewById(R.id.highlight).setVisibility
+                      (View.GONE);
+                  if (popupTextView != null)
+                    popupTextView.setVisibility(View.GONE);
+                  return false;
+                }
+
+                boolean hit = false;
+                for (int i = 0; i < gridView.getChildCount(); ++i) {
+                  Rect hitRect = new Rect();
+                  View child = gridView.getChildAt(i);
+                  child.getHitRect(hitRect);
+                  if (hitRect.contains((int) event.getRawX() - gridViewCoords[0],
+                      (int) event.getRawY() - gridViewCoords[1])) {
+                    hit = true;
+                    if (popupTextView == null) {
+                      popupTextView = new TextView(getActivity());
+                      popupTextView.setGravity(Gravity.CENTER);
+                      popupTextView.setPadding(Utils.dpToPx(5), Utils.dpToPx(5), Utils.dpToPx(5),
+                          Utils.dpToPx(5));
+                      popupTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+                      popupTextView.setTypeface(null, Typeface.BOLD);
+                      popupTextView.setTextColor(getResources().getColor(R.color.white));
+                      popupTextView.setVisibility(View.INVISIBLE);
+                      RelativeLayout layout = (RelativeLayout) getActivity().getWindow()
+                          .findViewById(R.id.bitlist_layout);
+                      layout.addView(popupTextView);
+                    }
+
+                    child.findViewById(R.id.highlight).setVisibility(View.VISIBLE);
+                    highlightedItem = i;
+
+                    ActionRecord record = (ActionRecord) child.getTag();
+
+                    String popUpText;
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MMM-dd",
+                        getResources().getConfiguration().locale);
+                    String dateText = format.format(record.getRecordOn());
+                    switch (record.getAction()) {
+                      case TaskManager.ACTION_TYPE_DONE:
+                        popupTextView.setBackgroundColor(getResources().getColor(R.color
+                            .doneColor));
+                        popUpText = "Done\n";
+                        break;
+                      case TaskManager.ACTION_TYPE_SKIP:
+                        popupTextView.setBackgroundColor(getResources().getColor(R.color
+                            .skipColor));
+                        popUpText = "Skipped\n";
+                        break;
+                      case TaskManager.ACTION_TYPE_LATE:
+                        popupTextView.setBackgroundColor(getResources().getColor(R.color
+                            .lateColor));
+                        popUpText = "Late\n";
+                        break;
+                      default:
+                        popUpText = "";
+                    }
+                    popUpText += dateText;
+                    int[] child_loc = new int[2];
+                    child.getLocationOnScreen(child_loc);
+                    popupTextView.setText(popUpText);
+                    popupTextView.setX(child_loc[0] + child.getWidth() / 2 - popupTextView
+                        .getWidth() / 2);
+                    popupTextView.setY(child_loc[1] - 2 * popupTextView.getHeight() - Utils
+                        .dpToPx(40));
+
+                    popupTextView.setVisibility(View.VISIBLE);
+                  } else {
+                    child.findViewById(R.id.highlight).setVisibility(View.GONE);
+                  }
+                }
+
+                if (!hit) {
+                  gridView.getChildAt(highlightedItem).findViewById(R.id.highlight).setVisibility
+                      (View.GONE);
+                  if (popupTextView != null)
+                    popupTextView.setVisibility(View.GONE);
+                }
+                return hit;
+              default:
+                gridView.getChildAt(highlightedItem).findViewById(R.id.highlight).setVisibility
+                    (View.GONE);
+                if (popupTextView != null)
+                  popupTextView.setVisibility(View.GONE);
+                return false;
+            }
+          }
+        });
       }
 
       return v;
@@ -1028,34 +1152,42 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
       Collections.sort(mItems, TaskManager.mBitsComparator);
     }
 
-    private int bounded(int number) {
-      return Math.min(Math.max(0, number), 100);
+    @Override
+    public void toggle(int position) {
+      super.toggle(position);
+    }
+
+    private double bounded(double number) {
+      return Math.min(Math.max(0., number), 100.);
     }
 
     private int progressToColor(int progress) {
-      return Color.rgb(22 + Math.round(1.92f * bounded(progress)),
-          160 - Math.round(0.62f * bounded(progress)),
-          133 - Math.round(0.36f * bounded(progress)));
+      progress = (int) bounded(progress);
+      Log.d("rgb for progress:" + progress, getRed(progress) + "," + getGreen(progress) + "," +
+          "" + getBlue(progress));
+      return Color.rgb(getRed(progress),
+          getGreen(progress),
+          getBlue(progress));
     }
 
-    private ValueAnimator progressToColorAnim(int progress, final View v) {
-      Integer colorFrom = getResources().getColor(R.color.MidnightBlue);
-      Integer colorTo = progressToColor(progress);
-      ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom,
-          colorTo);
-      colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-        @Override
-        public void onAnimationUpdate(ValueAnimator animator) {
-          v.setBackgroundColor((Integer) animator.getAnimatedValue());
-        }
-      });
+    private int getRed(int progress) {
+      return Math.min(22 + (int) Math.round(1.87f * Math.pow(progress / 10f, 2.7)), 255);
+    }
 
-      return colorAnimation;
+    private int getGreen(int progress) {
+      return Math.min(62 + (int) Math.round(1.7f * 10 * Math.sqrt(progress) - 144f * Math.pow
+          (progress / 100f, 2)), 255);
+    }
+
+    private int getBlue(int progress) {
+      return Math.min(80 + (int) Math.round(1.44f * 10 * Math.sqrt(progress) - 164f * Math.pow
+          (progress / 100f, 2)), 255);
     }
   }
 
   private class TimeLineAdapter extends ArrayAdapter<ActionRecord> {
     List<ActionRecord> mItems;
+
 
     public TimeLineAdapter(Context ctx, List<ActionRecord> t) {
       super(ctx, R.layout.timeline_girdview_item, t);
@@ -1088,7 +1220,8 @@ public class BitsListFragment extends Fragment implements ShakeEventListener.OnS
           break;
       }
 
-      v.setTag(mItems.get(position));
+      v.setTag(mItems.get(mItems.size() - position - 1));
+
       return v;
     }
   }

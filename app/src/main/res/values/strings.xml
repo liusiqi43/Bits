@@ -116,7 +116,7 @@
     <string name="first_late_summary">Task will be marked as late if you haven\'t done it on time. Try to get things done when the progress bar is red.</string>
     <string name="first_late_details">Just a friendly reminder though, chin up! :D</string>
     <string name="reward_history_on_tap">Timeline Unlocked!</string>
-    <string name="reward_history_on_tap_summary">That\'s 5 tasks done! You deserve a reward!</string>
+    <string name="reward_history_on_tap_summary">That\'s 3 tasks done! You deserve a reward!</string>
     <string name="reward_history_on_tap_details">You can now tap on an item to see its history!</string>
     <string name="reward_bitslist_help_off">That\'s 10 done!</string>
     <string name="reward_bitslist_help_off_summary">You\'re clearly getting the hang of things!</string>
@@ -161,4 +161,8 @@
     <string name="opt_in_ads">Opt-in Ads</string>
     <string name="unlimited_tasks_with_ads_support">Click here to switch to an upgrade option from Google Play.</string>
     <string name="bits_done_around_the_word">%1$d+ dones around the world!</string>
+    <string name="do_something_for_yourself_today">Ready to do something for yourself today? Keep up all the good habits!</string>
+    <string name="action_sign_up_later">Sign up later</string>
+    <string name="action_sign_in_fb">Sign in with Facebook</string>
+    <string name="action_sign_in_twitter">Sign in with Twitter</string>
 </resources>

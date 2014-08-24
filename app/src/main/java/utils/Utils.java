@@ -22,7 +22,9 @@ import com.siqi.bits.app.ui.InAppPurchaseActivity;
 import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.ocpsoft.prettytime.PrettyTime;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -53,6 +55,7 @@ public class Utils {
   public static final String IS_BITS_ADS_SUPPORT_ENABLED = "BITS_ADS_SUPPORT_ENABLED";
   public static final String LAST_GLOBAL_COUNT = "LAST_GLOBAL_COUNT";
   public static final String FAILED_POST_BACKLOG = "FAILED_POST_BACKLOG";
+  public static final String LAST_ACTIVE_TIME = "LAST_ACTIVE_TIME";
 
   public static boolean GOD_MODE_ON = false;
   public static DisplayMetrics mDisplayMetrics;
@@ -62,6 +65,7 @@ public class Utils {
   private static Clock mClock = new SystemClock();
   private static Random mRandomiser = new Random();
   private static BitsRestClient mBitsRestClient = new BitsRestClient();
+  private static PrettyTime mPrettyTime = new PrettyTime();
 
   public static Bitmap invertImage(Bitmap src) {
     // create new bitmap with the same attributes(width,height)
@@ -107,7 +111,13 @@ public class Utils {
       return;
     }
 
-    String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiNVRydS9aTj3bUDSTVt3bPrWt/AAgHF3Gl6rWTVxE+EjyUC09Wnoeh4V8uxjmQGx2DGUHXQzAa9pJli8zwEiTrr4CIjUZrjOPeLrB+K+V7sWTRogpdXpcetSsblPuIKp0mnPkgc6TtucgeilVC5uLMLjWR+XvT7g1XVXxjuKCoU5pL5rLVigGIIOMp937Hkg1L165zrmxbhhRUjizVSfhF/TrW/al5Tp5WK21+Gufx5/p37U0EplepuNx5u0MgX4x5xpJa9bA8NqXAZafetexmc1Jxz+BNf8q+Qj/MCWHuOSvGj9/7EQMUZ7bZN41vHitHUWdeGWy2LH3CLLP516MQIDAQAB";
+    String base64EncodedPublicKey =
+        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiNVRydS9aTj3bUDSTVt3bPrWt/AAgHF3Gl6rWTVxE" +
+            "+EjyUC09Wnoeh4V8uxjmQGx2DGUHXQzAa9pJli8zwEiTrr4CIjUZrjOPeLrB+K" +
+            "+V7sWTRogpdXpcetSsblPuIKp0mnPkgc6TtucgeilVC5uLMLjWR" +
+            "+XvT7g1XVXxjuKCoU5pL5rLVigGIIOMp937Hkg1L165zrmxbhhRUjizVSfhF/TrW/al5Tp5WK21+Gufx5" +
+            "/p37U0EplepuNx5u0MgX4x5xpJa9bA8NqXAZafetexmc1Jxz+BNf8q+Qj/MCWHuOSvGj9" +
+            "/7EQMUZ7bZN41vHitHUWdeGWy2LH3CLLP516MQIDAQAB";
     mIabHelper = new IabHelper(ctx, base64EncodedPublicKey);
     mIabHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
       public void onIabSetupFinished(IabResult result) {
@@ -166,7 +176,8 @@ public class Utils {
   }
 
   public static int dpToPx(int dp) {
-    int px = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, mDisplayMetrics));
+    int px = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+        mDisplayMetrics));
     return px;
   }
 
@@ -222,7 +233,8 @@ public class Utils {
       }
 
       @Override
-      public void onFailure(int statusCode, org.apache.http.Header[] headers, java.lang.Throwable throwable, org.json.JSONObject errorResponse) {
+      public void onFailure(int statusCode, org.apache.http.Header[] headers,
+                            java.lang.Throwable throwable, org.json.JSONObject errorResponse) {
         Log.d(getClass().getSimpleName(), "Post failed with statusCode: " + statusCode);
         Log.d(getClass().getSimpleName(), json);
         callback.onPostFailed(json);
@@ -241,7 +253,8 @@ public class Utils {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
 
-        final Set<String> backlog = preferences.getStringSet(Utils.FAILED_POST_BACKLOG, new HashSet<String>());
+        final Set<String> backlog = preferences.getStringSet(Utils.FAILED_POST_BACKLOG,
+            new HashSet<String>());
 
         activity.runOnUiThread(new Runnable() {
           @Override
@@ -273,5 +286,15 @@ public class Utils {
       e.printStackTrace();
     }
     return false;
+  }
+
+  public static String prettyPrint(Date date) {
+    return mPrettyTime.format(date);
+  }
+
+  public static void updateLastActiveTime(Context ctx) {
+    PreferenceManager.getDefaultSharedPreferences(ctx)
+        .edit()
+        .putLong(LAST_ACTIVE_TIME, currentTimeMillis()).commit();
   }
 }
